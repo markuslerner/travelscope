@@ -1,0 +1,38 @@
+{
+  "parser"  : "babel-eslint",
+  "extends" : [
+    "standard"
+  ],
+  "plugins": [
+    "babel"
+  ],
+  "env"     : {
+    "browser" : true
+  },
+  "globals" : {
+    "If": true,
+    "Else": true
+  },
+  "rules": {
+    "semi" : [2, "always"],
+    "generator-star-spacing": 0,
+    "babel/generator-star-spacing": 1,
+    "strict": [2, "never"],
+    "indent": [2, 2],
+    "quotes": [2, "single"],
+    "linebreak-style": [2, "unix"],
+    "no-reserved-keys": 0,
+    "no-wrap-func": 0,
+    "no-console": 0,
+    "spaced-line-comment": 0,
+    "no-multiple-empty-lines": [2, {"max": 3}],
+    "space-before-function-paren": [2, "never"],
+    "padded-blocks": [0, "always"],
+    "space-in-parens": [0, "always"],
+    "keyword-spacing": ["error", { "overrides": {
+      "if": { "after": false },
+      "for": { "after": false },
+      "while": { "after": false }
+    } }]
+  }
+}

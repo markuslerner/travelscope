@@ -1,0 +1,75 @@
+{
+  "name": "travelscope",
+  "version": "1.0.0",
+  "description": "Interactive worldmap of visa-free travel using Three.js and D3.js",
+  "author": "Markus Lerner <m@markuslerner.com>",
+  "engines": {
+    "node": ">=4.0.0",
+    "npm": "^3.0.0"
+  },
+  "scripts": {
+    "start": "gulp",
+    "dev": "gulp",
+    "deploy": "gulp deploy",
+    "clean": "rimraf dist rimraf public"
+  },
+  "main": "src/client.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/markuslerner/travelscope.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "babel",
+    "3d",
+    "map",
+    "datavisualisation"
+  ],
+  "devDependencies": {
+    "babel-eslint": "^6.1.2",
+    "babelify": "^7.3.0",
+    "browser-sync": "^2.14.0",
+    "browserify": "^13.1.0",
+    "chalk": "^1.1.3",
+    "envify": "^3.4.0",
+    "eslint": "^3.0.1",
+    "eslint-config-standard": "^5.1.0",
+    "eslint-plugin-babel": "^3.2.0",
+    "eslint-plugin-promise": "^2.0.0",
+    "eslint-plugin-standard": "^2.0.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-eslint": "^3.0.1",
+    "gulp-if": "^2.0.1",
+    "gulp-minify-css": "^1.2.1",
+    "gulp-plumber": "^1.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.1.0",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-streamify": "^1.0.2",
+    "gulp-uglify": "^2.0.0",
+    "gulp-util": "^3.0.7",
+    "loose-envify": "^1.2.0",
+    "utils-merge": "^1.0.0",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.7.0"
+  },
+  "dependencies": {
+    "babel-core": "^6.13.2",
+    "babel-plugin-transform-runtime": "^6.12.0",
+    "babel-polyfill": "^6.13.0",
+    "babel-preset-es2015": "^6.13.2",
+    "babel-preset-stage-0": "^6.5.0",
+    "babel-runtime": "^6.11.6",
+    "bootstrap-sass": "^3.3.7",
+    "connect-history-api-fallback": "^1.1.0",
+    "d3": "^3.4.11",
+    "jquery": "^3.1.0",
+    "jquery-mousewheel": "^3.1.13",
+    "jquery-ui": "^1.12.0",
+    "rimraf": "^2.5.4",
+    "three": "^0.80.0",
+    "tween.js": "^16.3.5"
+  }
+}
