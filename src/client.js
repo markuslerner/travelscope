@@ -4,5 +4,6 @@ import 'babel-polyfill';
 
 import './client/bootstrap';
 
-import './client/WorldMap';
+import './client/worldmap';
+
 

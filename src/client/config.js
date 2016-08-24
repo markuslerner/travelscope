@@ -7,7 +7,9 @@ const cdnURL = 'http://cdn.markuslerner.com/travelscope/'; // 'http://cdn.markus
 
 
 const config = {
-  supportsWebGL: Detector.webgl,
+  usesWebGL: Detector.webgl,
+  isTouchDevice: ('ontouchstart' in document.documentElement),
+  isMac: navigator.platform.toUpperCase().indexOf('MAC') >= 0,
 
   traceVisible: false,
   statsVisible: false,
@@ -28,9 +30,9 @@ const config = {
   saveMapData: false,
   mergedCountriesFilename: '/data/all_countries.json',
 
-  introRotateDuration: 4000, // 4000, 100
-  introWarpDelay: 2000, // 2000, 500
-  introWarpDuration: 2500, // 2500, 100
+  introRotateDuration: 400, // 4000
+  introWarpDelay: 200, // 2000
+  introWarpDuration: 250, // 2500
 
   lineAnimateDuration: 800,
   lineAnimateSpeed: 10.0,
