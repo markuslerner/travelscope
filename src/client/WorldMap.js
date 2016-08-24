@@ -25,40 +25,21 @@ import './jquery/jquery.tipsy';
 import './jquery-ui/jquery-ui-1.12.0.custom/jquery-ui';
 import './jquery-ui/jquery-ui.custom.combobox';
 
-import Defaults from './defaults';
-import merge from 'utils-merge';
+import { formatNumber, toSentenceStart } from './util';
+
+import Config from './config';
 
 
-
-Number.prototype.formatNumber = function(c, d, t){
-  var n = this,
-  c = isNaN(c = Math.abs(c)) ? 2 : c,
-  d = d == undefined ? '.' : d,
-  t = t == undefined ? ',' : t,
-  s = n < 0 ? '-' : '',
-  i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + '',
-  j = (j = i.length) > 3 ? j % 3 : 0;
-   return s + (j ? i.substr(0, j) + t : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, '$1' + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : '');
-};
-
-String.prototype.toSentenceStart = function () {
-    return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1);});
-};
 
 THREE.Vector3.prototype.mix = function(v2, factor) {
   this.x = this.x + (v2.x - this.x) * factor;
   this.y = this.y + (v2.y - this.y) * factor;
   this.z = this.z + (v2.z - this.z) * factor;
-}
+};
 
-if (!Date.now) {
-    Date.now = function() { return new Date().getTime(); };
-}
-
-var settings;
+if(!Date.now) Date.now = function() { return new Date().getTime(); };
 
 var stats;
-var gui;
 var worldMap;
 var container;
 var viewportWidth, viewportHeight;
@@ -70,10 +51,16 @@ var isMouseDown = false;
 var isTouchDevice = false;
 var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
 var usesWebGL = false;
-var usesCanvas = false;
 var activePanel = null;
 
-var uagent = navigator.userAgent.toLowerCase();
+const animationProps = {
+  interpolatePos: 0.0,
+  lineAnimatePos: 0.0,
+  lineAnimateOffset: 0.0,
+  colorChangeID: 0
+};
+
+
 
 function WorldMap() {
 
@@ -126,12 +113,11 @@ WorldMap.prototype = {
 
     const GeoConfig = function() {
 
+      this.projection = d3.geo.robinson();
+
       // this.projection = d3.geo.mercator(); // default, works
       // this.projection = d3.geo.equirectangular(); // works, needs scale = 0.2
       // this.projection = d3.geo.albers(); // works, needs scale = 0.2
-
-      this.projection = d3.geo.robinson();
-      // homolosine
       // this.projection = d3.geo.conicEqualArea(); // recommended for choropleths as it preserves the relative areas of geographic features.
       // this.projection = d3.geo.azimuthalEqualArea(); // also suitable for choropleths
 
@@ -144,7 +130,7 @@ WorldMap.prototype = {
       // var rotate = [0, 0, 90];
       // this.projection.rotate(rotate);
 
-      this.projection = this.projection.scale(settings.geoScale);
+      this.projection = this.projection.scale(Config.geoScale);
 
       this.path = d3.geo.path().projection(this.projection);
 
@@ -155,12 +141,10 @@ WorldMap.prototype = {
 
   initThree: function() {
 
-    if(settings.supportsWebGL) {
+    if(Config.supportsWebGL) {
       usesWebGL = true;
-      usesCanvas = false;
     } else {
       usesWebGL = false;
-      usesCanvas = true;
     }
 
     if(usesWebGL) {
@@ -178,7 +162,7 @@ WorldMap.prototype = {
 
     } else {
       this.renderer = new THREE.CanvasRenderer({
-        antialias : true,
+        antialias: true,
         alpha: true,
         clearAlpha: 0,
         clearColor: 0x000000,
@@ -218,10 +202,10 @@ WorldMap.prototype = {
     // this.scene.add( light2 );
 
     // put a camera in the scene
-    this.camera = new THREE.PerspectiveCamera(settings.cameraFOV, $(window).width() / $(window).height(), 0.1, 20000);
+    this.camera = new THREE.PerspectiveCamera(Config.cameraFOV, $(window).width() / $(window).height(), 0.1, 20000);
     this.camera.position.x = 0.0;
     this.camera.position.y = 0.0;
-    this.camera.position.z = settings.cameraDistance;
+    this.camera.position.z = Config.cameraDistance;
     // this.camera.lookAt( { x: this.CAMERA_LX, y: 0, z: this.CAMERA_LZ} );
     this.scene.add(this.camera);
 
@@ -243,25 +227,22 @@ WorldMap.prototype = {
     this.controlsTrackball.staticMoving = false;
     this.controlsTrackball.dynamicDampingFactor = 0.2;
 
-    this.controlsTrackball.minDistance = settings.cameraDistanceMin;
-    this.controlsTrackball.maxDistance = settings.cameraDistanceMax;
+    this.controlsTrackball.minDistance = Config.cameraDistanceMin;
+    this.controlsTrackball.maxDistance = Config.cameraDistanceMax;
 
     this.controlsTrackball.keys = []; // [ 65 // A, 83 // S, 68 // D ]; // [ rotateKey, zoomKey, panKey ]
     this.controlsTrackball.enabled = false;
 
-    //this.controlsTrackball.clearStateOnMouseUp = false;
-    //this.controlsTrackball.setState(2);
+    // this.controlsTrackball.clearStateOnMouseUp = false;
+    // this.controlsTrackball.setState(2);
 
     this.controlsPinchZoom = new THREE.PinchZoomControls( this.camera, this.renderer.domElement );
     this.controlsPinchZoom.staticMoving = true;
-    this.controlsPinchZoom.minDistance = settings.cameraDistanceMin2D;
-    this.controlsPinchZoom.maxDistance = settings.cameraDistanceMax;
+    this.controlsPinchZoom.minDistance = Config.cameraDistanceMin2D;
+    this.controlsPinchZoom.maxDistance = Config.cameraDistanceMax;
     this.controlsPinchZoom.enabled = false;
 
     this.controls = this.controlsPinchZoom;
-
-    //this.controls.cube = this.cube;
-    //this.controls.cube2 = this.cube2;
 
     if(!isTouchDevice) {
       $('#slider_zoom').slider({
@@ -284,29 +265,29 @@ WorldMap.prototype = {
 
     if($('#country_list').is(':visible')) {
 
-      if(this.mode == 'destinations') {
+      if(this.mode === 'destinations') {
 
-        if (this.selectedCountry) {
+        if(this.selectedCountry) {
           this.sortCountryListByCurrentFreeSourcesOrDestinations();
         } else {
           this.sortCountryListByFreeDestinations();
         }
 
-      } else if(this.mode == 'sources') {
+      } else if(this.mode === 'sources') {
 
-        if (this.selectedDestinationCountry) {
+        if(this.selectedDestinationCountry) {
           this.sortCountryListByCurrentFreeSourcesOrDestinations();
         } else {
           this.sortCountryListByFreeSources();
         }
 
-      } else if(this.mode == 'gdp') {
+      } else if(this.mode === 'gdp') {
         this.sortCountryListByGDP();
 
-      } else if(this.mode == 'gdp-per-capita') {
+      } else if(this.mode === 'gdp-per-capita') {
         this.sortCountryListByGDPPerCapita();
 
-      } else if(this.mode == 'population') {
+      } else if(this.mode === 'population') {
         this.sortCountryListByPopulation();
 
       }
@@ -318,7 +299,7 @@ WorldMap.prototype = {
 
   sortCountryListByName: function() {
     var newSorting = 'name';
-    if(this.countryListSorting != newSorting) {
+    if(this.countryListSorting !== newSorting) {
       this.countryListSorting = newSorting;
 
       var li = $('#country_list').children('li');
@@ -333,7 +314,7 @@ WorldMap.prototype = {
 
   sortCountryListByFreeDestinations: function() {
     var newSorting = 'destinations';
-    if(this.countryListSorting != newSorting) {
+    if(this.countryListSorting !== newSorting) {
       this.countryListSorting = newSorting;
 
       var li = $('#country_list').children('li');
@@ -349,13 +330,13 @@ WorldMap.prototype = {
 
       li.each(function() {
         var country = $(this).data('country');
-        //var width = parseInt(country.numDestinationsFreeOrOnArrival / worldMap.maxNumDestinationsFreeOrOnArrival * 200);
+        // var width = parseInt(country.numDestinationsFreeOrOnArrival / worldMap.maxNumDestinationsFreeOrOnArrival * 200);
         var num = country.numDestinationsFreeOrOnArrival;
-        if(country.destinations.length == 0) {
+        if(country.destinations.length === 0) {
           num = '?';
         }
-        //$(this).find('.box').data('width', width);
-        //$(this).find('.box').css('width', width + 'px');
+        // $(this).find('.box').data('width', width);
+        // $(this).find('.box').css('width', width + 'px');
         $(this).find('.box').css('background-color', '#' + country.colorByFreeDestinations.getHexString());
         $(this).find('.number').html(num);
       });
@@ -366,7 +347,7 @@ WorldMap.prototype = {
 
   sortCountryListByCurrentFreeSourcesOrDestinations: function() {
     var newSorting = 'sources-or-destinations';
-    if(this.countryListSorting != newSorting || this.countrySelectionChanged) {
+    if(this.countryListSorting !== newSorting || this.countrySelectionChanged) {
       this.countryListSorting = newSorting;
       this.countrySelectionChanged = false;
 
@@ -376,19 +357,19 @@ WorldMap.prototype = {
         var bCountry = $(b).data('country');
 
         var aName = 3 + aCountry.properties.name_long;
-        if(aCountry.visa_required == 'no' || aCountry.visa_required == 'on-arrival') {
+        if(aCountry.visa_required === 'no' || aCountry.visa_required === 'on-arrival') {
           aName = 2 + aCountry.properties.name_long;
-        } else if(aCountry.visa_required == 'free-eu') {
+        } else if(aCountry.visa_required === 'free-eu') {
           aName = 1 + aCountry.properties.name_long;
-        } else if(aCountry == worldMap.selectedCountry) {
+        } else if(aCountry === worldMap.selectedCountry) {
           aName = 0 + aCountry.properties.name_long;
         }
         var bName = 3 + bCountry.properties.name_long;
-        if(bCountry.visa_required == 'no' || bCountry.visa_required == 'on-arrival') {
+        if(bCountry.visa_required === 'no' || bCountry.visa_required === 'on-arrival') {
           bName = 2 + bCountry.properties.name_long;
-        } else if(bCountry.visa_required == 'free-eu') {
+        } else if(bCountry.visa_required === 'free-eu') {
           bName = 1 + bCountry.properties.name_long;
-        } else if(bCountry == worldMap.selectedCountry) {
+        } else if(bCountry === worldMap.selectedCountry) {
           bName = 0 + bCountry.properties.name_long;
         }
 
@@ -417,7 +398,7 @@ WorldMap.prototype = {
 
   sortCountryListByFreeSources: function() {
     var newSorting = 'sources';
-    if(this.countryListSorting != newSorting) {
+    if(this.countryListSorting !== newSorting) {
       this.countryListSorting = newSorting;
 
       var li = $('#country_list').children('li');
@@ -434,10 +415,10 @@ WorldMap.prototype = {
 
       li.each(function() {
         var country = $(this).data('country');
-        //var width = parseInt(country.numSourcesFreeOrOnArrival / worldMap.maxNumSourcesFreeOrOnArrival * 200);
+        // var width = parseInt(country.numSourcesFreeOrOnArrival / worldMap.maxNumSourcesFreeOrOnArrival * 200);
         var num = country.numSourcesFreeOrOnArrival;
-        //$(this).find('.box').data('width', width);
-        //$(this).find('.box').css('width', width + 'px');
+        // $(this).find('.box').data('width', width);
+        // $(this).find('.box').css('width', width + 'px');
         $(this).find('.box').css('background-color', '#' + country.colorByFreeSources.getHexString());
         $(this).find('.number').html(num);
       });
@@ -448,7 +429,7 @@ WorldMap.prototype = {
 
   sortCountryListByGDP: function() {
     var newSorting = 'gdp';
-    if(this.countryListSorting != newSorting) {
+    if(this.countryListSorting !== newSorting) {
       this.countryListSorting = newSorting;
 
       var li = $('#country_list').children('li');
@@ -467,9 +448,9 @@ WorldMap.prototype = {
         var num = Math.round(country.properties.gdp_md_est);
         if(num > 1000) {
           num /= 1000;
-          num = num.formatNumber(0) + ' b USD';
+          num = formatNumber(num, 0) + ' b USD';
         } else {
-          num = num.formatNumber(0) + ' m USD';
+          num = formatNumber(num, 0) + ' m USD';
         }
         $(this).find('.number').html(num);
       });
@@ -480,7 +461,7 @@ WorldMap.prototype = {
 
   sortCountryListByGDPPerCapita: function() {
     var newSorting = 'gdp-per-capita';
-    if(this.countryListSorting != newSorting) {
+    if(this.countryListSorting !== newSorting) {
       this.countryListSorting = newSorting;
 
       var li = $('#country_list').children('li');
@@ -497,7 +478,7 @@ WorldMap.prototype = {
       li.each(function() {
         var country = $(this).data('country');
         var num = Math.round(country.properties.gdp_per_capita);
-        num = num.formatNumber(0) + ' USD';
+        num = formatNumber(num, 0) + ' USD';
         $(this).find('.number').html(num);
       });
 
@@ -507,7 +488,7 @@ WorldMap.prototype = {
 
   sortCountryListByPopulation: function() {
     var newSorting = 'population';
-    if(this.countryListSorting != newSorting) {
+    if(this.countryListSorting !== newSorting) {
       this.countryListSorting = newSorting;
 
       var li = $('#country_list').children('li');
@@ -527,7 +508,7 @@ WorldMap.prototype = {
         if(num > 1000000) {
           num = Math.round(num / 1000000) + ' m';
         } else {
-          num = num.formatNumber(0);
+          num = formatNumber(num, 0);
         }
         $(this).find('.number').html(num);
       });
@@ -558,13 +539,14 @@ WorldMap.prototype = {
 
   setMode: function(mode) {
     this.mode = mode;
+    var num;
 
     $('#map_mode .mode').removeClass('active');
     $(this).addClass('active');
 
     $('#legend_main .range .min').html('min');
 
-    if(this.mode == 'destinations') {
+    if(this.mode === 'destinations') {
       $('#legend_main .range .min').html(0);
       $('#legend_main .range .rangelabel').html('Destinations');
       $('#legend_main .range .max').html(this.maxNumDestinationsFreeOrOnArrival);
@@ -581,7 +563,7 @@ WorldMap.prototype = {
       */
       // $('#destination_country_dropdown_container').show();
 
-    } else if(this.mode == 'sources') {
+    } else if(this.mode === 'sources') {
       $('#legend_main .range .min').html(0);
       $('#legend_main .range .rangelabel').html('Sources');
       $('#legend_main .range .max').html(this.maxNumSourcesFreeOrOnArrival);
@@ -598,11 +580,11 @@ WorldMap.prototype = {
       */
       // $('#destination_country_dropdown_container').show();
 
-    } else if(this.mode == 'gdp') {
+    } else if(this.mode === 'gdp') {
       $('#legend_main .range .min').html('0 USD');
       $('#legend_main .range .rangelabel').html('GDP');
-      var num = Math.round(this.maxGDP / 1000);
-      num = num.formatNumber(0);
+      num = Math.round(this.maxGDP / 1000);
+      num = formatNumber(num, 0);
       $('#legend_main .range .max').html(num + ' b USD');
 
       $('#last_update_wikipedia').fadeOut(800);
@@ -610,11 +592,11 @@ WorldMap.prototype = {
 
       // $('#destination_country_dropdown_container').hide();
 
-    } else if(this.mode == 'gdp-per-capita') {
+    } else if(this.mode === 'gdp-per-capita') {
       $('#legend_main .range .min').html('0 USD');
       $('#legend_main .range .rangelabel').html('GDP/capita');
-      var num = this.maxGDPPerCapita;
-      num = num.formatNumber(0);
+      num = this.maxGDPPerCapita;
+      num = formatNumber(num, 0);
       $('#legend_main .range .max').html(num + ' USD');
 
       $('#last_update_wikipedia').fadeOut(800);
@@ -622,11 +604,11 @@ WorldMap.prototype = {
 
       // $('#destination_country_dropdown_container').hide();
 
-    } else if(this.mode == 'population') {
+    } else if(this.mode === 'population') {
       $('#legend_main .range .min').html(0);
       $('#legend_main .range .rangelabel').html('Population');
-      var num = Math.round(this.maxPopulation / 1000000);
-      num = num.formatNumber(0);
+      num = Math.round(this.maxPopulation / 1000000);
+      num = formatNumber(num, 0);
       $('#legend_main .range .max').html(num + ' m');
 
       $('#last_update_wikipedia').fadeOut(800);
@@ -642,9 +624,7 @@ WorldMap.prototype = {
 
     /*
     worldMap.deleteLinesObject();
-
     worldMap.updateCountrySelection();
-
     worldMap.updateBufferGeometry();
     */
 
@@ -657,14 +637,14 @@ WorldMap.prototype = {
   initUI: function() {
     // $('#legend_main').prepend('<div class="info_visa_free"><span class="superscript">*</span>Visa not required or Visa on arrival</div>');
 
-    $('#legend_main .range .box').css('background', '#' + settings.colorMaxDestinations.getHexString());  /* Old browsers */
-    $('#legend_main .range .box').css('background', '-moz-linear-gradient(left,  #' + settings.colorZeroDestinations.getHexString() + ' 0%, #' + settings.colorMaxDestinations.getHexString() + ' 100%)'); /* FF3.6+ */
-    $('#legend_main .range .box').css('background', '-webkit-gradient(linear,left top,right top,from(#' + settings.colorZeroDestinations.getHexString() + '),to(#' + settings.colorMaxDestinations.getHexString() + '))');  /* Chrome,Safari4+ */
-    $('#legend_main .range .box').css('background', '-webkit-linear-gradient(left,  #' + settings.colorZeroDestinations.getHexString() + ' 0%,#' + settings.colorMaxDestinations.getHexString() + ' 100%)'); /* Chrome10+,Safari5.1+ */
-    $('#legend_main .range .box').css('background', '-o-linear-gradient(left,  #' + settings.colorZeroDestinations.getHexString() + ' 0%,#' + settings.colorMaxDestinations.getHexString() + ' 100%)'); /* Opera 11.10+ */
-    $('#legend_main .range .box').css('background', '-ms-linear-gradient(left,  #' + settings.colorZeroDestinations.getHexString() + ' 0%,#' + settings.colorMaxDestinations.getHexString() + ' 100%)'); /* IE10+ */
-    $('#legend_main .range .box').css('background', 'linear-gradient(to right,  #' + settings.colorZeroDestinations.getHexString() + ' 0%,#' + settings.colorMaxDestinations.getHexString() + ' 100%)'); /* W3C */
-    $('#legend_main .range .box').css('filter', "progid:DXImageTransform.Microsoft.gradient( startColorstr='#" + settings.colorZeroDestinations.getHexString() + "', endColorstr='#" + settings.colorMaxDestinations.getHexString() + "',GradientType=1 )"); /* IE6-9 */
+    $('#legend_main .range .box').css('background', '#' + Config.colorMaxDestinations.getHexString());  /* Old browsers */
+    $('#legend_main .range .box').css('background', '-moz-linear-gradient(left,  #' + Config.colorZeroDestinations.getHexString() + ' 0%, #' + Config.colorMaxDestinations.getHexString() + ' 100%)'); /* FF3.6+ */
+    $('#legend_main .range .box').css('background', '-webkit-gradient(linear,left top,right top,from(#' + Config.colorZeroDestinations.getHexString() + '),to(#' + Config.colorMaxDestinations.getHexString() + '))');  /* Chrome,Safari4+ */
+    $('#legend_main .range .box').css('background', '-webkit-linear-gradient(left,  #' + Config.colorZeroDestinations.getHexString() + ' 0%,#' + Config.colorMaxDestinations.getHexString() + ' 100%)'); /* Chrome10+,Safari5.1+ */
+    $('#legend_main .range .box').css('background', '-o-linear-gradient(left,  #' + Config.colorZeroDestinations.getHexString() + ' 0%,#' + Config.colorMaxDestinations.getHexString() + ' 100%)'); /* Opera 11.10+ */
+    $('#legend_main .range .box').css('background', '-ms-linear-gradient(left,  #' + Config.colorZeroDestinations.getHexString() + ' 0%,#' + Config.colorMaxDestinations.getHexString() + ' 100%)'); /* IE10+ */
+    $('#legend_main .range .box').css('background', 'linear-gradient(to right,  #' + Config.colorZeroDestinations.getHexString() + ' 0%,#' + Config.colorMaxDestinations.getHexString() + ' 100%)'); /* W3C */
+    $('#legend_main .range .box').css('filter', 'progid:DXImageTransform.Microsoft.gradient( startColorstr=\'#' + Config.colorZeroDestinations.getHexString() + '\', endColorstr=\'#' + Config.colorMaxDestinations.getHexString() + '\',GradientType=1 )'); /* IE6-9 */
 
     // $('#legend_main .range .min').html('Min');
     // $('#legend_main .range .max').html('Max');
@@ -673,18 +653,18 @@ WorldMap.prototype = {
     $('#legend_main .range .rangelabel').html('Destinations');
     $('#legend_main .range .max').html(this.maxNumDestinationsFreeOrOnArrival);
 
-    $('#legend_main .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + settings.colorVisaDataNotAvailable.getHexString() + '"></div><div class="text">Data not available</div></div>');
+    $('#legend_main .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaDataNotAvailable.getHexString() + '"></div><div class="text">Data not available</div></div>');
 
     // $('#legend_selected').prepend('<div class="info_visa_free"><span class="superscript">*</span>Visa not required or Visa on arrival</div>');
 
-    $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + settings.colorCountrySelected.getHexString() + '"></div><div class="text">Selected country/nationality</div></div>');
-    $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + settings.colorVisaNotRequired.getHexString() + '"></div><div class="text">Visa not required</div></div>');
-    $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + settings.colorVisaOnArrival.getHexString() + '"></div><div class="text">Visa on arrival</div></div>');
-    $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + settings.colorVisaFreeEU.getHexString() + '"></div><div class="text">EU freedom of movement</div></div>');
-    $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + settings.colorVisaSpecial.getHexString() + '"></div><div class="text">Special regulations</div></div>');
-    $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + settings.colorVisaRequired.getHexString() + '"></div><div class="text">Visa required</div></div>');
-    $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + settings.colorVisaAdmissionRefused.getHexString() + '"></div><div class="text">Admission refused</div></div>');
-    $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + settings.colorVisaDataNotAvailable.getHexString() + '"></div><div class="text">Data not available</div></div>');
+    $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorCountrySelected.getHexString() + '"></div><div class="text">Selected country/nationality</div></div>');
+    $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaNotRequired.getHexString() + '"></div><div class="text">Visa not required</div></div>');
+    $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaOnArrival.getHexString() + '"></div><div class="text">Visa on arrival</div></div>');
+    $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaFreeEU.getHexString() + '"></div><div class="text">EU freedom of movement</div></div>');
+    $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaSpecial.getHexString() + '"></div><div class="text">Special regulations</div></div>');
+    $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaRequired.getHexString() + '"></div><div class="text">Visa required</div></div>');
+    $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaAdmissionRefused.getHexString() + '"></div><div class="text">Admission refused</div></div>');
+    $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaDataNotAvailable.getHexString() + '"></div><div class="text">Data not available</div></div>');
 
     // $('#legend_main').delay(0).fadeIn(1000);
     // $('#legend_selected').delay(0).fadeIn(1000);
@@ -701,7 +681,7 @@ WorldMap.prototype = {
       /*
       var width = parseInt(country.numDestinationsFreeOrOnArrival / this.maxNumDestinationsFreeOrOnArrival * 200);
       var num = country.numDestinationsFreeOrOnArrival;
-      if(country.destinations.length == 0) {
+      if(country.destinations.length === 0) {
         num = "?";
       }
       li.find('.box').css('width', width + 'px');
@@ -715,8 +695,8 @@ WorldMap.prototype = {
     $('#country_list li').click(function(event) {
       var selectedCountryNew = $(this).data('country');
 
-      if(worldMap.selectedCountry != selectedCountryNew) {
-        if (event.ctrlKey || event.altKey || event.metaKey) {
+      if(worldMap.selectedCountry !== selectedCountryNew) {
+        if(event.ctrlKey || event.altKey || event.metaKey) {
           worldMap.setSelectedDestinationCountry(selectedCountryNew);
           worldMap.trackEvent('destinationCountryListClick', selectedCountryNew.properties.name_long);
         } else {
@@ -740,7 +720,7 @@ WorldMap.prototype = {
           worldMap.listHover = true;
           worldMap.updateCountryHover(country);
           // centerCountryHoverInfoToScreen();
-          if(!worldMap.geometryNeedsUpdate && (worldMap.intersectedObjectBefore != worldMap.intersectedObject) ) {
+          if(!worldMap.geometryNeedsUpdate && (worldMap.intersectedObjectBefore !== worldMap.intersectedObject) ) {
             worldMap.updateAllCountryColors();
             if(usesWebGL) {
               worldMap.updateBufferGeometry();
@@ -790,7 +770,7 @@ WorldMap.prototype = {
     });
 
     $('#button_country_list').click(function(event) {
-      if($('#country_list').is(":visible")) {
+      if($('#country_list').is(':visible')) {
         $('#country_list').slideToggle();
         $('#button_country_list .caret').css('-webkit-transform', 'rotate(0deg)');
 
@@ -817,8 +797,8 @@ WorldMap.prototype = {
 
       worldMap.controls.enabled = false;
 
-      worldMap.tweenSwitch = new TWEEN.Tween(settings)
-        .to({ interpolatePos: 0.0}, settings.viewSwitchDuration)
+      worldMap.tweenSwitch = new TWEEN.Tween(animationProps)
+        .to({interpolatePos: 0.0}, Config.viewSwitchDuration)
         .onStart(function() {
         })
         .onUpdate(function() {
@@ -828,18 +808,18 @@ WorldMap.prototype = {
         .onComplete(function() {
           worldMap.controls = worldMap.controlsPinchZoom;
           worldMap.controls.enabled = true;
-          worldMap.viewMode = "2d";
+          worldMap.viewMode = '2d';
         })
         .easing(TWEEN.Easing.Cubic.Out)
         .start();
 
       worldMap.tweenCameraPosition = new TWEEN.Tween(worldMap.camera.position)
-        .to({ x: 0, y: 0, z: settings.cameraDistance }, settings.viewSwitchDuration)
+        .to({ x: 0, y: 0, z: Config.cameraDistance }, Config.viewSwitchDuration)
         .easing(TWEEN.Easing.Cubic.Out)
         .start();
 
       worldMap.tweenCameraUp = new TWEEN.Tween(worldMap.camera.up)
-        .to({ x: 0, y: 1, z: 0 }, settings.viewSwitchDuration)
+        .to({ x: 0, y: 1, z: 0 }, Config.viewSwitchDuration)
         .easing(TWEEN.Easing.Cubic.Out)
         .start();
 
@@ -851,8 +831,8 @@ WorldMap.prototype = {
 
       worldMap.controls.enabled = false;
 
-      worldMap.tweenSwitch = new TWEEN.Tween(settings)
-        .to({ interpolatePos: 1.0}, settings.viewSwitchDuration)
+      worldMap.tweenSwitch = new TWEEN.Tween(animationProps)
+        .to({interpolatePos: 1.0}, Config.viewSwitchDuration)
         .onStart(function() {
         })
         .onUpdate(function() {
@@ -862,13 +842,13 @@ WorldMap.prototype = {
         .onComplete(function() {
           worldMap.controls = worldMap.controlsTrackball;
           worldMap.controls.enabled = true;
-          worldMap.viewMode = "3d";
+          worldMap.viewMode = '3d';
         })
         .easing(TWEEN.Easing.Cubic.Out)
         .start();
 
       worldMap.tweenCameraPosition = new TWEEN.Tween(worldMap.camera.position)
-        .to({ x: 0, y: 0, z: settings.cameraDistance }, settings.viewSwitchDuration)
+        .to({ x: 0, y: 0, z: Config.cameraDistance }, Config.viewSwitchDuration)
         .easing(TWEEN.Easing.Cubic.Out)
         .start();
     });
@@ -879,42 +859,41 @@ WorldMap.prototype = {
   updateZoomSlider: function() {
     var z = (this.camera.position.length() - worldMap.controls.minDistance) / (worldMap.controls.maxDistance - worldMap.controls.minDistance);
     z = (1 - z) * 100;
-    $("#slider_zoom").slider("value", z);
+    $('#slider_zoom').slider('value', z);
   },
 
-
   createSphere: function() {
-    this.sphere = new THREE.Mesh( new THREE.PlaneGeometry( 700, 700, 24, 96 ), settings.materialSphere );
-    this.sphere.name = "sphere";
+    this.sphere = new THREE.Mesh( new THREE.PlaneGeometry( 700, 700, 24, 96 ), Config.materialSphere );
+    this.sphere.name = 'sphere';
     this.scene.add( this.sphere );
-    this.sphere.visible = settings.sphereVisible;
+    this.sphere.visible = Config.sphereVisible;
 
     this.sphereGeometry2D = this.sphere.geometry.clone();
     var k;
     for(k = 0; k < this.sphereGeometry2D.vertices.length; k++) {
       this.sphereGeometry2D.vertices[k].x -= 20;
       this.sphereGeometry2D.vertices[k].y -= 90;
-      this.sphereGeometry2D.vertices[k].z -= settings.extrudeDepth * 2.0;
+      this.sphereGeometry2D.vertices[k].z -= Config.extrudeDepth * 2.0;
     }
 
     this.sphereGeometry3D = this.sphere.geometry.clone();
 
     for(k = 0; k < this.sphere.geometry.vertices.length; k++) {
-      var spherical = this.geo.projection.invert([ - this.sphere.geometry.vertices[k].x, this.sphere.geometry.vertices[k].y * 2.0 + 250 ]); //  * 2.0 + 260
+      var spherical = this.geo.projection.invert([ -this.sphere.geometry.vertices[k].x, this.sphere.geometry.vertices[k].y * 2.0 + 250 ]); //  * 2.0 + 260
 
       spherical[0] = THREE.Math.degToRad(spherical[0]);
       spherical[1] = THREE.Math.degToRad(spherical[1]);
 
-      this.sphereGeometry3D.vertices[k].x = (settings.globeRadius - 1) * Math.cos(spherical[0]) * Math.cos(spherical[1]);
-      this.sphereGeometry3D.vertices[k].y = - (settings.globeRadius - 1) * Math.sin(spherical[1]);
-      this.sphereGeometry3D.vertices[k].z = (settings.globeRadius - 1) * Math.sin(spherical[0]) * Math.cos(spherical[1]);
+      this.sphereGeometry3D.vertices[k].x = (Config.globeRadius - 1) * Math.cos(spherical[0]) * Math.cos(spherical[1]);
+      this.sphereGeometry3D.vertices[k].y = -(Config.globeRadius - 1) * Math.sin(spherical[1]);
+      this.sphereGeometry3D.vertices[k].z = (Config.globeRadius - 1) * Math.sin(spherical[0]) * Math.cos(spherical[1]);
 
       /*
       if(this.sphereGeometry3D.vertices[k].z < 0.0) {
-        this.sphereGeometry3D.vertices[k].z = settings.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
+        this.sphereGeometry3D.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
         //this.sphereGeometry3D.vertices[k].multiplyScalar(0.5);
       } else {
-        this.sphereGeometry3D.vertices[k].z = settings.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
+        this.sphereGeometry3D.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
         //this.sphereGeometry3D.vertices[k].multiplyScalar(1.04);
       }
       */
@@ -928,56 +907,56 @@ WorldMap.prototype = {
   },
 
   matchDestinationToCountryName: function(destination, country) {
-    if(destination == country) return true;
+    if(destination === country) return true;
 
-    if(destination == "Brunei") {
-      destination = "Brunei Darussalam";
-    } else if(destination == "People's Republic of China") {
-      destination = "China";
-    } else if(destination == "Republic of the Congo") {
-      destination = "Republic of Congo";
-    } else if(destination == "Ivory Coast") {
-      destination = "Côte d'Ivoire";
-    } else if(destination == "Gambia") {
-      destination = "The Gambia";
-    } else if(destination == "North Korea") {
-      destination = "Dem. Rep. Korea";
-    } else if(destination == "South Korea") {
-      destination = "Republic of Korea";
-    } else if(destination == "Laos") {
-      destination = "Lao PDR";
-    } else if(destination == "Burma") {
-      destination = "Myanmar";
-    } else if(destination == "Russia") {
-      destination = "Russian Federation";
-    } else if(destination == "São Tomé and Príncipe") {
-      destination = "São Tomé and Principe";
-    } else if(destination == "Vatican City") {
-      destination = "Vatican";
-    } else if(destination == "United States of America") {
-      destination = "United States";
-    } else if(destination == "Republic of Serbia") {
-      destination = "Serbia";
+    if(destination === 'Brunei') {
+      destination = 'Brunei Darussalam';
+    } else if(destination === 'People\'s Republic of China') {
+      destination = 'China';
+    } else if(destination === 'Republic of the Congo') {
+      destination = 'Republic of Congo';
+    } else if(destination === 'Ivory Coast') {
+      destination = 'Côte d\'Ivoire';
+    } else if(destination === 'Gambia') {
+      destination = 'The Gambia';
+    } else if(destination === 'North Korea') {
+      destination = 'Dem. Rep. Korea';
+    } else if(destination === 'South Korea') {
+      destination = 'Republic of Korea';
+    } else if(destination === 'Laos') {
+      destination = 'Lao PDR';
+    } else if(destination === 'Burma') {
+      destination = 'Myanmar';
+    } else if(destination === 'Russia') {
+      destination = 'Russian Federation';
+    } else if(destination === 'São Tomé and Príncipe') {
+      destination = 'São Tomé and Principe';
+    } else if(destination === 'Vatican City') {
+      destination = 'Vatican';
+    } else if(destination === 'United States of America') {
+      destination = 'United States';
+    } else if(destination === 'Republic of Serbia') {
+      destination = 'Serbia';
     }
 
-    return country == destination;
+    return country === destination;
   },
 
   getCountryNameWithArticle: function(country) {
     var name = country.properties.name_long;
     var nameFormatted = '<b>' + name + '</b>';
-    if(name == "Republic of the Congo") {
-      return "the " + nameFormatted;
-    } else if(name == "Russia Federation") {
-      return "the " + nameFormatted;
-    } else if(name == "Vatican") {
-      return "the " + nameFormatted;
-    } else if(name == "United States") {
-      return "the " + nameFormatted;
-    } else if(name == "British Indian Ocean Territory") {
-      return "the " + nameFormatted;
-    } else if(name == "British Virgin Islands") {
-      return "the " + nameFormatted;
+    if(name === 'Republic of the Congo') {
+      return 'the ' + nameFormatted;
+    } else if(name === 'Russia Federation') {
+      return 'the ' + nameFormatted;
+    } else if(name === 'Vatican') {
+      return 'the ' + nameFormatted;
+    } else if(name === 'United States') {
+      return 'the ' + nameFormatted;
+    } else if(name === 'British Indian Ocean Territory') {
+      return 'the ' + nameFormatted;
+    } else if(name === 'British Virgin Islands') {
+      return 'the ' + nameFormatted;
     }
     return nameFormatted;
   },
@@ -994,7 +973,7 @@ WorldMap.prototype = {
   getAllCountriesWithSameSovereignty: function(sov) {
     var countries = [];
     for(var c = 0; c < this.countries.length; c++) {
-      if(this.countries[c].properties.sovereignt == sov) {
+      if(this.countries[c].properties.sovereignt === sov) {
         countries.push( this.countries[c] );
       }
     }
@@ -1014,34 +993,33 @@ WorldMap.prototype = {
       collapseNavBar();
     });
 
-    $('#country_dropdown').val(settings.sourceCountryDefaultText);
+    $('#country_dropdown').val(Config.sourceCountryDefaultText);
 
-    $('#country_dropdown').on( "click", function(event, value) {
-      if($(this).val() == settings.sourceCountryDefaultText) {
+    $('#country_dropdown').on('click', function(event, value) {
+      if($(this).val() === Config.sourceCountryDefaultText) {
         $(this).val('');
       }
     });
     $('#country_dropdown').focusout( function(event, value) {
       // $('#country_dropdown').immybox('hideResults', '');
       collapseNavBar();
-      if( $('#country_dropdown').val() == '') {
-            $('#country_dropdown').val(settings.sourceCountryDefaultText);
-          }
+      if( $('#country_dropdown').val() === '') {
+        $('#country_dropdown').val(Config.sourceCountryDefaultText);
+      }
     });
-    $('#country_dropdown_container .cancel').bind("click", function() {
+    $('#country_dropdown_container .cancel').bind('click', function() {
       $('#country_dropdown').focus();
-          worldMap.clearSelectedSourceCountry();
+      worldMap.clearSelectedSourceCountry();
+    });
+    $('#country_dropdown').bind('keyup', function() {
+      if($('#country_dropdown').val() === '') {
+        $('#country_dropdown_container .cancel').fadeOut();
+      } else {
+        $('#country_dropdown_container .cancel').fadeIn();
+      }
+    });
 
-        });
-        $('#country_dropdown').bind('keyup', function() {
-          if($('#country_dropdown').val() == '') {
-            $('#country_dropdown_container .cancel').fadeOut();
-          } else {
-            $('#country_dropdown_container .cancel').fadeIn();
-          }
-        });
-
-    $('#country_dropdown').on( "update", function(event, value) {
+    $('#country_dropdown').on( 'update', function(event, value) {
       if(!worldMap.introRunning) {
         $('#country_dropdown').blur();
 
@@ -1054,24 +1032,24 @@ WorldMap.prototype = {
         var selectedCountryNew = null;
 
         for(var i = 0; i < worldMap.countries.length; i++) {
-          if(worldMap.countries[i].properties.name_long == value) {
+          if(worldMap.countries[i].properties.name_long === value) {
             selectedCountryNew = worldMap.countries[i];
             break;
           }
         }
 
-        if(selectedCountryNew != null) {
-          if(worldMap.selectedDestinationCountry == selectedCountryNew) {
+        if(selectedCountryNew !== null) {
+          if(worldMap.selectedDestinationCountry === selectedCountryNew) {
             if(worldMap.selectedCountry) {
               worldMap.clearSelectedCountry();
             } else {
               $('#country_dropdown').immybox('setValue', '');
-              $('#country_dropdown').val(settings.sourceCountryDefaultText);
+              $('#country_dropdown').val(Config.sourceCountryDefaultText);
             }
             return;
           }
 
-          if(worldMap.selectedCountry != selectedCountryNew) {
+          if(worldMap.selectedCountry !== selectedCountryNew) {
             worldMap.setSelectedCountry(selectedCountryNew);
             worldMap.trackEvent('sourceCountryDropdownSelect', selectedCountryNew.properties.name_long);
             worldMap.updateCountryHover(selectedCountryNew);
@@ -1099,34 +1077,36 @@ WorldMap.prototype = {
       collapseNavBar();
     });
 
-    $('#destination_country_dropdown').val(settings.destinationCountryDefaultText);
+    $('#destination_country_dropdown').val(Config.destinationCountryDefaultText);
 
-    $('#destination_country_dropdown').on( "click", function(event, value) {
-      if($(this).val() == settings.destinationCountryDefaultText) {
+    $('#destination_country_dropdown').on( 'click', function(event, value) {
+      if($(this).val() === Config.destinationCountryDefaultText) {
         $(this).val('');
       }
     });
+
     $('#destination_country_dropdown').focusout( function(event, value) {
       // $('#destination_country_dropdown').immybox('hideResults', '');
       collapseNavBar();
-      if( $('#destination_country_dropdown').val() == '') {
-            $('#destination_country_dropdown').val(settings.destinationCountryDefaultText);
-          }
+      if( $('#destination_country_dropdown').val() === '') {
+        $('#destination_country_dropdown').val(Config.destinationCountryDefaultText);
+      }
     });
-    $('#destination_country_dropdown_container .cancel').bind("click", function() {
+
+    $('#destination_country_dropdown_container .cancel').bind('click', function() {
       $('#destination_country_dropdown').focus();
-          worldMap.clearSelectedDestinationCountry();
+      worldMap.clearSelectedDestinationCountry();
+    });
 
-        });
-        $('#destination_country_dropdown').bind('keyup', function() {
-          if($('#destination_country_dropdown').val() == '') {
-            $('#destination_country_dropdown_container .cancel').fadeOut();
-          } else {
-            $('#destination_country_dropdown_container .cancel').fadeIn();
-          }
-        });
+    $('#destination_country_dropdown').bind('keyup', function() {
+      if($('#destination_country_dropdown').val() === '') {
+        $('#destination_country_dropdown_container .cancel').fadeOut();
+      } else {
+        $('#destination_country_dropdown_container .cancel').fadeIn();
+      }
+    });
 
-    $('#destination_country_dropdown').on( "update", function(event, value) {
+    $('#destination_country_dropdown').on( 'update', function(event, value) {
       if(!worldMap.introRunning) {
         $('#destination_country_dropdown').blur();
 
@@ -1139,24 +1119,24 @@ WorldMap.prototype = {
         var selectedDestinationCountryNew = null;
 
         for(var i = 0; i < worldMap.countries.length; i++) {
-          if(worldMap.countries[i].properties.name_long == value) {
+          if(worldMap.countries[i].properties.name_long === value) {
             selectedDestinationCountryNew = worldMap.countries[i];
             break;
           }
         }
 
-        if(selectedDestinationCountryNew != null) {
-          if(worldMap.selectedCountry == selectedDestinationCountryNew) {
+        if(selectedDestinationCountryNew !== null) {
+          if(worldMap.selectedCountry === selectedDestinationCountryNew) {
             if(worldMap.selectedDestinationCountry) {
               worldMap.clearSelectedDestinationCountry();
             } else {
               $('#destination_country_dropdown').immybox('setValue', '');
-              $('#destination_country_dropdown').val(settings.destinationCountryDefaultText);
+              $('#destination_country_dropdown').val(Config.destinationCountryDefaultText);
             }
             return;
           }
 
-          if(worldMap.selectedCountry != selectedDestinationCountryNew && worldMap.selectedDestinationCountry != selectedDestinationCountryNew) {
+          if(worldMap.selectedCountry !== selectedDestinationCountryNew && worldMap.selectedDestinationCountry !== selectedDestinationCountryNew) {
             worldMap.setSelectedDestinationCountry(selectedDestinationCountryNew);
             worldMap.trackEvent('destinationCountryDropdownSelect', selectedDestinationCountryNew.properties.name_long);
             worldMap.updateCountryHover(selectedDestinationCountryNew);
@@ -1172,8 +1152,9 @@ WorldMap.prototype = {
   },
 
   createCountries: function() {
-    trace("createCountries()");
-    $('#loading .details').html("Creating map ...");
+    trace('createCountries()');
+
+    $('#loading .details').html('Creating map ...');
 
     var data = this.dataCountries;
 
@@ -1185,16 +1166,17 @@ WorldMap.prototype = {
 
     this.trianglesNumTotal = 0;
 
-    var i, j;
     var globalPointCount = 0;
     var numVisaRequirementsFound = 0;
 
     this.choices = [];
 
     // features = countries
-    for(var i = 0 ; i < data.features.length ; i++) {
+    var i;
+    var destinations;
+    for(i = 0; i < data.features.length; i++) {
       var feature = data.features[i];
-      var destinations = [];
+      destinations = [];
 
 
       // trace( feature.properties.name );
@@ -1202,12 +1184,12 @@ WorldMap.prototype = {
       // trace( feature.properties.name_sort );
 
 
-      if(feature.properties.name != "Antarctica") { //  && feature.properties.name == "Germany"
+      if(feature.properties.name !== 'Antarctica') { //  && feature.properties.name === 'Germany'
         for(var r = 0; r < this.visaRequirements.countries.length; r++) {
           // 199 nationalities travelling to 240 (?) countries, assuming nationals from a country don't need a visa to the sovereignty's main country:
           // if(this.matchDestinationToCountryName(feature.properties.name_long, this.visaRequirements.countries[r].name) || this.matchDestinationToCountryName(this.visaRequirements.countries[r].name, feature.properties.name_long)) {
           if(this.matchDestinationToCountryName(feature.properties.sovereignt, this.visaRequirements.countries[r].name) || this.matchDestinationToCountryName(this.visaRequirements.countries[r].name, feature.properties.sovereignt)) {
-            // trace("Loading visa requirements for: " + feature.properties.name);
+            // trace('Loading visa requirements for: ' + feature.properties.name);
             destinations = this.visaRequirements.countries[r].destinations;
             numVisaRequirementsFound++;
           }
@@ -1216,18 +1198,26 @@ WorldMap.prototype = {
         // convert SVG data to three.js Shapes array (all shapes in one country):
         var t = this.geo.path(feature);
 
-        if(t != undefined) {
+        if(t !== undefined) {
           var shapes = transformSVGPath( t );
 
           var pointCount = 0;
-          for(var p = 0 ; p < shapes.length; p++) {
+          for(var p = 0; p < shapes.length; p++) {
             pointCount += shapes[p].getPoints().length;
           }
           globalPointCount += pointCount;
 
-          this.countries.push({"properties": feature.properties, "shapes": shapes, "destinations": destinations, "numDestinationsFreeOrOnArrival": 0, "numSourcesFreeOrOnArrival": 0, "color": new THREE.Color(settings.colorCountryDefault), "colorLast": new THREE.Color(settings.colorCountryDefault) });
+          this.countries.push({
+            properties: feature.properties,
+            shapes: shapes,
+            destinations: destinations,
+            numDestinationsFreeOrOnArrival: 0,
+            numSourcesFreeOrOnArrival: 0,
+            color: new THREE.Color(Config.colorCountryDefault),
+            colorLast: new THREE.Color(Config.colorCountryDefault)
+          });
 
-          if(destinations.length == 0) {
+          if(destinations.length === 0) {
             // trace("No visa requirements found for: " + feature.properties.name);
           }
 
@@ -1239,13 +1229,15 @@ WorldMap.prototype = {
       }
     }
 
+    var d;
+    var country;
     // remove destinations who's country doesn't exist:
-    for(var i = 0 ; i < this.countries.length; i++) {
-      var destinations = this.countries[i].destinations;
+    for(i = 0; i < this.countries.length; i++) {
+      destinations = this.countries[i].destinations;
       var destinationsNew = [];
-      for(var d = 0; d < destinations.length; d++) {
-        var country = this.getCountryByName(destinations[d].d_name);
-        if(country != null) {
+      for(d = 0; d < destinations.length; d++) {
+        country = this.getCountryByName(destinations[d].d_name);
+        if(country !== null) {
           destinationsNew.push(destinations[d]);
         }
       }
@@ -1254,13 +1246,13 @@ WorldMap.prototype = {
     }
 
     // count visa-free destinations:
-    for(var i = 0 ; i < this.countries.length; i++) {
-      var destinations = this.countries[i].destinations;
+    for(i = 0; i < this.countries.length; i++) {
+      destinations = this.countries[i].destinations;
 
       this.countries[i].numDestinationsFreeOrOnArrival = 0;
-      for(var d = 0; d < destinations.length; d++) {
-        if(destinations[d].visa_required == "no" || destinations[d].visa_required == "on-arrival" || destinations[d].visa_required == "free-eu"
-           // || destinations[d].visa_required == "evisa" || destinations[d].visa_required == "evisitor" || destinations[d].visa_required == "eta"
+      for(d = 0; d < destinations.length; d++) {
+        if(destinations[d].visa_required === 'no' || destinations[d].visa_required === 'on-arrival' || destinations[d].visa_required === 'free-eu'
+           // || destinations[d].visa_required === 'evisa' || destinations[d].visa_required === 'evisitor' || destinations[d].visa_required === 'eta'
           ) {
           this.countries[i].numDestinationsFreeOrOnArrival++;
         }
@@ -1269,7 +1261,7 @@ WorldMap.prototype = {
 
       // add main sovereignty, if exists:
       var mainCountry = this.getCountryByName(this.countries[i].properties.sovereignt);
-      if(mainCountry && mainCountry.properties.sovereignt != this.countries[i].properties.name_long) {
+      if(mainCountry && mainCountry.properties.sovereignt !== this.countries[i].properties.name_long) {
         this.countries[i].numDestinationsFreeOrOnArrival++;
       }
 
@@ -1280,19 +1272,19 @@ WorldMap.prototype = {
     }
 
     // count countries from where people can come without a visa > find most open countries:
-    for(var i = 0 ; i < this.countries.length; i++) {
-      var destinations = this.countries[i].destinations;
-      for(var d = 0; d < destinations.length; d++) {
-        if(destinations[d].visa_required == "no" || destinations[d].visa_required == "on-arrival" || destinations[d].visa_required == "free-eu") {
-          var country = this.getCountryByName(destinations[d].d_name);
-          if(country != null) {
+    for(i = 0; i < this.countries.length; i++) {
+      destinations = this.countries[i].destinations;
+      for(d = 0; d < destinations.length; d++) {
+        if(destinations[d].visa_required === 'no' || destinations[d].visa_required === 'on-arrival' || destinations[d].visa_required === 'free-eu') {
+          country = this.getCountryByName(destinations[d].d_name);
+          if(country !== null) {
             country.numSourcesFreeOrOnArrival++;
           }
         }
       }
     }
 
-    for(var i = 0 ; i < this.countries.length; i++) {
+    for(i = 0; i < this.countries.length; i++) {
       if( this.countries[i].numSourcesFreeOrOnArrival > this.maxNumSourcesFreeOrOnArrival ) {
         this.maxNumSourcesFreeOrOnArrival = this.countries[i].numSourcesFreeOrOnArrival;
       }
@@ -1308,14 +1300,14 @@ WorldMap.prototype = {
         if(this.countries[i].properties.gdp_md_est > 100) {
           this.maxGDPPerCapita = this.countries[i].properties.gdp_md_est / this.countries[i].properties.pop_est * 1000000;
           // trace( this.countries[i].properties.name_long );
-          // trace( "population: " + this.countries[i].properties.pop_est );
-          // trace( "gdp: " + this.countries[i].properties.gdp_md_est );
-          // trace( "gdp per capita: " + this.maxGDPPerCapita );
+          // trace( 'population: ' + this.countries[i].properties.pop_est );
+          // trace( 'gdp: ' + this.countries[i].properties.gdp_md_est );
+          // trace( 'gdp per capita: ' + this.maxGDPPerCapita );
         }
       }
     }
 
-    function SortChoicesByName(a, b){
+    function SortChoicesByName(a, b) {
       var aName = a.text.toLowerCase();
       var bName = b.text.toLowerCase();
       return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
@@ -1323,35 +1315,35 @@ WorldMap.prototype = {
 
     this.choices.sort(SortChoicesByName);
 
-    var stringLoaded = this.countries.length + " countries loaded (" + globalPointCount + " points total) from '" + settings.mapDataFile + "'";
-    if(settings.mergeDataFromMapDataFile2) {
-      stringLoaded += " and '" + settings.mapDataFile2 + "'";
+    var stringLoaded = this.countries.length + ' countries loaded (' + globalPointCount + ' points total) from \'' + Config.mapDataFile + '\'';
+    if(Config.mergeDataFromMapDataFile2) {
+      stringLoaded += ' and \'' + Config.mapDataFile2 + '\'';
     }
     trace(stringLoaded);
 
-    trace("Visa requirements loaded for " + numVisaRequirementsFound + " countries from '" + settings.visaRequirementsFile + "'");
-    // trace("Max number of visa-free destinations: " + this.maxNumDestinationsFreeOrOnArrival);
-    // trace("Max number of visa-free sources: " + this.maxNumSourcesFreeOrOnArrival);
-    // trace("Total population: " + this.totalPopulation.formatNumber(0));
+    trace('Visa requirements loaded for ' + numVisaRequirementsFound + ' countries from \'' + Config.visaRequirementsFile + '\'');
+    // trace('Max number of visa-free destinations: ' + this.maxNumDestinationsFreeOrOnArrival);
+    // trace('Max number of visa-free sources: ' + this.maxNumSourcesFreeOrOnArrival);
+    // trace('Total population: ' + this.totalPopulation.formatNumber(0));
 
     var m = new THREE.Matrix4();
     var m1 = new THREE.Matrix4();
     var m2 = new THREE.Matrix4();
-    m1.makeRotationX( settings.globeRotationX );
-    m2.makeRotationY( settings.globeRotationY );
+    m1.makeRotationX( Config.globeRotationX );
+    m2.makeRotationY( Config.globeRotationY );
     m.multiplyMatrices( m1, m2 );
 
-    for(var i = 0 ; i < this.countries.length ; i++) {
+    for(i = 0; i < this.countries.length; i++) {
       this.countries[i].colorByFreeDestinations = this.getCountryColorByFreeDestinations(this.countries[i].numDestinationsFreeOrOnArrival);
       this.countries[i].colorByFreeSources = this.getCountryColorByFreeSources(this.countries[i].numSourcesFreeOrOnArrival);
       this.countries[i].colorByGDP = this.getCountryColorByGDP(this.countries[i]);
       this.countries[i].colorByGDPPerCapita = this.getCountryColorByGDPPerCapita(this.countries[i]);
       this.countries[i].colorByPopulation = this.getCountryColorByPopulation(this.countries[i]);
 
-      if(settings.extrudeEnabled) {
+      if(Config.extrudeEnabled) {
         // create extruded geometry from path Shape:
         this.countries[i].geometry = new THREE.ExtrudeGeometry( this.countries[i].shapes, {
-          // amount: settings.extrudeDepth * 10,
+          // amount: Config.extrudeDepth * 10,
           // amount: 0.5 + this.getPopulationRatio(this.countries[i].properties) * 100,
           amount: this.countries[i].numDestinationsFreeOrOnArrival / this.maxNumDestinationsFreeOrOnArrival * 100,
           bevelEnabled: false
@@ -1363,19 +1355,19 @@ WorldMap.prototype = {
 
 
       // subtesselate surface:
-      if(settings.tesselationEnabled) {
-        var tessellateModifier = new THREE.TessellateModifier( settings.tesselationMaxEdgeLength ); // 2
-        for( var n = 0; n < settings.tesselationIterations; n++ ) { // 10
+      if(Config.tesselationEnabled) {
+        var tessellateModifier = new THREE.TessellateModifier( Config.tesselationMaxEdgeLength ); // 2
+        for( var n = 0; n < Config.tesselationIterations; n++ ) { // 10
           tessellateModifier.modify( this.countries[i].geometry );
         }
       }
 
-
       // 2D Geometry:
+      var k;
       this.countries[i].geometry2D = this.countries[i].geometry.clone();
-      for(var k = 0; k < this.countries[i].geometry2D.vertices.length; k++) {
-        this.countries[i].geometry2D.vertices[k].x += settings.mapOffsetX;
-        this.countries[i].geometry2D.vertices[k].y = - this.countries[i].geometry2D.vertices[k].y + settings.mapOffsetY;
+      for(k = 0; k < this.countries[i].geometry2D.vertices.length; k++) {
+        this.countries[i].geometry2D.vertices[k].x += Config.mapOffsetX;
+        this.countries[i].geometry2D.vertices[k].y = -this.countries[i].geometry2D.vertices[k].y + Config.mapOffsetY;
         // this.countries[i].geometry2D.vertices[k].z += 0;
       }
 
@@ -1387,79 +1379,79 @@ WorldMap.prototype = {
       var vertexCount = 0;
       for(var s = 0; s < this.countries[i].shapes.length; s++) {
         var pointsGeometry = this.countries[i].shapes[s].createPointsGeometry();
-        for(var k = 0; k < pointsGeometry.vertices.length; k++) {
-          pointsGeometry.vertices[k].x += settings.mapOffsetX;
-          pointsGeometry.vertices[k].y = - pointsGeometry.vertices[k].y + settings.mapOffsetY;
+        for(k = 0; k < pointsGeometry.vertices.length; k++) {
+          pointsGeometry.vertices[k].x += Config.mapOffsetX;
+          pointsGeometry.vertices[k].y = -pointsGeometry.vertices[k].y + Config.mapOffsetY;
           pointsGeometry.vertices[k].z += 0.2;
 
           this.countries[i].center2D.add(pointsGeometry.vertices[k]);
           vertexCount++;
         }
-        var line = new THREE.Line( pointsGeometry, settings.materialCountryBorder );
+        var line = new THREE.Line( pointsGeometry, Config.materialCountryBorder );
         this.countries[i].pointsMesh2D.add(line);
       }
       this.countries[i].center2D.divideScalar(vertexCount);
 
       // -40
       // +73
-      if(this.countries[i].properties.name == "France") {
+      if(this.countries[i].properties.name === 'France') {
         this.countries[i].center2D.x = -55;
         this.countries[i].center2D.y = 89;
-      } else if(this.countries[i].properties.name == "Netherlands") {
+      } else if(this.countries[i].properties.name === 'Netherlands') {
         this.countries[i].center2D.x = -47;
         this.countries[i].center2D.y = 104;
-      } else if(this.countries[i].properties.name == "Norway") {
+      } else if(this.countries[i].properties.name === 'Norway') {
         this.countries[i].center2D.x = -35;
         this.countries[i].center2D.y = 140;
-      } else if(this.countries[i].properties.name == "United States") {
+      } else if(this.countries[i].properties.name === 'United States') {
         this.countries[i].center2D.x = -300;
         this.countries[i].center2D.y = 65;
-      } else if(this.countries[i].properties.name == "Canada") {
+      } else if(this.countries[i].properties.name === 'Canada') {
         this.countries[i].center2D.x = -290;
         this.countries[i].center2D.y = 130;
-      } else if(this.countries[i].properties.name == "Denmark") {
+      } else if(this.countries[i].properties.name === 'Denmark') {
         this.countries[i].center2D.x = -38;
         this.countries[i].center2D.y = 114;
-      } else if(this.countries[i].properties.name == "India") {
+      } else if(this.countries[i].properties.name === 'India') {
         this.countries[i].center2D.x = 145;
         this.countries[i].center2D.y = 20;
-      } else if(this.countries[i].properties.name == "Russia") {
+      } else if(this.countries[i].properties.name === 'Russia') {
         this.countries[i].center2D.x = 135;
         this.countries[i].center2D.y = 132;
-      } else if(this.countries[i].properties.name == "Brazil") {
+      } else if(this.countries[i].properties.name === 'Brazil') {
         this.countries[i].center2D.x = -190;
         this.countries[i].center2D.y = -78;
-      } else if(this.countries[i].properties.name == "United Kingdom") {
+      } else if(this.countries[i].properties.name === 'United Kingdom') {
         this.countries[i].center2D.x = -64;
         this.countries[i].center2D.y = 107;
-      } else if(this.countries[i].properties.name == "Spain") {
+      } else if(this.countries[i].properties.name === 'Spain') {
         this.countries[i].center2D.x = -67;
         this.countries[i].center2D.y = 70;
-      } else if(this.countries[i].properties.name == "Portugal") {
+      } else if(this.countries[i].properties.name === 'Portugal') {
         this.countries[i].center2D.x = -79;
         this.countries[i].center2D.y = 67;
       }
 
       // 3D Geometry:
       this.countries[i].geometry3D = this.countries[i].geometry.clone();
-      for(var k = 0; k < this.countries[i].geometry.vertices.length; k++) {
+      for(k = 0; k < this.countries[i].geometry.vertices.length; k++) {
         var spherical = this.geo.projection.invert([this.countries[i].geometry.vertices[k].x, this.countries[i].geometry.vertices[k].y]);
         spherical[0] = THREE.Math.degToRad(spherical[0]);
         spherical[1] = THREE.Math.degToRad(spherical[1]);
 
-        // this.countries[i].geometry3D.vertices[k].x = settings.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
-        // this.countries[i].geometry3D.vertices[k].y = - settings.globeRadius * Math.sin(spherical[1]);
-        // this.countries[i].geometry3D.vertices[k].z = settings.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
+        // this.countries[i].geometry3D.vertices[k].x = Config.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
+        // this.countries[i].geometry3D.vertices[k].y = - Config.globeRadius * Math.sin(spherical[1]);
+        // this.countries[i].geometry3D.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
 
-        this.countries[i].geometry3D.vertices[k].x = settings.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
-        this.countries[i].geometry3D.vertices[k].y = - settings.globeRadius * Math.sin(spherical[1]);
-        if(this.countries[i].geometry.vertices[k].z < settings.extrudeDepth) {
-          this.countries[i].geometry3D.vertices[k].z = settings.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
+        this.countries[i].geometry3D.vertices[k].x = Config.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
+        this.countries[i].geometry3D.vertices[k].y = -Config.globeRadius * Math.sin(spherical[1]);
+        if(this.countries[i].geometry.vertices[k].z < Config.extrudeDepth) {
+          this.countries[i].geometry3D.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
           // this.countries[i].geometry3D.vertices[k].multiplyScalar(0.5);
         } else {
-          this.countries[i].geometry3D.vertices[k].z = settings.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
+          this.countries[i].geometry3D.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
           this.countries[i].geometry3D.vertices[k].multiplyScalar(1.002);
-          if(settings.extrudeEnabled) {
+          if(Config.extrudeEnabled) {
             this.countries[i].geometry3D.vertices[k].multiplyScalar( 1 + this.countries[i].numDestinationsFreeOrOnArrival / this.maxNumDestinationsFreeOrOnArrival * 0.5);
           }
         }
@@ -1469,63 +1461,70 @@ WorldMap.prototype = {
 
       this.countries[i].center3D = new THREE.Vector3();
       vertexCount = 0;
-      for(var k = 0; k < this.countries[i].geometry3D.vertices.length; k++) {
+      for(k = 0; k < this.countries[i].geometry3D.vertices.length; k++) {
         this.countries[i].center3D.add(this.countries[i].geometry3D.vertices[k]);
         vertexCount++;
       }
       this.countries[i].center3D.divideScalar(vertexCount);
 
       // this.countries[i].center3D.copy(this.countries[i].center2D);
-      var spherical = this.geo.projection.invert([this.countries[i].center2D.x - settings.mapOffsetX, - this.countries[i].center2D.y + settings.mapOffsetY]);
+      spherical = this.geo.projection.invert([this.countries[i].center2D.x - Config.mapOffsetX, -this.countries[i].center2D.y + Config.mapOffsetY]);
       spherical[0] = THREE.Math.degToRad(spherical[0]);
       spherical[1] = THREE.Math.degToRad(spherical[1]);
-      this.countries[i].center3D.x = settings.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
-      this.countries[i].center3D.y = - settings.globeRadius * Math.sin(spherical[1]);
-      this.countries[i].center3D.z = settings.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
+      this.countries[i].center3D.x = Config.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
+      this.countries[i].center3D.y = -Config.globeRadius * Math.sin(spherical[1]);
+      this.countries[i].center3D.z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
       this.countries[i].center3D.applyMatrix4(m);
 
 
       // 3D points meshes
       this.countries[i].pointsMesh3D = new THREE.Object3D();
-      for(var s = 0; s < this.countries[i].shapes.length; s++) {
-        var pointsGeometry = this.countries[i].shapes[s].createPointsGeometry();
-        for(var k = 0; k < pointsGeometry.vertices.length; k++) {
-          var spherical = this.geo.projection.invert([pointsGeometry.vertices[k].x, pointsGeometry.vertices[k].y]);
+      for(s = 0; s < this.countries[i].shapes.length; s++) {
+        pointsGeometry = this.countries[i].shapes[s].createPointsGeometry();
+        for(k = 0; k < pointsGeometry.vertices.length; k++) {
+          spherical = this.geo.projection.invert([pointsGeometry.vertices[k].x, pointsGeometry.vertices[k].y]);
 
           spherical[0] = THREE.Math.degToRad(spherical[0]);
           spherical[1] = THREE.Math.degToRad(spherical[1]);
 
-          pointsGeometry.vertices[k].x = settings.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
-          pointsGeometry.vertices[k].y = - settings.globeRadius * Math.sin(spherical[1]);
-          pointsGeometry.vertices[k].z = settings.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
+          pointsGeometry.vertices[k].x = Config.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
+          pointsGeometry.vertices[k].y = -Config.globeRadius * Math.sin(spherical[1]);
+          pointsGeometry.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
 
           pointsGeometry.vertices[k].multiplyScalar(1.004);
 
         }
 
-        var line = new THREE.Line( pointsGeometry, settings.materialCountryBorder );
+        line = new THREE.Line( pointsGeometry, Config.materialCountryBorder );
         this.countries[i].pointsMesh3D.add(line);
       }
       // rotate and bake transform into vertices:
       this.countries[i].pointsMesh3D.applyMatrix(m);
 
 
-      this.countries[i].mesh = new THREE.Mesh(this.countries[i].geometry, settings.materialCountryDefault); // this.countries[i].material // this.materialCountryDefault
+      this.countries[i].mesh = new THREE.Mesh(this.countries[i].geometry, Config.materialCountryDefault); // this.countries[i].material // this.materialCountryDefault
       this.countries[i].mesh.name = this.countries[i].properties.name_long;
       this.countries[i].mesh.countryObject = this.countries[i];
-      if( !usesWebGL ){
-        this.countries[i].mesh.material = new THREE.MeshPhongMaterial({ color: new THREE.Color(0xFF0000), transparent: false,  wireframe: false, shading: THREE.SmoothShading, side: THREE.DoubleSide, overdraw: true });
+      if(!usesWebGL) {
+        this.countries[i].mesh.material = new THREE.MeshPhongMaterial({
+          color: new THREE.Color(0xFF0000),
+          transparent: false,
+          wireframe: false,
+          shading: THREE.SmoothShading,
+          side: THREE.DoubleSide,
+          overdraw: true
+        });
       }
 
       this.countriesObject3D.add(this.countries[i].mesh);
 
     } // for this.countries.length initial geometry creation end
 
-    if( !usesWebGL ){
+    if(!usesWebGL) {
       this.scene.add(this.countriesObject3D);
     }
 
-    trace( this.trianglesNumTotal + " triangles total" );
+    trace(this.trianglesNumTotal + ' triangles total');
 
     var scaleStart = 0.0;
     this.countriesObject3D.scale.set(scaleStart, scaleStart, scaleStart);
@@ -1533,11 +1532,11 @@ WorldMap.prototype = {
 
     this.updateGeometry(true);
 
-    trace("Creating meshes took " + (Date.now() - start) + " ms");
+    trace('Creating meshes took ' + (Date.now() - start) + ' ms');
 
     worldMap.updateAllCountryColors();
 
-    settings.interpolatePos = 1.0;
+    animationProps.interpolatePos = 1.0;
 
     if(usesWebGL) {
       worldMap.createBufferGeometry();
@@ -1549,10 +1548,10 @@ WorldMap.prototype = {
 
       var scaleFinal = 1.0; // has to be one for the picking to work properly in combination with buffer geometry
       worldMap.tweenScale = new TWEEN.Tween(worldMap.countriesObject3D.scale)
-        .to({ x: scaleFinal, y: scaleFinal, z: scaleFinal}, settings.introRotateDuration) // 3500
+        .to({x: scaleFinal, y: scaleFinal, z: scaleFinal}, Config.introRotateDuration) // 3500
         .delay(0)
         .onStart(function() {
-          settings.interpolatePos = 1.0;
+          animationProps.interpolatePos = 1.0;
         })
         .onUpdate(function() {
           worldMap.geometryNeedsUpdate = true;
@@ -1564,8 +1563,8 @@ WorldMap.prototype = {
         // .easing(TWEEN.Easing.Cubic.Out)
         .start();
 
-      worldMap.tweenWarp = new TWEEN.Tween(settings)
-        .to({ interpolatePos: 0.0 }, settings.introWarpDuration)
+      worldMap.tweenWarp = new TWEEN.Tween(animationProps)
+        .to({interpolatePos: 0.0}, Config.introWarpDuration)
         .delay(0)
         .easing(TWEEN.Easing.Exponential.InOut)
         .onUpdate(function() {
@@ -1581,7 +1580,7 @@ WorldMap.prototype = {
           worldMap.initDestinationCountryDropDown();
 
           if($(window).width() > 480 && IS_DESKTOP) {
-            if(!$('#country_list').is(":visible")) {
+            if(!$('#country_list').is(':visible')) {
               worldMap.updateCountryList();
               $('#country_list').slideToggle();
               $('#button_country_list .caret').css('-webkit-transform', 'rotate(180deg)');
@@ -1600,10 +1599,10 @@ WorldMap.prototype = {
 
       window.setTimeout(function() {
         worldMap.tweenWarp.start();
-      }, settings.introWarpDelay);
+      }, Config.introWarpDelay);
 
       worldMap.tweenRotation = new TWEEN.Tween(worldMap.countriesObject3D.rotation)
-        .to({ y: 0.0 }, settings.introRotateDuration) // 3500
+        .to({ y: 0.0 }, Config.introRotateDuration) // 3500
         .delay(0)
         .easing(TWEEN.Easing.Quintic.Out)
         .onUpdate(function() {
@@ -1619,12 +1618,14 @@ WorldMap.prototype = {
   },
 
   updateGeometry: function(computeFaceNormals) {
-    // trace("updateGeometry()");
+    // trace('updateGeometry()');
 
-    for(var i = 0 ; i < this.countries.length ; i++) {
-      for(var k = 0; k < this.countries[i].geometry.vertices.length; k++) {
+    var i;
+    var k;
+    for(i = 0; i < this.countries.length; i++) {
+      for(k = 0; k < this.countries[i].geometry.vertices.length; k++) {
         this.countries[i].geometry.vertices[k].copy(this.countries[i].geometry2D.vertices[k]);
-        this.countries[i].geometry.vertices[k].mix(this.countries[i].geometry3D.vertices[k], settings.interpolatePos);
+        this.countries[i].geometry.vertices[k].mix(this.countries[i].geometry3D.vertices[k], animationProps.interpolatePos);
       }
       // this.countries[i].geometry.verticesNeedUpdate = true; // required to update mesh, also for picking to work
 
@@ -1646,9 +1647,9 @@ WorldMap.prototype = {
 
     // transform sphere:
     if(this.sphere) {
-      for(var k = 0; k < this.sphere.geometry.vertices.length; k++) {
+      for(k = 0; k < this.sphere.geometry.vertices.length; k++) {
         this.sphere.geometry.vertices[k].copy(this.sphereGeometry2D.vertices[k]);
-        this.sphere.geometry.vertices[k].mix(this.sphereGeometry3D.vertices[k], settings.interpolatePos * settings.interpolatePos);
+        this.sphere.geometry.vertices[k].mix(this.sphereGeometry3D.vertices[k], animationProps.interpolatePos * animationProps.interpolatePos);
       }
       this.sphere.geometry.verticesNeedUpdate = true; // required to update mesh
 
@@ -1666,14 +1667,14 @@ WorldMap.prototype = {
     var colors = new Float32Array( this.trianglesNumTotal * 3 * 3 );
 
     var color = new THREE.Color();
-    color.set(settings.colorCountryDefault);
+    color.set(Config.colorCountryDefault);
 
     var index = 0;
     var i, f;
-    for(i = 0 ; i < this.countries.length; i++) {
+    for(i = 0; i < this.countries.length; i++) {
       var vertices = this.countries[i].geometry.vertices;
 
-      for(f = 0 ; f < this.countries[i].geometry.faces.length; f++) {
+      for(f = 0; f < this.countries[i].geometry.faces.length; f++) {
         var face = this.countries[i].geometry.faces[f];
 
         // positions
@@ -1686,13 +1687,13 @@ WorldMap.prototype = {
         positions[ index + 4 ] = vertices[ face.b ].y;
         positions[ index + 5 ] = vertices[ face.b ].z;
 
-        positions[ index + 6] = vertices[ face.c ].x;
+        positions[ index + 6 ] = vertices[ face.c ].x;
         positions[ index + 7 ] = vertices[ face.c ].y;
         positions[ index + 8 ] = vertices[ face.c ].z;
 
         // normals
 
-        normals[ index ]     = face.normal.x;
+        normals[ index ] = face.normal.x;
         normals[ index + 1 ] = face.normal.y;
         normals[ index + 2 ] = face.normal.z;
 
@@ -1706,7 +1707,7 @@ WorldMap.prototype = {
 
         // colors
 
-        colors[ index ]     = color.r;
+        colors[ index ] = color.r;
         colors[ index + 1 ] = color.g;
         colors[ index + 2 ] = color.b;
 
@@ -1731,27 +1732,27 @@ WorldMap.prototype = {
     this.bufferGeometry.computeBoundingSphere();
     // this.bufferGeometry.computeVertexNormals();
 
-    var mesh = new THREE.Mesh( this.bufferGeometry, settings.mapMaterial );
+    var mesh = new THREE.Mesh( this.bufferGeometry, Config.materialMap );
     this.scene.add( mesh );
 
   },
 
   updateCountryColorsOneByOne: function() {
-    // trace("updateCountryColorsOneByOne()");
+    // trace('updateCountryColorsOneByOne()');
 
     if(this.selectedCountry) {
-      this.selectedCountry.color.set(settings.colorCountrySelected);
+      this.selectedCountry.color.set(Config.colorCountrySelected);
       this.selectedCountry.colorLast.set(this.selectedCountry.color);
     }
 
-    settings.colorChangeID = 0;
+    animationProps.colorChangeID = 0;
     new TWEEN.Tween({})
-      .to({ x: 0 }, settings.updateColorsDuration)
+      .to({ x: 0 }, Config.updateColorsDuration)
       .onUpdate(function(time) {
-        var idLast = settings.colorChangeID;
-        settings.colorChangeID = parseInt(time * worldMap.countries.length);
+        var idLast = animationProps.colorChangeID;
+        animationProps.colorChangeID = parseInt(time * worldMap.countries.length);
 
-        worldMap.updateCountryColors(idLast, settings.colorChangeID);
+        worldMap.updateCountryColors(idLast, animationProps.colorChangeID);
 
         // worldMap.updateBufferGeometry();
         if(usesWebGL) {
@@ -1768,33 +1769,33 @@ WorldMap.prototype = {
 
   getCountryColorByVisaStatus: function(country) {
     var c;
-    if(country.visa_required == "no") {
-      c = settings.colorVisaNotRequired;
+    if(country.visa_required === 'no') {
+      c = Config.colorVisaNotRequired;
 
-    } else if(country.visa_required == "on-arrival") {
-      c = settings.colorVisaOnArrival;
+    } else if(country.visa_required === 'on-arrival') {
+      c = Config.colorVisaOnArrival;
 
-    } else if(country.visa_required == "free-eu") {
-      c = settings.colorVisaFreeEU;
+    } else if(country.visa_required === 'free-eu') {
+      c = Config.colorVisaFreeEU;
 
-    } else if(country.visa_required == "yes") {
-      c = settings.colorVisaRequired;
+    } else if(country.visa_required === 'yes') {
+      c = Config.colorVisaRequired;
 
-    } else if(country.visa_required == "admission-refused") {
-      c = settings.colorVisaAdmissionRefused;
+    } else if(country.visa_required === 'admission-refused') {
+      c = Config.colorVisaAdmissionRefused;
 
-    } else if(country.visa_required == "") {
-      c = settings.colorVisaDataNotAvailable;
+    } else if(country.visa_required === '') {
+      c = Config.colorVisaDataNotAvailable;
 
     } else { // special
-      c = settings.colorVisaSpecial;
+      c = Config.colorVisaSpecial;
 
     }
     return c;
   },
 
   updateCountryColors: function(start, end, pos) {
-    // trace("updateCountryColors()");
+    // trace('updateCountryColors()');
 
     // for(var i = 0 ; i < this.countries.length; i++) {
     var c = new THREE.Color();
@@ -1802,36 +1803,36 @@ WorldMap.prototype = {
     for(var i = start; i < end; i++) {
       var country = this.countries[i];
 
-      if(this.mode == "destinations") {
+      if(this.mode === 'destinations') {
 
         if(this.selectedCountry && this.selectedDestinationCountry) {
 
-          if( country == this.selectedDestinationCountry ) {
+          if( country === this.selectedDestinationCountry ) {
             if(this.visaInformationFound) {
               c.set( this.getCountryColorByVisaStatus(country) );
 
             } else {
-              c.set(settings.colorCountryDefault);
+              c.set(Config.colorCountryDefault);
             }
 
-          } else if( country == this.selectedCountry ) {
-            c.set(settings.colorCountrySelected);
+          } else if( country === this.selectedCountry ) {
+            c.set(Config.colorCountrySelected);
 
           } else {
-            c.set(settings.colorCountryDefault);
+            c.set(Config.colorCountryDefault);
           }
 
         } else if(this.selectedCountry && !this.selectedDestinationCountry) {
 
-          if( country == this.selectedCountry ) {
-            c.set(settings.colorCountrySelected);
+          if( country === this.selectedCountry ) {
+            c.set(Config.colorCountrySelected);
 
           } else {
             if(this.visaInformationFound) {
               c.set( this.getCountryColorByVisaStatus(country) );
 
             } else {
-              c.set(settings.colorCountryDefault);
+              c.set(Config.colorCountryDefault);
             }
 
           }
@@ -1842,7 +1843,7 @@ WorldMap.prototype = {
           if(country.destinations.length > 0) {
             c.set(country.colorByFreeDestinations);
           } else {
-            c.set(settings.colorVisaDataNotAvailable);
+            c.set(Config.colorVisaDataNotAvailable);
           }
 
         } else {
@@ -1851,32 +1852,32 @@ WorldMap.prototype = {
           if(country.destinations.length > 0) {
             c.set(country.colorByFreeDestinations);
           } else {
-            c.set(settings.colorVisaDataNotAvailable);
+            c.set(Config.colorVisaDataNotAvailable);
           }
 
         }
 
-        if( country == this.selectedCountry ) {
-          c.set(settings.colorCountrySelected);
+        if( country === this.selectedCountry ) {
+          c.set(Config.colorCountrySelected);
         }
 
-      } else if(this.mode == "sources") {
+      } else if(this.mode === 'sources') {
 
         if(this.selectedCountry && this.selectedDestinationCountry) {
 
-          if( country == this.selectedDestinationCountry ) {
+          if( country === this.selectedDestinationCountry ) {
             if(this.visaInformationFound) {
               c.set( this.getCountryColorByVisaStatus(country) );
 
             } else {
-              c.set(settings.colorCountryDefault);
+              c.set(Config.colorCountryDefault);
             }
 
-          } else if( country == this.selectedCountry ) {
-            c.set(settings.colorCountrySelected);
+          } else if( country === this.selectedCountry ) {
+            c.set(Config.colorCountrySelected);
 
           } else {
-            c.set(settings.colorCountryDefault);
+            c.set(Config.colorCountryDefault);
           }
 
         } else if(this.selectedCountry && !this.selectedDestinationCountry) {
@@ -1886,15 +1887,15 @@ WorldMap.prototype = {
 
         } else if(!this.selectedCountry && this.selectedDestinationCountry) {
 
-          if( country == this.selectedDestinationCountry ) {
-            c.set(settings.colorCountrySelected);
+          if( country === this.selectedDestinationCountry ) {
+            c.set(Config.colorCountrySelected);
 
           } else {
             if(this.visaInformationFound) {
               c.set( this.getCountryColorByVisaStatus(country) );
 
             } else {
-              c.set(settings.colorCountryDefault);
+              c.set(Config.colorCountryDefault);
             }
 
           }
@@ -1906,27 +1907,27 @@ WorldMap.prototype = {
 
         }
 
-      } else if(this.mode == "gdp") {
-        if( country == this.selectedCountry ) {
-          c.set(settings.colorCountrySelected);
+      } else if(this.mode === 'gdp') {
+        if( country === this.selectedCountry ) {
+          c.set(Config.colorCountrySelected);
         } else if(country.properties.gdp_md_est > 100) {
           c.set(country.colorByGDP);
         } else {
-          c.set(settings.colorVisaDataNotAvailable);
+          c.set(Config.colorVisaDataNotAvailable);
         }
 
-      } else if(this.mode == "gdp-per-capita") {
-        if( country == this.selectedCountry ) {
-          c.set(settings.colorCountrySelected);
+      } else if(this.mode === 'gdp-per-capita') {
+        if( country === this.selectedCountry ) {
+          c.set(Config.colorCountrySelected);
         } else if(country.properties.gdp_md_est > 100) {
           c.set(country.colorByGDPPerCapita);
         } else {
-          c.set(settings.colorVisaDataNotAvailable);
+          c.set(Config.colorVisaDataNotAvailable);
         }
 
-      } else if(this.mode == "population") {
-        if( country == this.selectedCountry ) {
-          c.set(settings.colorCountrySelected);
+      } else if(this.mode === 'population') {
+        if( country === this.selectedCountry ) {
+          c.set(Config.colorCountrySelected);
         } else {
           c.set(country.colorByPopulation);
         }
@@ -1951,7 +1952,7 @@ WorldMap.prototype = {
   },
 
   updateBufferGeometry: function() {
-    // trace("updateBufferGeometry()");
+    // trace('updateBufferGeometry()');
 
     var positions = this.bufferGeometry.getAttribute( 'position' ).array;
     var normals = this.bufferGeometry.getAttribute( 'normal' ).array;
@@ -1969,7 +1970,7 @@ WorldMap.prototype = {
 
     var index = 0;
     var i, f;
-    for(i = 0 ; i < this.countries.length; i++) {
+    for(i = 0; i < this.countries.length; i++) {
       var vertices = this.countries[i].geometry.vertices;
 
       // trace( this.countries[i].properties.name_long );
@@ -1977,7 +1978,7 @@ WorldMap.prototype = {
 
       color.set(this.countries[i].color);
 
-      for(f = 0 ; f < this.countries[i].geometry.faces.length; f++) {
+      for(f = 0; f < this.countries[i].geometry.faces.length; f++) {
         var face = this.countries[i].geometry.faces[f];
 
         // positions
@@ -1999,13 +2000,13 @@ WorldMap.prototype = {
         v.copy( vertices[ face.c ] );
         v.applyMatrix4(m);
 
-        positions[ index + 6] = v.x;
+        positions[ index + 6 ] = v.x;
         positions[ index + 7 ] = v.y;
         positions[ index + 8 ] = v.z;
 
         // normals
 
-        normals[ index ]     = face.normal.x;
+        normals[ index ] = face.normal.x;
         normals[ index + 1 ] = face.normal.y;
         normals[ index + 2 ] = face.normal.z;
 
@@ -2019,7 +2020,7 @@ WorldMap.prototype = {
 
         // colors
 
-        colors[ index ]     = color.r;
+        colors[ index ] = color.r;
         colors[ index + 1 ] = color.g;
         colors[ index + 2 ] = color.b;
 
@@ -2048,7 +2049,7 @@ WorldMap.prototype = {
 
 
   updateBufferGeometryColors: function() {
-    // trace("updateBufferGeometryColors()");
+    // trace('updateBufferGeometryColors()');
 
     var colors = this.bufferGeometry.getAttribute( 'color' ).array;
 
@@ -2056,11 +2057,11 @@ WorldMap.prototype = {
 
     var index = 0;
     var i, f;
-    for(i = 0 ; i < this.countries.length; i++) {
+    for(i = 0; i < this.countries.length; i++) {
       color.set(this.countries[i].color);
 
-      for(f = 0 ; f < this.countries[i].geometry.faces.length; f++) {
-        colors[ index ]     = color.r;
+      for(f = 0; f < this.countries[i].geometry.faces.length; f++) {
+        colors[ index ] = color.r;
         colors[ index + 1 ] = color.g;
         colors[ index + 2 ] = color.b;
 
@@ -2081,60 +2082,58 @@ WorldMap.prototype = {
 
   },
 
-
   getPopulationRatio: function(country) {
     return parseFloat(country.properties.pop_est) / this.maxPopulation;    // 1 166 079 220.0;
   },
 
-
   getCountryColorByPopulation: function(country) {
     var m = this.getPopulationRatio(country);
     m = TWEEN.Easing.Exponential.Out(m);
-    var color = new THREE.Color(settings.colorZeroDestinations);
-    color.lerp(settings.colorMaxDestinations, m);
+    var color = new THREE.Color(Config.colorZeroDestinations);
+    color.lerp(Config.colorMaxDestinations, m);
     // color.copyLinearToGamma(color);
     return color;
   },
 
   getCountryColorByFreeDestinations: function(numDestinations) {
     var m = numDestinations / this.maxNumDestinationsFreeOrOnArrival;
-    var color = new THREE.Color(settings.colorZeroDestinations);
-    color.lerp(settings.colorMaxDestinations, m);
+    var color = new THREE.Color(Config.colorZeroDestinations);
+    color.lerp(Config.colorMaxDestinations, m);
     return color;
   },
 
   getCountryColorByFreeSources: function(numSources) {
     var m = numSources / this.maxNumSourcesFreeOrOnArrival;
-    var color = new THREE.Color(settings.colorZeroDestinations);
-    color.lerp(settings.colorMaxDestinations, m);
+    var color = new THREE.Color(Config.colorZeroDestinations);
+    color.lerp(Config.colorMaxDestinations, m);
     return color;
   },
 
   getCountryColorByGDP: function(country) {
     var m = country.properties.gdp_md_est / this.maxGDP;
     m = TWEEN.Easing.Exponential.Out(m);
-    var color = new THREE.Color(settings.colorZeroDestinations);
-    color.lerp(settings.colorMaxDestinations, m);
+    var color = new THREE.Color(Config.colorZeroDestinations);
+    color.lerp(Config.colorMaxDestinations, m);
     return color;
   },
 
   getCountryColorByGDPPerCapita: function(country) {
     var m = (country.properties.gdp_md_est / country.properties.pop_est * 1000000) / this.maxGDPPerCapita;
     m = TWEEN.Easing.Exponential.Out(m);
-    var color = new THREE.Color(settings.colorZeroDestinations);
-    color.lerp(settings.colorMaxDestinations, m);
+    var color = new THREE.Color(Config.colorZeroDestinations);
+    color.lerp(Config.colorMaxDestinations, m);
     return color;
   },
 
   updateCountryHover: function(country) {
-    // trace("updateCountryHover()");
+    // trace('updateCountryHover()');
     if(!isTouchDevice) {
       this.intersectedObject = country.mesh;
 
       if(this.countryBorder) {
         this.scene.remove(this.countryBorder);
       }
-      if(this.viewMode == "3d") {
+      if(this.viewMode === '3d') {
         this.countryBorder = country.pointsMesh3D;
       } else {
         this.countryBorder = country.pointsMesh2D;
@@ -2145,34 +2144,34 @@ WorldMap.prototype = {
         return;
       }
 
-      if(country.properties.name_long == country.properties.sovereignt) {
+      if(country.properties.name_long === country.properties.sovereignt) {
         $('#country-info .title').html( country.properties.name_long );
       } else {
-        $('#country-info .title').html( country.properties.name_long + " (" + country.properties.sovereignt + ")" );
+        $('#country-info .title').html( country.properties.name_long + ' (' + country.properties.sovereignt + ')' );
       }
 
       $('#country-info .details').html('');
 
-      if(this.mode == "destinations") {
+      if(this.mode === 'destinations') {
         if(this.selectedCountry && this.selectedDestinationCountry) {
-          if(country == this.selectedCountry) {
+          if(country === this.selectedCountry) {
             this.showCountryHoverInfoVisaFreeDestinations(country);
 
-          } else if(country == this.selectedDestinationCountry) {
+          } else if(country === this.selectedDestinationCountry) {
             if(this.visaInformationFound) {
-              $('#country-info .details').html( this.getCountryDetailsByVisaStatus(country) + " for nationals from " + this.getCountryNameWithArticle(this.selectedCountry) + '.<br/><div class="notes">' + country.notes + '</div>');
+              $('#country-info .details').html( this.getCountryDetailsByVisaStatus(country) + ' for nationals from ' + this.getCountryNameWithArticle(this.selectedCountry) + '.<br/><div class="notes">' + country.notes + '</div>');
             } else {
               $('#country-info .details').html( 'Data not available.' );
             }
           }
 
         } else if(this.selectedCountry && !this.selectedDestinationCountry) {
-          if(country == this.selectedCountry) {
+          if(country === this.selectedCountry) {
             this.showCountryHoverInfoVisaFreeDestinations(country);
 
           } else {
             if(this.visaInformationFound) {
-              $('#country-info .details').html( this.getCountryDetailsByVisaStatus(country) + " for nationals from " + this.getCountryNameWithArticle(this.selectedCountry) + '.<br/><div class="notes">' + country.notes + '</div>');
+              $('#country-info .details').html( this.getCountryDetailsByVisaStatus(country) + ' for nationals from ' + this.getCountryNameWithArticle(this.selectedCountry) + '.<br/><div class="notes">' + country.notes + '</div>');
             } else {
               $('#country-info .details').html( 'Data not available.' );
             }
@@ -2186,12 +2185,12 @@ WorldMap.prototype = {
           this.showCountryHoverInfoVisaFreeDestinations(country);
         }
 
-      } else if(this.mode == "sources") {
+      } else if(this.mode === 'sources') {
         if(this.selectedCountry && this.selectedDestinationCountry) {
-          if(country == this.selectedDestinationCountry) {
+          if(country === this.selectedDestinationCountry) {
             this.showCountryHoverInfoVisaFreeSources(country);
 
-          } else if(country == this.selectedCountry) {
+          } else if(country === this.selectedCountry) {
             if(this.visaInformationFound) {
               $('#country-info .details').html( this.getCountryDetailsByVisaStatus(this.selectedDestinationCountry) + ' in ' + this.selectedDestinationCountry.properties.name_long + ' for nationals from ' + this.getCountryNameWithArticle(this.selectedCountry) + '.<br/><div class="notes">' + this.selectedDestinationCountry.notes + '</div>');
             } else {
@@ -2203,7 +2202,7 @@ WorldMap.prototype = {
           this.showCountryHoverInfoVisaFreeSources(country);
 
         } else if(!this.selectedCountry && this.selectedDestinationCountry) {
-          if(country == this.selectedDestinationCountry) {
+          if(country === this.selectedDestinationCountry) {
             this.showCountryHoverInfoVisaFreeSources(country);
 
           } else {
@@ -2219,13 +2218,13 @@ WorldMap.prototype = {
           this.showCountryHoverInfoVisaFreeSources(country);
         }
 
-      } else if(this.mode == "gdp") {
+      } else if(this.mode === 'gdp') {
         this.showCountryHoverInfoGDP(country);
 
-      } else if(this.mode == "gdp-per-capita") {
+      } else if(this.mode === 'gdp-per-capita') {
         this.showCountryHoverInfoGDPPerCapita(country);
 
-      } else if(this.mode == "population") {
+      } else if(this.mode === 'population') {
         this.showCountryHoverInfoPopulation(country);
 
       }
@@ -2246,15 +2245,15 @@ WorldMap.prototype = {
   },
 
   toScreenXY: function(pos3D) {
-          var v = pos3D.project( this.camera );
-          var percX = (v.x + 1) / 2;
-          var percY = (-v.y + 1) / 2;
+    var v = pos3D.project( this.camera );
+    var percX = (v.x + 1) / 2;
+    var percY = (-v.y + 1) / 2;
 
-          var left = percX * window.innerWidth;
-          var top = percY * window.innerHeight;
+    var left = percX * window.innerWidth;
+    var top = percY * window.innerHeight;
 
-          return new THREE.Vector2(left, top);
-      },
+    return new THREE.Vector2(left, top);
+  },
 
   showCountryHoverInfoVisaFreeDestinations: function(country) {
     if(country.destinations.length > 0) {
@@ -2273,7 +2272,7 @@ WorldMap.prototype = {
   showCountryHoverInfoGDP: function(country) {
     if(country.properties.gdp_md_est > 100) {
       var value = country.properties.gdp_md_est / 1000;
-      $('#country-info .details').html( 'GDP: ' + value.formatNumber(1) + ' Billion USD' );
+      $('#country-info .details').html( 'GDP: ' + formatNumber(value, 1) + ' Billion USD' );
     } else {
       $('#country-info .details').html( 'Data not available' );
     }
@@ -2283,7 +2282,7 @@ WorldMap.prototype = {
   showCountryHoverInfoGDPPerCapita: function(country) {
     if(country.properties.gdp_md_est > 100) {
       var value = Math.round(country.properties.gdp_md_est / country.properties.pop_est * 1000000);
-      $('#country-info .details').html( 'GDP per capita: ' + value.formatNumber(0) + ' USD' );
+      $('#country-info .details').html( 'GDP per capita: ' + formatNumber(value, 0) + ' USD' );
     } else {
       $('#country-info .details').html( 'Data not available' );
     }
@@ -2292,26 +2291,27 @@ WorldMap.prototype = {
 
   showCountryHoverInfoPopulation: function(country) {
     var value = country.properties.pop_est;
-    $('#country-info .details').html( 'Population: ' + value.formatNumber(0) );
+    $('#country-info .details').html( 'Population: ' + formatNumber(value, 0) );
     $('#country-info .details').show();
   },
 
   setModeStatement: function() {
-    if(this.mode == 'destinations') {
+    if(this.mode === 'destinations') {
       $('#travelscope').html('This map explores the power of passports: it visualizes the number of countries people with a certain nationality can travel to without a visa or with visa on arrival.');
-    } else if(this.mode == 'sources') {
+    } else if(this.mode === 'sources') {
       $('#travelscope').html('This map visualizes the number of sources countries, whose nationals can enter a specific country without a visa or with visa on arrival.');
-    } else if(this.mode == 'gdp') {
+    } else if(this.mode === 'gdp') {
       $('#travelscope').html('This map visualizes the GDP of all the countries in the world.');
-    } else if(this.mode == 'gdp-per-capita') {
+    } else if(this.mode === 'gdp-per-capita') {
       $('#travelscope').html('This map visualizes the GDP-per-capita of all the countries in the world.');
-    } else if(this.mode == 'population') {
-      $('#travelscope').html('This map visualizes the population of all the countries in the world. Total population (2014): ' + this.totalPopulation.formatNumber(0));
+    } else if(this.mode === 'population') {
+      $('#travelscope').html('This map visualizes the population of all the countries in the world. Total population (2014): ' + formatNumber(this.totalPopulation, 0));
     }
 
     if(IS_DESKTOP) {
-      if(this.mode == 'destinations') {
-        var keyboardhint = 'Click map to select source country,<br/>';
+      var keyboardhint;
+      if(this.mode === 'destinations') {
+        keyboardhint = 'Click map to select source country,<br/>';
         if(isMac) {
           keyboardhint += 'CMD + Click';
         } else {
@@ -2321,8 +2321,8 @@ WorldMap.prototype = {
 
         $('#travelscope').append('<div class="notes">' + keyboardhint + '</div>');
 
-      } else if(this.mode == 'sources') {
-        var keyboardhint = 'Click map to select destination country,<br/>';
+      } else if(this.mode === 'sources') {
+        keyboardhint = 'Click map to select destination country,<br/>';
         if(isMac) {
           keyboardhint += 'CMD + Click';
         } else {
@@ -2335,7 +2335,7 @@ WorldMap.prototype = {
 
     }
 
-    if(!$('#travelscope').is( ":visible" )) {
+    if(!$('#travelscope').is( ':visible' )) {
       // $('#travelscope').fadeIn(600);
 
       $('#travelscope').css('top', '50px');
@@ -2348,7 +2348,7 @@ WorldMap.prototype = {
       }
       $('#travelscope').animate({
         top: top,
-        opacity: 1,
+        opacity: 1
       }, {
         easing: 'easeOutCubic',
         duration: 800
@@ -2373,12 +2373,12 @@ WorldMap.prototype = {
 
         var intersects = this.getIntersects();
 
-        if ( intersects.length > 0 ) {
-          // if ( this.intersectedObject != intersects[ 0 ].object && intersects[ 0 ].object.countryObject && intersects[ 0 ].object.countryObject != this.selectedCountry ) {
-          if ( this.intersectedObject != intersects[ 0 ].object && !this.listHover) {
+        if( intersects.length > 0 ) {
+          // if( this.intersectedObject !== intersects[ 0 ].object && intersects[ 0 ].object.countryObject && intersects[ 0 ].object.countryObject !== this.selectedCountry ) {
+          if( this.intersectedObject !== intersects[ 0 ].object && !this.listHover) {
             this.clearCountryHover();
 
-            if(intersects[ 0 ].object.name != "sphere") {
+            if(intersects[ 0 ].object.name !== 'sphere') {
               this.intersectedObject = intersects[ 0 ].object;
             }
             var country = intersects[ 0 ].object.countryObject;
@@ -2395,7 +2395,7 @@ WorldMap.prototype = {
         }
 
         /*
-        if(!this.geometryNeedsUpdate && (this.intersectedObjectBefore != this.intersectedObject) ) {
+        if(!this.geometryNeedsUpdate && (this.intersectedObjectBefore !== this.intersectedObject) ) {
           this.updateAllCountryColors();
           this.updateBufferGeometry();
         }
@@ -2432,7 +2432,7 @@ WorldMap.prototype = {
     this.raycaster.set( this.camera.position, vector.sub( this.camera.position ).normalize() );
 
     var intersects = this.raycaster.intersectObjects( this.countriesObject3D.children );
-    intersects.sort( function ( a, b ) { return a.distance - b.distance; } );
+    intersects.sort( function( a, b ) { return a.distance - b.distance; } );
 
     return intersects;
   },
@@ -2445,30 +2445,30 @@ WorldMap.prototype = {
     this.raycaster.set( this.camera.position, vector.sub( this.camera.position ).normalize() );
 
     var intersects = this.raycaster.intersectObjects( this.countriesObject3D.children );
-    intersects.sort( function ( a, b ) { return a.distance - b.distance; } );
+    intersects.sort( function( a, b ) { return a.distance - b.distance; } );
 
     return intersects;
   },
 
   selectCountryFromMap: function(event) {
-    // trace("selectCountryFromMap");
+    // trace('selectCountryFromMap');
 
     var intersects = this.getIntersectsMouseDown();
 
-    if ( intersects.length > 0 ) {
-      if (intersects[ 0 ].object.countryObject && this.selectedCountry != intersects[ 0 ].object.countryObject ) {
+    if( intersects.length > 0 ) {
+      if(intersects[ 0 ].object.countryObject && this.selectedCountry !== intersects[ 0 ].object.countryObject ) {
 
-        if(intersects[ 0 ].object.name != "sphere") {
-          if(this.mode == "destinations") {
-            if (event.ctrlKey || event.altKey || event.metaKey) {
+        if(intersects[ 0 ].object.name !== 'sphere') {
+          if(this.mode === 'destinations') {
+            if(event.ctrlKey || event.altKey || event.metaKey) {
               this.setSelectedDestinationCountry(intersects[ 0 ].object.countryObject);
               this.trackEvent('destinationCountryMapClick', intersects[ 0 ].object.countryObject.properties.name_long);
             } else {
               this.setSelectedCountry(intersects[ 0 ].object.countryObject);
               this.trackEvent('sourceCountryMapClick', intersects[ 0 ].object.countryObject.properties.name_long);
             }
-          } else if(this.mode == "sources") {
-            if (event.ctrlKey || event.altKey || event.metaKey) {
+          } else if(this.mode === 'sources') {
+            if(event.ctrlKey || event.altKey || event.metaKey) {
               this.setSelectedCountry(intersects[ 0 ].object.countryObject);
               this.trackEvent('sourceCountryMapClick', intersects[ 0 ].object.countryObject.properties.name_long);
             } else {
@@ -2477,9 +2477,9 @@ WorldMap.prototype = {
             }
 
           } else {
-            //this.setSelectedCountry(intersects[ 0 ].object.countryObject);
-            //this.trackEvent('mapClickSourceCountry', intersects[ 0 ].object.countryObject.properties.name_long);
-            if (event.ctrlKey || event.altKey || event.metaKey) {
+            // this.setSelectedCountry(intersects[ 0 ].object.countryObject);
+            // this.trackEvent('mapClickSourceCountry', intersects[ 0 ].object.countryObject.properties.name_long);
+            if(event.ctrlKey || event.altKey || event.metaKey) {
               this.setSelectedDestinationCountry(intersects[ 0 ].object.countryObject);
               this.trackEvent('destinationCountryMapClick', intersects[ 0 ].object.countryObject.properties.name_long);
             } else {
@@ -2494,20 +2494,20 @@ WorldMap.prototype = {
         }
       }
     } else {
-      if(this.mode == "destinations") {
-        if (event.ctrlKey || event.altKey || event.metaKey) {
+      if(this.mode === 'destinations') {
+        if(event.ctrlKey || event.altKey || event.metaKey) {
           this.clearSelectedDestinationCountry();
         } else {
           this.clearBothSelectedCountries();
         }
-      } else if(this.mode == "sources") {
-        if (event.ctrlKey || event.altKey || event.metaKey) {
+      } else if(this.mode === 'sources') {
+        if(event.ctrlKey || event.altKey || event.metaKey) {
           this.clearSelectedSourceCountry();
         } else {
           this.clearBothSelectedCountries();
         }
       } else {
-        if (event.ctrlKey || event.altKey || event.metaKey) {
+        if(event.ctrlKey || event.altKey || event.metaKey) {
           this.clearSelectedDestinationCountry();
         } else {
           this.clearBothSelectedCountries();
@@ -2524,15 +2524,15 @@ WorldMap.prototype = {
   },
 
   clearBothSelectedCountries: function() {
-    // trace("clearBothSelectedCountries()");
+    // trace('clearBothSelectedCountries()');
 
     if(this.selectedCountry || this.selectedDestinationCountry) {
       this.deleteLinesObject();
-      for(var i = 0 ; i < this.countries.length; i++) {
-        this.countries[i].visa_required = "";
-        this.countries[i].notes = "";
+      for(var i = 0; i < this.countries.length; i++) {
+        this.countries[i].visa_required = '';
+        this.countries[i].notes = '';
       }
-      if (this.selectedCountry) {
+      if(this.selectedCountry) {
         this.selectedCountry.listItem.removeClass('selected');
       }
       if(this.selectedDestinationCountry) {
@@ -2544,12 +2544,12 @@ WorldMap.prototype = {
       $('#country-info').stop().fadeOut(100);
 
       $('#country_dropdown').immybox('setValue', '');
-      $('#country_dropdown').val(settings.sourceCountryDefaultText);
+      $('#country_dropdown').val(Config.sourceCountryDefaultText);
       $('#country_dropdown').removeClass('filled');
       $('#country_dropdown_container .cancel').fadeOut();
 
       $('#destination_country_dropdown').immybox('setValue', '');
-      $('#destination_country_dropdown').val(settings.destinationCountryDefaultText);
+      $('#destination_country_dropdown').val(Config.destinationCountryDefaultText);
       $('#destination_country_dropdown').removeClass('filled');
       $('#destination_country_dropdown_container .cancel').fadeOut();
 
@@ -2566,11 +2566,11 @@ WorldMap.prototype = {
   clearSelectedSourceCountry: function() {
     if(this.selectedCountry) {
       this.deleteLinesObject();
-      for(var i = 0 ; i < this.countries.length; i++) {
-        this.countries[i].visa_required = "";
-        this.countries[i].notes = "";
+      for(var i = 0; i < this.countries.length; i++) {
+        this.countries[i].visa_required = '';
+        this.countries[i].notes = '';
       }
-      if (this.selectedCountry) {
+      if(this.selectedCountry) {
         this.selectedCountry.listItem.removeClass('selected');
       }
       this.selectedCountry = null;
@@ -2580,7 +2580,7 @@ WorldMap.prototype = {
       $('#country-info').stop().fadeOut(100);
 
       $('#country_dropdown').immybox('setValue', '');
-      $('#country_dropdown').val(settings.sourceCountryDefaultText);
+      $('#country_dropdown').val(Config.sourceCountryDefaultText);
       $('#country_dropdown').removeClass('filled');
       $('#country_dropdown_container .cancel').fadeOut();
 
@@ -2596,11 +2596,11 @@ WorldMap.prototype = {
   clearSelectedDestinationCountry: function() {
     if(this.selectedDestinationCountry) {
       this.deleteLinesObject();
-      for(var i = 0 ; i < this.countries.length; i++) {
-        this.countries[i].visa_required = "";
-        this.countries[i].notes = "";
+      for(var i = 0; i < this.countries.length; i++) {
+        this.countries[i].visa_required = '';
+        this.countries[i].notes = '';
       }
-      if (this.selectedDestinationCountry) {
+      if(this.selectedDestinationCountry) {
         this.selectedDestinationCountry.listItem.removeClass('selected');
       }
       this.selectedDestinationCountry = null;
@@ -2610,7 +2610,7 @@ WorldMap.prototype = {
       $('#country-info').stop().fadeOut(100);
 
       $('#destination_country_dropdown').immybox('setValue', '');
-      $('#destination_country_dropdown').val(settings.destinationCountryDefaultText);
+      $('#destination_country_dropdown').val(Config.destinationCountryDefaultText);
       $('#destination_country_dropdown').removeClass('filled');
       $('#destination_country_dropdown_container .cancel').fadeOut();
 
@@ -2624,43 +2624,48 @@ WorldMap.prototype = {
   },
 
   getLineMaterial: function(country) {
-    var material = settings.materialLineDefault;
-    if(country.visa_required == "no") {
-      material = settings.materialLineVisaNotRequired;
-    } else if(country.visa_required == "on-arrival") {
-      material = settings.materialLineVisaOnArrival;
-    } else if(country.visa_required == "free-eu") {
-      material = settings.materialLineVisaFreeEU;
-    } else if(country.visa_required == "yes") {
-      material = settings.materialLineVisaRequired;
-    } else if(country.visa_required == "admission-refused") {
-      material = settings.materialLineVisaAdmissionRefused;
-    } else if(country.visa_required == "") {
-      material = settings.materialLineVisaDataNotAvailable;
+    var material = Config.materialLineDefault;
+    if(country.visa_required === 'no') {
+      material = Config.materialLineVisaNotRequired;
+    } else if(country.visa_required === 'on-arrival') {
+      material = Config.materialLineVisaOnArrival;
+    } else if(country.visa_required === 'free-eu') {
+      material = Config.materialLineVisaFreeEU;
+    } else if(country.visa_required === 'yes') {
+      material = Config.materialLineVisaRequired;
+    } else if(country.visa_required === 'admission-refused') {
+      material = Config.materialLineVisaAdmissionRefused;
+    } else if(country.visa_required === '') {
+      material = Config.materialLineVisaDataNotAvailable;
     } else { // special
-      material = settings.materialLineVisaSpecial;
+      material = Config.materialLineVisaSpecial;
     }
     return material;
   },
 
   createLines: function() {
-    // trace("createLines()");
+    // trace('createLines()');
 
-    if(this.mode != "destinations" && this.mode != "sources") {
+    if(this.mode !== 'destinations' && this.mode !== 'sources') {
       return;
     }
 
     if(this.selectedCountry || this.selectedDestinationCountry) {
+      var points2D;
+      var points3D;
+      var line;
+      var c;
+
       this.deleteLinesObject();
 
       this.linesObject = new THREE.Object3D();
       this.scene.add(this.linesObject);
 
       if(this.selectedCountry && this.selectedDestinationCountry) {
-        var points2D = [];
-        var points3D = [];
+        points2D = [];
+        points3D = [];
 
-        if(this.mode == "destinations") {
+        if(this.mode === 'destinations') {
           points2D.push( this.selectedCountry.center2D );
           points2D.push( this.selectedDestinationCountry.center2D );
 
@@ -2681,19 +2686,19 @@ WorldMap.prototype = {
         this.selectedDestinationCountry.splineHeight = this.selectedDestinationCountry.splineLength * 0.25;
         this.selectedDestinationCountry.geometrySpline = new THREE.Geometry();
 
-        var line = new THREE.Line( this.selectedDestinationCountry.geometrySpline, this.getLineMaterial(this.selectedDestinationCountry), THREE.LineStrip );
+        line = new THREE.Line( this.selectedDestinationCountry.geometrySpline, this.getLineMaterial(this.selectedDestinationCountry), THREE.LineStrip );
         this.linesObject.add(line);
 
       } else if(this.selectedCountry && !this.selectedDestinationCountry) {
-        if(this.mode == "destinations") {
-          for(var c = 0; c < this.countries.length; c++) {
-            if(this.countries[c].visa_required == "no" || this.countries[c].visa_required == "on-arrival" || this.countries[c].visa_required == "free-eu") {
-              var points2D = [];
+        if(this.mode === 'destinations') {
+          for(c = 0; c < this.countries.length; c++) {
+            if(this.countries[c].visa_required === 'no' || this.countries[c].visa_required === 'on-arrival' || this.countries[c].visa_required === 'free-eu') {
+              points2D = [];
               points2D.push( this.selectedCountry.center2D );
               points2D.push( this.countries[c].center2D );
               this.countries[c].spline2D = new THREE.Spline( points2D );
 
-              var points3D = [];
+              points3D = [];
               points3D.push( this.selectedCountry.center3D );
               points3D.push( this.countries[c].center3D );
               this.countries[c].spline3D = new THREE.Spline( points3D );
@@ -2702,22 +2707,22 @@ WorldMap.prototype = {
               this.countries[c].splineHeight = this.countries[c].splineLength * 0.25;
               this.countries[c].geometrySpline = new THREE.Geometry();
 
-              var line = new THREE.Line( this.countries[c].geometrySpline, this.getLineMaterial(this.countries[c]), THREE.LineStrip );
+              line = new THREE.Line( this.countries[c].geometrySpline, this.getLineMaterial(this.countries[c]), THREE.LineStrip );
               this.linesObject.add(line);
             }
           }
         }
 
       } else if(!this.selectedCountry && this.selectedDestinationCountry) {
-        if(this.mode == "sources") {
-          for(var c = 0; c < this.countries.length; c++) {
-            if(this.countries[c].visa_required == "no" || this.countries[c].visa_required == "on-arrival" || this.countries[c].visa_required == "free-eu") {
-              var points2D = [];
+        if(this.mode === 'sources') {
+          for(c = 0; c < this.countries.length; c++) {
+            if(this.countries[c].visa_required === 'no' || this.countries[c].visa_required === 'on-arrival' || this.countries[c].visa_required === 'free-eu') {
+              points2D = [];
               points2D.push( this.selectedDestinationCountry.center2D );
               points2D.push( this.countries[c].center2D );
               this.countries[c].spline2D = new THREE.Spline( points2D );
 
-              var points3D = [];
+              points3D = [];
               points3D.push( this.selectedDestinationCountry.center3D );
               points3D.push( this.countries[c].center3D );
               this.countries[c].spline3D = new THREE.Spline( points3D );
@@ -2726,48 +2731,48 @@ WorldMap.prototype = {
               this.countries[c].splineHeight = this.countries[c].splineLength * 0.25;
               this.countries[c].geometrySpline = new THREE.Geometry();
 
-              var line = new THREE.Line( this.countries[c].geometrySpline, this.getLineMaterial(this.countries[c]), THREE.LineStrip );
+              line = new THREE.Line( this.countries[c].geometrySpline, this.getLineMaterial(this.countries[c]), THREE.LineStrip );
               this.linesObject.add(line);
             }
           }
         }
       }
 
-      settings.lineAnimatePos = 0;
-      settings.lineAnimateOffset = 0;
+      animationProps.lineAnimatePos = 0;
+      animationProps.lineAnimateOffset = 0;
 
-      this.tweenLines = new TWEEN.Tween(settings)
-      .to({ lineAnimatePos: 1 }, settings.lineAnimateDuration)
-      .onStart(function() {
-      })
-      .onUpdate(function(time) {
-        //worldMap.updateLines(time);
-      })
-      .easing(TWEEN.Easing.Sinusoidal.Out)
-      .start();
+      this.tweenLines = new TWEEN.Tween(animationProps)
+        .to({lineAnimatePos: 1}, Config.lineAnimateDuration)
+        .onStart(function() {
+        })
+        .onUpdate(function(time) {
+          // worldMap.updateLines(time);
+        })
+        .easing(TWEEN.Easing.Sinusoidal.Out)
+        .start();
     }
 
   },
 
   updateLines: function(time) {
-    // trace("updateLines()");
+    // trace('updateLines()');
 
-    settings.lineAnimateOffset += settings.lineAnimateSpeed * this.clock.getDelta();
-    settings.lineAnimateOffset %= settings.lineDashOffsetLimit;
+    animationProps.lineAnimateOffset += Config.lineAnimateSpeed * this.clock.getDelta();
+    animationProps.lineAnimateOffset %= Config.lineDashOffsetLimit;
 
     if(this.selectedCountry || this.selectedDestinationCountry) {
 
       for(var c = 0; c < this.countries.length; c++) {
-        var offset = settings.lineAnimateOffset / this.countries[c].splineLength;
+        var offset = animationProps.lineAnimateOffset / this.countries[c].splineLength;
 
-        // if(this.countries[c].visa_required == "no" || this.countries[c].visa_required == "on-arrival" || this.countries[c].visa_required == "free-eu") {
+        // if(this.countries[c].visa_required === 'no' || this.countries[c].visa_required === 'on-arrival' || this.countries[c].visa_required === 'free-eu') {
         if(this.countries[c].geometrySpline) {
           var subdivisions = 30;
-          for( var i = 0; i < subdivisions; i ++ ) {
+          for(var i = 0; i < subdivisions; i++) {
             var index;
-            index = i / subdivisions * settings.lineAnimatePos;
+            index = i / subdivisions * animationProps.lineAnimatePos;
             index += offset;
-            if(this.mode == "sources") {
+            if(this.mode === 'sources') {
               index = 1 - index;
             }
             index = Math.min(index, 1);
@@ -2788,9 +2793,9 @@ WorldMap.prototype = {
             this.countries[c].geometrySpline.vertices[ i ].z += z;
 
             var v3D = new THREE.Vector3( position3D.x, position3D.y, position3D.z );
-            v3D.setLength(settings.globeRadius + z);
+            v3D.setLength(Config.globeRadius + z);
 
-            this.countries[c].geometrySpline.vertices[ i ].lerp(v3D, settings.interpolatePos);
+            this.countries[c].geometrySpline.vertices[ i ].lerp(v3D, animationProps.interpolatePos);
 
           }
           this.countries[c].geometrySpline.verticesNeedUpdate = true;
@@ -2802,16 +2807,16 @@ WorldMap.prototype = {
   },
 
   trackEvent: function(category, action) {
-    if(typeof(ga) !== undefined) {
+    if(typeof ga !== undefined) {
       ga('send', 'event', category, action);
     }
   },
 
   setSelectedCountry: function(selectedCountry) {
-    // trace("setSelectedCountry()");
+    // trace('setSelectedCountry()');
 
     if(!this.introRunning) {
-      if(selectedCountry != this.selectedCountry) {
+      if(selectedCountry !== this.selectedCountry) {
         this.countrySelectionChanged = true;
       }
       this.selectedCountry = selectedCountry;
@@ -2828,10 +2833,10 @@ WorldMap.prototype = {
   },
 
   setSelectedDestinationCountry: function(selectedDestinationCountry) {
-    // trace("setSelectedDestinationCountry()");
+    // trace('setSelectedDestinationCountry()');
 
     if(!this.introRunning) {
-      if(selectedDestinationCountry != this.selectedDestinationCountry) {
+      if(selectedDestinationCountry !== this.selectedDestinationCountry) {
         this.countrySelectionChanged = true;
       }
       this.selectedDestinationCountry = selectedDestinationCountry;
@@ -2848,28 +2853,28 @@ WorldMap.prototype = {
   },
 
   getCountryDetailsByVisaStatus: function(country) {
-    var details = "";
+    var details = '';
 
-    if(country.visa_required == "no") {
-      details = "Visa not required";
+    if(country.visa_required === 'no') {
+      details = 'Visa not required';
 
-    } else if(country.visa_required == "on-arrival") {
-      details = "Visa on arrival";
+    } else if(country.visa_required === 'on-arrival') {
+      details = 'Visa on arrival';
 
-    } else if(country.visa_required == "free-eu") {
-      details = "Visa not required (EU)";
+    } else if(country.visa_required === 'free-eu') {
+      details = 'Visa not required (EU)';
 
-    } else if(country.visa_required == "yes") {
-      details = "Visa required";
+    } else if(country.visa_required === 'yes') {
+      details = 'Visa required';
 
-    } else if(country.visa_required == "admission-refused") {
-      details = "Admission refused";
+    } else if(country.visa_required === 'admission-refused') {
+      details = 'Admission refused';
 
-    } else if(country.visa_required == "special") {
-      details = "Special regulations";
+    } else if(country.visa_required === 'special') {
+      details = 'Special regulations';
 
-    } else if(country.visa_required == "") { // data not available
-      details = "Data not available";
+    } else if(country.visa_required === '') { // data not available
+      details = 'Data not available';
 
     } else { // special
       details = country.visa_required;
@@ -2879,22 +2884,29 @@ WorldMap.prototype = {
   },
 
   updateCountrySelection: function() {
-    // trace("updateCountrySelection()");
+    // trace('updateCountrySelection()');
 
-    for(var i = 0 ; i < this.countries.length; i++) {
-      this.countries[i].visa_required = "";
-      this.countries[i].notes = "";
+    var i;
+    var destinations;
+    var d;
+    var mainCountry;
+    var value;
+    var html;
+
+    for(i = 0; i < this.countries.length; i++) {
+      this.countries[i].visa_required = '';
+      this.countries[i].notes = '';
     }
 
-    if(this.mode == "destinations") {
+    if(this.mode === 'destinations') {
 
       if(this.selectedCountry && this.selectedDestinationCountry) {
         this.visaInformationFound = false;
 
-        var destinations = this.selectedCountry.destinations;
+        destinations = this.selectedCountry.destinations;
         if( destinations.length > 0 ) {
-          for(var d = 0; d < destinations.length; d++) {
-            if( (this.matchDestinationToCountryName(destinations[d].d_name, this.selectedDestinationCountry.properties.name_long) || this.matchDestinationToCountryName(this.selectedDestinationCountry.properties.name_long, destinations[d].d_name)) && this.selectedDestinationCountry.properties.name_long != this.selectedCountry.properties.name_long) {
+          for(d = 0; d < destinations.length; d++) {
+            if( (this.matchDestinationToCountryName(destinations[d].d_name, this.selectedDestinationCountry.properties.name_long) || this.matchDestinationToCountryName(this.selectedDestinationCountry.properties.name_long, destinations[d].d_name)) && this.selectedDestinationCountry.properties.name_long !== this.selectedCountry.properties.name_long) {
               this.selectedDestinationCountry.visa_required = destinations[d].visa_required;
               this.selectedDestinationCountry.notes = destinations[d].notes;
 
@@ -2906,10 +2918,10 @@ WorldMap.prototype = {
           }
 
           // add main sovereignty, if exists:
-          var mainCountry = this.getCountryByName(this.selectedCountry.properties.sovereignt);
-          if(mainCountry && mainCountry.visa_required == "") {
-            mainCountry.visa_required = "no";
-            mainCountry.notes = "National of same sovereignty (exceptions may exist)";
+          mainCountry = this.getCountryByName(this.selectedCountry.properties.sovereignt);
+          if(mainCountry && mainCountry.visa_required === '') {
+            mainCountry.visa_required = 'no';
+            mainCountry.notes = 'National of same sovereignty (exceptions may exist)';
             this.visaInformationFound = true;
             $('#travelscope').html( this.getCountryDetailsByVisaStatus(this.selectedDestinationCountry) + ' for nationals from ' + this.getCountryNameWithArticle( this.selectedCountry ) + ' travelling to ' + this.getCountryNameWithArticle( this.selectedDestinationCountry ) + '.<br/><div class="notes">' + this.selectedDestinationCountry.notes + '</div>' );
           }
@@ -2922,26 +2934,26 @@ WorldMap.prototype = {
 
       } else if(this.selectedCountry && !this.selectedDestinationCountry) {
         this.selectedCountry.populationReachable = 0;
-        var destinations = this.selectedCountry.destinations;
+        destinations = this.selectedCountry.destinations;
         if( destinations.length > 0 ) {
-          for(var d = 0; d < destinations.length; d++) {
+          for(d = 0; d < destinations.length; d++) {
             var found = false;
 
             for(var c = 0; c < this.countries.length; c++) {
-              // if( (this.matchDestinationToCountryName(destinations[d].d_name, this.countries[c].properties.name_long) || this.matchDestinationToCountryName(this.countries[c].properties.name_long, destinations[d].d_name)) && this.countries[c].properties.name_long != this.selectedCountry.properties.name_long) {
+              // if( (this.matchDestinationToCountryName(destinations[d].d_name, this.countries[c].properties.name_long) || this.matchDestinationToCountryName(this.countries[c].properties.name_long, destinations[d].d_name)) && this.countries[c].properties.name_long !== this.selectedCountry.properties.name_long) {
               if(
-                //( destinations[d].d_name == this.countries[c].properties.sovereignt) || 
+                // ( destinations[d].d_name === this.countries[c].properties.sovereignt) ||
                 (
                    this.matchDestinationToCountryName(destinations[d].d_name, this.countries[c].properties.name_long) ||
                    this.matchDestinationToCountryName(this.countries[c].properties.name_long, destinations[d].d_name)
                 ) &&
-                  this.countries[c].properties.name_long != this.selectedCountry.properties.name_long
+                  this.countries[c].properties.name_long !== this.selectedCountry.properties.name_long
 
                 ) {
                 this.countries[c].visa_required = destinations[d].visa_required;
                 this.countries[c].notes = destinations[d].notes;
 
-                if(destinations[d].visa_required == "no" || destinations[d].visa_required == "on-arrival" || destinations[d].visa_required == "free-eu") {
+                if(destinations[d].visa_required === 'no' || destinations[d].visa_required === 'on-arrival' || destinations[d].visa_required === 'free-eu') {
                   this.selectedCountry.populationReachable += this.countries[c].properties.pop_est;
                 }
 
@@ -2951,20 +2963,20 @@ WorldMap.prototype = {
 
             }
             if(!found) {
-              // trace("ERROR: " + destinations[d].d_name + " could not be matched");
+              // trace('ERROR: ' + destinations[d].d_name + ' could not be matched');
             }
           }
 
           // add main sovereignty, if exists:
-          var mainCountry = this.getCountryByName(this.selectedCountry.properties.sovereignt);
-          if(mainCountry && mainCountry.visa_required == "") {
-            mainCountry.visa_required = "no";
-            mainCountry.notes = "National of same sovereignty (exceptions may exist)";
+          mainCountry = this.getCountryByName(this.selectedCountry.properties.sovereignt);
+          if(mainCountry && mainCountry.visa_required === '') {
+            mainCountry.visa_required = 'no';
+            mainCountry.notes = 'National of same sovereignty (exceptions may exist)';
             this.selectedCountry.populationReachable += mainCountry.properties.pop_est;
           }
 
           this.selectedCountry.populationPercentage = Math.round( this.selectedCountry.populationReachable / this.totalPopulation * 100 * 10 ) / 10;
-          this.selectedCountry.populationPercentage = this.selectedCountry.populationPercentage.formatNumber(1);
+          this.selectedCountry.populationPercentage = formatNumber(this.selectedCountry.populationPercentage, 1);
 
           this.visaInformationFound = true;
 
@@ -2988,15 +3000,15 @@ WorldMap.prototype = {
         // nothing selected
       }
 
-    } else if(this.mode == "sources") {
+    } else if(this.mode === 'sources') {
 
       if(this.selectedCountry && this.selectedDestinationCountry) {
         this.visaInformationFound = false;
 
-        var destinations = this.selectedCountry.destinations;
+        destinations = this.selectedCountry.destinations;
         if( destinations.length > 0 ) {
-          for(var d = 0; d < destinations.length; d++) {
-            if( (this.matchDestinationToCountryName(destinations[d].d_name, this.selectedDestinationCountry.properties.name_long) || this.matchDestinationToCountryName(this.selectedDestinationCountry.properties.name_long, destinations[d].d_name)) && this.selectedDestinationCountry.properties.name_long != this.selectedCountry.properties.name_long) {
+          for(d = 0; d < destinations.length; d++) {
+            if( (this.matchDestinationToCountryName(destinations[d].d_name, this.selectedDestinationCountry.properties.name_long) || this.matchDestinationToCountryName(this.selectedDestinationCountry.properties.name_long, destinations[d].d_name)) && this.selectedDestinationCountry.properties.name_long !== this.selectedCountry.properties.name_long) {
               this.selectedDestinationCountry.visa_required = destinations[d].visa_required;
               this.selectedDestinationCountry.notes = destinations[d].notes;
 
@@ -3008,9 +3020,9 @@ WorldMap.prototype = {
           }
 
           // check, if selected destination country has the same sovereignty
-          if(this.selectedCountry.properties.sovereignt == this.selectedDestinationCountry.properties.sovereignt) {
-            this.selectedDestinationCountry.visa_required = "no";
-            this.selectedDestinationCountry.notes = "National of same sovereignty (exceptions may exist)";
+          if(this.selectedCountry.properties.sovereignt === this.selectedDestinationCountry.properties.sovereignt) {
+            this.selectedDestinationCountry.visa_required = 'no';
+            this.selectedDestinationCountry.notes = 'National of same sovereignty (exceptions may exist)';
             this.visaInformationFound = true;
             $('#travelscope').html( this.getCountryDetailsByVisaStatus(this.selectedDestinationCountry) + ' for nationals from ' + this.getCountryNameWithArticle( this.selectedCountry ) + ' travelling to ' + this.getCountryNameWithArticle( this.selectedDestinationCountry ) + '.<br/><div class="notes">' + this.selectedDestinationCountry.notes + '</div>' );
           }
@@ -3027,14 +3039,14 @@ WorldMap.prototype = {
 
         this.selectedDestinationCountry.populationAccepted = 0;
 
-        for(var i = 0 ; i < this.countries.length; i++) {
-          var destinations = this.countries[i].destinations;
-          for(var d = 0; d < destinations.length; d++) {
+        for(i = 0; i < this.countries.length; i++) {
+          destinations = this.countries[i].destinations;
+          for(d = 0; d < destinations.length; d++) {
             if( this.matchDestinationToCountryName(destinations[d].d_name, this.selectedDestinationCountry.properties.name_long) || this.matchDestinationToCountryName(this.selectedDestinationCountry.properties.name_long, destinations[d].d_name) ) {
               this.countries[i].visa_required = destinations[d].visa_required;
               this.countries[i].notes = destinations[d].notes;
 
-              if(destinations[d].visa_required == "no" || destinations[d].visa_required == "on-arrival" || destinations[d].visa_required == "free-eu") {
+              if(destinations[d].visa_required === 'no' || destinations[d].visa_required === 'on-arrival' || destinations[d].visa_required === 'free-eu') {
                 this.selectedDestinationCountry.populationAccepted += this.countries[i].properties.pop_est;
               }
             }
@@ -3044,18 +3056,18 @@ WorldMap.prototype = {
 
         // add all countries width same sovereignty like destination country:
         var countries = this.getAllCountriesWithSameSovereignty(this.selectedDestinationCountry.properties.sovereignt);
-        for(var i = 0 ; i < countries.length; i++) {
-          if(countries[i].visa_required == "") {
-            countries[i].visa_required = "no";
-            countries[i].notes = "National of same sovereignty (exceptions may exist)";
+        for(i = 0; i < countries.length; i++) {
+          if(countries[i].visa_required === '') {
+            countries[i].visa_required = 'no';
+            countries[i].notes = 'National of same sovereignty (exceptions may exist)';
             this.selectedDestinationCountry.populationAccepted += countries[i].properties.pop_est;
           }
         }
 
         var populationPercentage = Math.round( this.selectedDestinationCountry.populationAccepted / this.totalPopulation * 100 * 10 ) / 10;
-        populationPercentage = populationPercentage.formatNumber(1);
+        populationPercentage = formatNumber(populationPercentage, 1);
 
-        $('#travelscope').html( this.getCountryNameWithArticle( this.selectedDestinationCountry ).toSentenceStart() + ' grants nationals from <b>' + this.selectedDestinationCountry.numSourcesFreeOrOnArrival + ' countries</b> (' + populationPercentage + '&nbsp;% of the global population) access visa-free or with visa on arrival.');
+        $('#travelscope').html( toSentenceStart( this.getCountryNameWithArticle(this.selectedDestinationCountry) ) + ' grants nationals from <b>' + this.selectedDestinationCountry.numSourcesFreeOrOnArrival + ' countries</b> (' + populationPercentage + '&nbsp;% of the global population) access visa-free or with visa on arrival.');
         $('#legend_selected').fadeIn();
         $('#legend_main').fadeOut();
 
@@ -3063,12 +3075,12 @@ WorldMap.prototype = {
         // nothing selected
       }
 
-    } else if(this.mode == "gdp") {
-      var html = "";
+    } else if(this.mode === 'gdp') {
+      html = '';
       if(this.selectedCountry) {
         if(this.selectedCountry.properties.gdp_md_est > 100) {
-          var value = this.selectedCountry.properties.gdp_md_est / 1000;
-          value = value.formatNumber(1) + ' Billion USD';
+          value = this.selectedCountry.properties.gdp_md_est / 1000;
+          value = formatNumber(value, 1) + ' Billion USD';
           html += 'GDP of ' + this.getCountryNameWithArticle( this.selectedCountry ) + ': ' + value + '<br/>';
         } else {
           html += 'Data for ' + this.getCountryNameWithArticle( this.selectedCountry ) + ' not available<br/>';
@@ -3076,8 +3088,8 @@ WorldMap.prototype = {
       }
       if(this.selectedDestinationCountry) {
         if(this.selectedDestinationCountry.properties.gdp_md_est > 100) {
-          var value = this.selectedDestinationCountry.properties.gdp_md_est / 1000;
-          value = value.formatNumber(1) + ' Billion USD';
+          value = this.selectedDestinationCountry.properties.gdp_md_est / 1000;
+          value = formatNumber(value, 1) + ' Billion USD';
           html += 'GDP of ' + this.getCountryNameWithArticle( this.selectedDestinationCountry ) + ': ' + value + '<br/>';
         } else {
           html += 'Data for ' + this.getCountryNameWithArticle( this.selectedDestinationCountry ) + ' not available<br/>';
@@ -3088,20 +3100,20 @@ WorldMap.prototype = {
       $('#legend_selected').fadeOut();
       $('#legend_main').fadeIn();
 
-    } else if(this.mode == "gdp-per-capita") {
-      var html = "";
+    } else if(this.mode === 'gdp-per-capita') {
+      html = '';
       if(this.selectedCountry) {
         if(this.selectedCountry.properties.gdp_md_est > 100) {
-          var value = Math.round(this.selectedCountry.properties.gdp_md_est / this.selectedCountry.properties.pop_est * 1000000);
-          html += 'GDP per capita of ' + this.getCountryNameWithArticle( this.selectedCountry ) + ': ' + value.formatNumber(0) + ' USD<br/>';
+          value = Math.round(this.selectedCountry.properties.gdp_md_est / this.selectedCountry.properties.pop_est * 1000000);
+          html += 'GDP per capita of ' + this.getCountryNameWithArticle( this.selectedCountry ) + ': ' + formatNumber(value, 0) + ' USD<br/>';
         } else {
           html += 'Data for ' + this.getCountryNameWithArticle( this.selectedCountry ) + ' not available<br/>';
         }
       }
       if(this.selectedDestinationCountry) {
         if(this.selectedDestinationCountry.properties.gdp_md_est > 100) {
-          var value = Math.round(this.selectedDestinationCountry.properties.gdp_md_est / this.selectedDestinationCountry.properties.pop_est * 1000000);
-          html += 'GDP per capita of ' + this.getCountryNameWithArticle( this.selectedDestinationCountry ) + ': ' + value.formatNumber(0) + ' USD<br/>';
+          value = Math.round(this.selectedDestinationCountry.properties.gdp_md_est / this.selectedDestinationCountry.properties.pop_est * 1000000);
+          html += 'GDP per capita of ' + this.getCountryNameWithArticle( this.selectedDestinationCountry ) + ': ' + formatNumber(value, 0) + ' USD<br/>';
         } else {
           html += 'Data for ' + this.getCountryNameWithArticle( this.selectedDestinationCountry ) + ' not available<br/>';
         }
@@ -3111,16 +3123,16 @@ WorldMap.prototype = {
       $('#legend_selected').fadeOut();
       $('#legend_main').fadeIn();
 
-    } else if(this.mode == "population") {
-      var html = "";
+    } else if(this.mode === 'population') {
+      html = '';
       if(this.selectedCountry) {
-        var value = this.selectedCountry.properties.pop_est;
-        value = value.formatNumber(0);
+        value = this.selectedCountry.properties.pop_est;
+        value = formatNumber(value, 0);
         html += 'Population of ' + this.getCountryNameWithArticle( this.selectedCountry ) + ': ' + value + '<br/>';
       }
       if(this.selectedDestinationCountry) {
-        var value = this.selectedDestinationCountry.properties.pop_est;
-        value = value.formatNumber(0);
+        value = this.selectedDestinationCountry.properties.pop_est;
+        value = formatNumber(value, 0);
         html += 'Population of ' + this.getCountryNameWithArticle( this.selectedDestinationCountry ) + ': ' + value + '<br/>';
       }
       $('#travelscope').html(html);
@@ -3139,7 +3151,7 @@ WorldMap.prototype = {
   },
 
   deleteLinesObject: function() {
-    // trace("deleteLinesObject()");
+    // trace('deleteLinesObject()');
 
     if(this.linesObject) {
       this.scene.remove(this.linesObject);
@@ -3162,7 +3174,7 @@ WorldMap.prototype = {
     */
 
   }
-};
+}; /* WorldMap end */
 
 function centerCountryHoverInfoToMouse() {
   $('#country-info').css('left', (mouse.x - $('#country-info').width() / 2) + 'px');
@@ -3180,7 +3192,7 @@ function centerLoadingPanelToScreen() {
 }
 
 function centerPanelToScreen(panel) {
-  if(panel && panel.is( ":visible" )) {
+  if(panel && panel.is( ':visible' )) {
     panel.css('left', ( ($(window).width() - panel.width() - 2 ) / 2 ) + 'px');
     panel.css('top', ( ($(window).height() - panel.height()) / 2 - 25 ) + 'px');
   }
@@ -3191,12 +3203,12 @@ function showPanel(panel) {
     hidePanel(activePanel);
   }
 
-  if(!panel.is( ":visible" )) {
+  if(!panel.is( ':visible' )) {
     panel.css('left', ( ($(window).width() - panel.width() - 2 ) / 2 ) + 'px');
-    panel.css('top', - panel.height() + 'px');
+    panel.css('top', -panel.height() + 'px');
     panel.show();
 
-    var tweenPanel = new TWEEN.Tween({ top: - panel.height() })
+    new TWEEN.Tween({ top: -panel.height() })
     .to({ top: ( ($(window).height() - panel.height()) / 2 - 25 ) }, 500)
     .onStart(function() {
     })
@@ -3211,17 +3223,17 @@ function showPanel(panel) {
 }
 
 function hidePanel(panel) {
-  if(panel.is( ":visible" )) {
-    var tweenPanel = new TWEEN.Tween({ top: panel.position().top  })
-    .to({ top: - panel.height() - 50 }, 300)
-    .onUpdate(function() {
-      panel.css('top', this.top);
-    })
-    .onComplete(function() {
-      panel.hide();
-    })
-    .easing(TWEEN.Easing.Cubic.In)
-    .start();
+  if(panel.is( ':visible' )) {
+    new TWEEN.Tween({top: panel.position().top})
+      .to({top: -panel.height() - 50}, 300)
+      .onUpdate(function() {
+        panel.css('top', this.top);
+      })
+      .onComplete(function() {
+        panel.hide();
+      })
+      .easing(TWEEN.Easing.Cubic.In)
+      .start();
 
     activePanel = null;
   }
@@ -3234,40 +3246,40 @@ function collapseNavBar() {
 }
 
 function init() {
-  isTouchDevice = ("ontouchstart" in document.documentElement);
+  isTouchDevice = ('ontouchstart' in document.documentElement);
 
-  if(settings.statsVisible) {
+  if(Config.statsVisible) {
     stats = new Stats();
     stats.domElement.style.position = 'fixed';
     stats.domElement.style.top = '150px';
     stats.domElement.style.right = '0px';
-    $("body").append( stats.domElement );
+    $('body').append( stats.domElement );
   }
 
-  container = $("#container");
+  container = $('#container');
 
   /*
   // add GUI
-  gui = new dat.GUI();
-  gui.add(settings, 'interpolatePos', 0.0, 1.0).listen().onChange(function() {
+  var gui = new dat.GUI();
+  gui.add(animationProps, 'interpolatePos', 0.0, 1.0).listen().onChange(function() {
     worldMap.updateGeometry(false);
     worldMap.updateBufferGeometry();
   });
-  gui.add(settings, 'globeRotationX', -Math.PI, Math.PI).onChange(function() {
+  gui.add(animationProps, 'globeRotationX', -Math.PI, Math.PI).onChange(function() {
     worldMap.updateGeometry(false);
     worldMap.updateBufferGeometry();
   });
-  gui.add(settings, 'globeRotationY', -Math.PI, Math.PI).onChange(function() {
+  gui.add(animationProps, 'globeRotationY', -Math.PI, Math.PI).onChange(function() {
     worldMap.updateGeometry(false);
     worldMap.updateBufferGeometry();
   });
-  gui.add(settings, 'sphereVisible').onChange(function() {
-    worldMap.sphere.visible = settings.sphereVisible;
+  gui.add(animationProps, 'sphereVisible').onChange(function() {
+    worldMap.sphere.visible = Config.sphereVisible;
   });
   */
 
   $('#button_about').click(function(event) {
-    if(!$('#about').is( ":visible" )) {
+    if(!$('#about').is( ':visible' )) {
       showPanel($('#about'));
     } else {
       hidePanel($('#about'));
@@ -3279,7 +3291,7 @@ function init() {
     hidePanel($('#about'));
   });
   $('#button_disclaimer').click(function(event) {
-    if(!$('#disclaimer').is( ":visible" )) {
+    if(!$('#disclaimer').is( ':visible' )) {
       showPanel($('#disclaimer'));
     } else {
       hidePanel($('#disclaimer'));
@@ -3301,26 +3313,26 @@ function init() {
   $('#country_dropdown').val('Loading ...');
   $('#destination_country_dropdown').val('Loading ...');
 
-  trace("Loading Visa requirements ...");
-  $('#loading .details').html("Loading Visa requirements ...");
+  trace('Loading Visa requirements ...');
+  $('#loading .details').html('Loading Visa requirements ...');
   centerLoadingPanelToScreen();
 
-  $.when( $.getJSON(settings.visaRequirementsFile) ).then(function(dataRequirements) {
-    trace("Visa requirements loaded.");
-    // trace( "JSON Data: " + dataRequirements.countries['Germany'].code );
+  $.when( $.getJSON(Config.visaRequirementsFile) ).then(function(dataRequirements) {
+    trace('Visa requirements loaded.');
+    // trace( 'JSON Data: ' + dataRequirements.countries['Germany'].code );
     worldMap.visaRequirements = dataRequirements;
     worldMap.initD3();
     worldMap.initThree();
 
-    if(settings.sphereEnabled) {
+    if(Config.sphereEnabled) {
       worldMap.createSphere();
     }
 
-    // trace("Loading world map ...");
-    $('#loading .details').html("Loading world map ...");
+    // trace('Loading world map ...');
+    $('#loading .details').html('Loading world map ...');
 
-    $.when( $.getJSON(settings.mapDataFile) ).then(function(dataCountries) {
-      // trace("World map loaded.");
+    $.when( $.getJSON(Config.mapDataFile) ).then(function(dataCountries) {
+      // trace('World map loaded.');
       worldMap.dataCountries = dataCountries;
 
       /*
@@ -3334,55 +3346,55 @@ function init() {
         var found = false;
         for(var j = 0 ; j < worldMap.dataCountries.features.length ; j++) {
           var feature = worldMap.dataCountries.features[j];
-          if( feature.properties.sovereignt == feature2.properties.sovereignt ) {
+          if( feature.properties.sovereignt === feature2.properties.sovereignt ) {
             found = true;
             break;
           }
         }
         if(!found) {
           worldMap.dataCountries.features.push(feature2);
-          // trace("Adding country: " + feature2.properties.name_long);
+          // trace('Adding country: ' + feature2.properties.name_long);
         } else {
-          trace("Duplicate country: " + feature2.properties.name_long + ", sovereignty: " + feature2.properties.sovereignt);
+          trace('Duplicate country: ' + feature2.properties.name_long + ', sovereignty: ' + feature2.properties.sovereignt);
           count++;
         }
       }
       trace(count);
       */
 
-      if(settings.mergeDataFromMapDataFile2) {
-        $.when( $.getJSON(settings.mapDataFile2) ).then(function(dataCountries2) {
+      if(Config.mergeDataFromMapDataFile2) {
+        $.when( $.getJSON(Config.mapDataFile2) ).then(function(dataCountries2) {
           worldMap.dataCountries2 = dataCountries2;
 
           // merge countries from second higher-res map into first instead of loading full highres map:
-          for(var i = 0 ; i < worldMap.dataCountries2.features.length ; i++) {
+          for(var i = 0; i < worldMap.dataCountries2.features.length; i++) {
             var feature2 = worldMap.dataCountries2.features[i];
 
             var found = false;
-            for(var j = 0 ; j < worldMap.dataCountries.features.length ; j++) {
+            for(var j = 0; j < worldMap.dataCountries.features.length; j++) {
               var feature = worldMap.dataCountries.features[j];
-              if( feature.properties.name == feature2.properties.name ) {
+              if( feature.properties.name === feature2.properties.name ) {
                 found = true;
                 break;
               }
             }
             if(!found) {
               worldMap.dataCountries.features.push(feature2);
-              trace("Adding country: " + feature2.properties.name);
+              trace('Adding country: ' + feature2.properties.name);
             }
           }
 
-          if(settings.saveMapData) {
+          if(Config.saveMapData) {
             var jsonPretty = JSON.stringify(worldMap.dataCountries, null, '');
-            $.ajax ({
-               type: "POST",
-               url: "php/save_country_data.php",
-               data: {mergedCountriesFilename: settings.mergedCountriesFilename, json: jsonPretty},
-               success: function() {
-                trace("JSON map data sent");
-               }
+            $.ajax({
+              type: 'POST',
+              url: 'php/save_country_data.php',
+              data: {mergedCountriesFilename: Config.mergedCountriesFilename, json: jsonPretty},
+              success: function() {
+                trace('JSON map data sent');
+              }
             }).done(function( msg ) {
-              trace( "Response: " + msg );
+              trace( 'Response: ' + msg );
             });
           }
 
@@ -3400,13 +3412,13 @@ function init() {
   function animate() {
     requestAnimationFrame(animate);
 
-    if(worldMap) worldMap.geometryNeedsUpdate = false;
+    if(worldMap !== undefined) worldMap.geometryNeedsUpdate = false;
 
-    if(stats) stats.update();
+    if(stats !== undefined) stats.update();
 
     TWEEN.update();
 
-    if(worldMap) worldMap.animate();
+    if(worldMap !== undefined) worldMap.animate();
   }
   animate();
 
@@ -3435,16 +3447,16 @@ function completeInit() {
 
   onWindowResize();
 
-  $('#loading .details').html("Done.");
+  $('#loading .details').html('Done.');
   // $('#loading').delay(0).fadeOut(1000);
   $({s: 1}).stop().delay(0).animate({s: 0}, {
     duration: 800,
     easing: 'easeOutCubic',
     step: function() {
-      var t = "scale(" + this.s + ", " + this.s + ")";
-      $('#loading').css("-webkit-transform", t);
-      $('#loading').css("-moz-transform", t);
-      $('#loading').css("-ms-transform", t);
+      var t = 'scale(' + this.s + ', ' + this.s + ')';
+      $('#loading').css('-webkit-transform', t);
+      $('#loading').css('-moz-transform', t);
+      $('#loading').css('-ms-transform', t);
     },
     complete: function() {
       $('#loading').hide();
@@ -3454,7 +3466,7 @@ function completeInit() {
 }
 
 function onMouseDown(event) {
-  // trace("onMouseDown()");
+  // trace('onMouseDown()');
 
   isMouseDown = true;
 
@@ -3464,7 +3476,7 @@ function onMouseDown(event) {
 }
 
 function onMouseMove(event) {
-  // trace("onMouseMove()");
+  // trace('onMouseMove()');
 
   event.preventDefault();
 
@@ -3472,7 +3484,7 @@ function onMouseMove(event) {
   mouse.y = event.clientY;
 
   mouseNormalized.x = ( event.clientX / viewportWidth ) * 2 - 1;
-  mouseNormalized.y = - ( event.clientY / viewportHeight ) * 2 + 1;
+  mouseNormalized.y = -( event.clientY / viewportHeight ) * 2 + 1;
 
   if(isMouseDown) {
     selectCountryOnTouchEnd = mouseNormalized.distanceTo(mouseNormalizedTouchStart) < 0.005;
@@ -3489,11 +3501,11 @@ function onMouseUp(event) {
 }
 
 function onMouseClick(event) {
-  // trace("onMouseClick()");
+  // trace('onMouseClick()');
 
   $('#country_dropdown').blur();
   $('#destination_country_dropdown').blur();
-  $("#slider_zoom .ui-slider-handle").blur();
+  $('#slider_zoom .ui-slider-handle').blur();
 
   if(selectCountryOnTouchEnd) {
     worldMap.selectCountryFromMap(event);
@@ -3502,7 +3514,7 @@ function onMouseClick(event) {
 }
 
 function onMouseDoubleClick(event) {
-  // trace("onMouseDoubleClick()");
+  // trace('onMouseDoubleClick()');
 }
 
 function onMouseWheel(event) {
@@ -3510,12 +3522,12 @@ function onMouseWheel(event) {
 }
 
 function onTouchStart(event) {
-  // trace("onTouchStart");
+  // trace('onTouchStart');
   event.preventDefault();
 
   var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
   mouseNormalized.x = ( touch.pageX / viewportWidth ) * 2 - 1;
-  mouseNormalized.y = - ( touch.pageY / viewportHeight ) * 2 + 1;
+  mouseNormalized.y = -( touch.pageY / viewportHeight ) * 2 + 1;
 
   mouseNormalizedTouchStart.copy(mouseNormalized);
 
@@ -3524,7 +3536,7 @@ function onTouchStart(event) {
 }
 
 function onTouchMove(event) {
-  // trace("onTouchMove");
+  // trace('onTouchMove');
   event.preventDefault();
 
   var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
@@ -3533,7 +3545,7 @@ function onTouchMove(event) {
   mouse.y = touch.pageY;
 
   mouseNormalized.x = ( touch.pageX / viewportWidth ) * 2 - 1;
-  mouseNormalized.y = - ( touch.pageY / viewportHeight ) * 2 + 1;
+  mouseNormalized.y = -( touch.pageY / viewportHeight ) * 2 + 1;
 
   if(mouseNormalized.distanceTo(mouseNormalizedTouchStart) > 0.03) {
     selectCountryOnTouchEnd = false;
@@ -3542,12 +3554,12 @@ function onTouchMove(event) {
 }
 
 function onTouchEnd(event) {
-  // trace("onTouchEnd");
+  // trace('onTouchEnd');
   event.preventDefault();
 
   var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
   mouseNormalized.x = ( touch.pageX / viewportWidth ) * 2 - 1;
-  mouseNormalized.y = - ( touch.pageY / viewportHeight ) * 2 + 1;
+  mouseNormalized.y = -( touch.pageY / viewportHeight ) * 2 + 1;
 
   if(selectCountryOnTouchEnd) {
     worldMap.selectCountryFromMap(event);
@@ -3556,7 +3568,7 @@ function onTouchEnd(event) {
 }
 
 function onDoubleTap(event) {
-  // trace("onDoubleTap()");
+  // trace('onDoubleTap()');
 }
 
 
@@ -3617,22 +3629,8 @@ function onWindowResize() {
 
 $(document).ready(function() {
 
-  var defaults = new Defaults();
-  var version = '0.47';
-  var cdnURL = 'http://cdn.markuslerner.com/travelscope/'; // 'http://cdn.markuslerner.com/travelscope/'
-
-  var options = {
-    traceVisible: true,
-    mapDataFile: IS_DESKTOP && defaults.supportsWebGL
-      ? cdnURL + 'data/ne_50m_admin_0_countries_simplified.json?v=' + version
-      : cdnURL + 'data/all_countries.json?v=' + version,
-    visaRequirementsFile: cdnURL + VISA_REQUIREMENTS_URL
-  };
-
-  settings = merge(defaults, options);
-
   Trace.init({ showLineNumbers: true });
-  if(!settings.traceVisible) {
+  if(!Config.traceVisible) {
     Trace.div.css('display', 'none');
   }
 
