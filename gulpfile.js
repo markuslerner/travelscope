@@ -197,7 +197,7 @@ gulp.task('browser-sync', function() {
 });
 
 
-gulp.task('default', ['lint', 'sass', 'copy', 'watch', 'watchify', 'browser-sync']);
+gulp.task('default', ['sass', 'copy', 'watch', 'watchify', 'browser-sync']);
 
-gulp.task('deploy', ['prepare-deploy', 'lint', 'sass', 'copy', 'build']);
+gulp.task('deploy', ['prepare-deploy', 'sass', 'copy', 'build']);
 
