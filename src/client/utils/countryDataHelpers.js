@@ -41,6 +41,7 @@ export function matchDestinationToCountryName(destination, country) {
   return country === destination;
 };
 
+
 export function getCountryNameWithArticle(country) {
   var name = country.properties.name_long;
   var nameFormatted = '<b>' + name + '</b>';
@@ -60,6 +61,7 @@ export function getCountryNameWithArticle(country) {
   return nameFormatted;
 };
 
+
 export function getCountryByName(countries, name) {
   for(var c = 0; c < countries.length; c++) {
     if(matchDestinationToCountryName(countries[c].properties.name_long, name) || matchDestinationToCountryName(name, countries[c].properties.name_long)) {
@@ -68,6 +70,7 @@ export function getCountryByName(countries, name) {
   }
   return null;
 };
+
 
 export function getAllCountriesWithSameSovereignty(countries, sov) {
   var countriesMatched = [];
@@ -78,6 +81,7 @@ export function getAllCountriesWithSameSovereignty(countries, sov) {
   }
   return countriesMatched;
 };
+
 
 export function correctCenter(country) {
   if(country.properties.name === 'France') {
@@ -119,6 +123,7 @@ export function correctCenter(country) {
   }
 };
 
+
 export function getCountryColorByVisaStatus(country) {
   var c;
   if(country.visa_required === 'no') {
@@ -146,6 +151,7 @@ export function getCountryColorByVisaStatus(country) {
   return c;
 };
 
+
 export function getCountryColorByFreeDestinations(numDestinations, maxNumDestinationsFreeOrOnArrival) {
   var m = numDestinations / maxNumDestinationsFreeOrOnArrival;
   var color = new THREE.Color(Config.colorZeroDestinations);
@@ -153,12 +159,14 @@ export function getCountryColorByFreeDestinations(numDestinations, maxNumDestina
   return color;
 };
 
+
 export function getCountryColorByFreeSources(numSources, maxNumSourcesFreeOrOnArrival) {
   var m = numSources / maxNumSourcesFreeOrOnArrival;
   var color = new THREE.Color(Config.colorZeroDestinations);
   color.lerp(Config.colorMaxDestinations, m);
   return color;
 };
+
 
 export function getCountryColorByGDP(country, maxGDP) {
   var m = country.properties.gdp_md_est / maxGDP;
@@ -168,6 +176,7 @@ export function getCountryColorByGDP(country, maxGDP) {
   return color;
 };
 
+
 export function getCountryColorByGDPPerCapita(country, maxGDPPerCapita) {
   var m = (country.properties.gdp_md_est / country.properties.pop_est * 1000000) / maxGDPPerCapita;
   m = TWEEN.Easing.Exponential.Out(m);
@@ -176,9 +185,11 @@ export function getCountryColorByGDPPerCapita(country, maxGDPPerCapita) {
   return color;
 };
 
+
 export function getPopulationRatio(country, maxPopulation) {
   return parseFloat(country.properties.pop_est) / maxPopulation;    // 1 166 079 220.0;
 };
+
 
 export function getCountryColorByPopulation(country, maxPopulation) {
   var m = getPopulationRatio(country, maxPopulation);
@@ -188,3 +199,37 @@ export function getCountryColorByPopulation(country, maxPopulation) {
   // color.copyLinearToGamma(color);
   return color;
 };
+
+
+export function getCountryDetailsByVisaStatus(country) {
+  var details = '';
+
+  if(country.visa_required === 'no') {
+    details = 'Visa not required';
+
+  } else if(country.visa_required === 'on-arrival') {
+    details = 'Visa on arrival';
+
+  } else if(country.visa_required === 'free-eu') {
+    details = 'Visa not required (EU)';
+
+  } else if(country.visa_required === 'yes') {
+    details = 'Visa required';
+
+  } else if(country.visa_required === 'admission-refused') {
+    details = 'Admission refused';
+
+  } else if(country.visa_required === 'special') {
+    details = 'Special regulations';
+
+  } else if(country.visa_required === '') { // data not available
+    details = 'Data not available';
+
+  } else { // special
+    details = country.visa_required;
+
+  }
+  return details;
+};
+
+
