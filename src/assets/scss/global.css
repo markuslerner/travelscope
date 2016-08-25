@@ -881,10 +881,10 @@ b {
 	padding: 0px 5px;
 }
 
-#trace {
-	top: 230px !important;
-	left: 15px !important;
-	width: 50% !important;
+#logterminal {
+	top: 250px !important;
+	left: 20px !important;
+	width: 75% !important;
 	height: calc(100% - 300px) !important;
 }
 
@@ -993,7 +993,7 @@ b {
 		margin: 2px 5px 5px 0;
 	}
 
-	#trace {
+	#logterminal {
 		top: 200px !important;
 		left: 0px !important;
 	}

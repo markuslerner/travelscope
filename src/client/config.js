@@ -11,7 +11,7 @@ const config = {
   isTouchDevice: ('ontouchstart' in document.documentElement),
   isMac: navigator.platform.toUpperCase().indexOf('MAC') >= 0,
 
-  traceVisible: false,
+  logTerminalVisible: true,
   statsVisible: false,
 
   rendererContainer: '#container',

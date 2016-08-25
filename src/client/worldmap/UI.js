@@ -7,6 +7,7 @@ import { formatNumber } from '../utils';
 import * as CountryDataHelpers from '../utils/countryDataHelpers';
 import { worldMap } from './index.js';
 import * as Panels from './panel';
+import { log } from '../LogTerminal';
 
 
 
@@ -14,6 +15,7 @@ export const mouse = new THREE.Vector2();
 export const mouseNormalized = new THREE.Vector3( 0, 0, 1 );
 export const mouseNormalizedTouchStart = new THREE.Vector3( 0, 0, 1 );
 export var countrySelectionChanged = false;
+
 var selectCountryOnTouchEnd = true;
 var isMouseDown = false;
 var countryListSorting = '';
@@ -862,7 +864,7 @@ export function collapseNavBar() {
 
 
 export function updateCountryTooltip(worldMap, country) {
-  // trace('updateCountryTooltip()');
+  // log('updateCountryTooltip()');
 
   if(country.properties.name_long === country.properties.sovereignt) {
     $('#country-tooltip .title').html( country.properties.name_long );
@@ -1160,9 +1162,9 @@ export function bindEventHandlers() {
 
 
 function onWindowResize() {
-  // trace('onWindowResize()');
+  // log('onWindowResize()');
 
-  // $('#trace').css('height', ($(window).height() - 200) + 'px');
+  // $('#log').css('height', ($(window).height() - 200) + 'px');
 
   var viewportWidth = $(window).width();
   var viewportHeight = $(window).height();
@@ -1216,7 +1218,7 @@ function onWindowResize() {
 }
 
 function onMouseDown(event) {
-  // trace('onMouseDown()');
+  // log('onMouseDown()');
 
   isMouseDown = true;
 
@@ -1226,7 +1228,7 @@ function onMouseDown(event) {
 }
 
 function onMouseMove(event) {
-  // trace('onMouseMove()');
+  // log('onMouseMove()');
 
   event.preventDefault();
 
@@ -1254,7 +1256,7 @@ function onMouseUp(event) {
 }
 
 function onMouseClick(event) {
-  // trace('onMouseClick()');
+  // log('onMouseClick()');
 
   $('#country_dropdown').blur();
   $('#destination_country_dropdown').blur();
@@ -1267,7 +1269,7 @@ function onMouseClick(event) {
 }
 
 function onMouseDoubleClick(event) {
-  // trace('onMouseDoubleClick()');
+  // log('onMouseDoubleClick()');
 }
 
 function onMouseWheel(event) {
@@ -1275,7 +1277,7 @@ function onMouseWheel(event) {
 }
 
 function onTouchStart(event) {
-  // trace('onTouchStart');
+  // log('onTouchStart');
   event.preventDefault();
 
   var viewportWidth = $(window).width();
@@ -1292,7 +1294,7 @@ function onTouchStart(event) {
 }
 
 function onTouchMove(event) {
-  // trace('onTouchMove');
+  // log('onTouchMove');
   event.preventDefault();
 
   var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
@@ -1313,7 +1315,7 @@ function onTouchMove(event) {
 }
 
 function onTouchEnd(event) {
-  // trace('onTouchEnd');
+  // log('onTouchEnd');
   event.preventDefault();
 
   var viewportWidth = $(window).width();
@@ -1330,6 +1332,6 @@ function onTouchEnd(event) {
 }
 
 function onDoubleTap(event) {
-  // trace('onDoubleTap()');
+  // log('onDoubleTap()');
 }
 

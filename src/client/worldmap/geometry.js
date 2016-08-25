@@ -4,10 +4,11 @@ import * as TWEEN from 'tween.js';
 import Config from '../config';
 import * as CountryDataHelpers from '../utils/countryDataHelpers';
 import { transformSVGPath } from '../three/d3-threeD';
+import { log } from '../LogTerminal';
 
 
 
-export function createGeometry(worldMap) {
+export function createCountriesGeometry(worldMap) {
   var data = worldMap.dataCountries;
   var start = Date.now();
   var globalPointCount = 0;
@@ -25,16 +26,16 @@ export function createGeometry(worldMap) {
     var feature = data.features[i];
     destinations = [];
 
-    // trace( feature.properties.name );
-    // trace( feature.properties.name_long );
-    // trace( feature.properties.name_sort );
+    // log( feature.properties.name );
+    // log( feature.properties.name_long );
+    // log( feature.properties.name_sort );
 
     if(feature.properties.name !== 'Antarctica') { //  && feature.properties.name === 'Germany'
       for(var r = 0; r < worldMap.visaRequirements.countries.length; r++) {
         // 199 nationalities travelling to 240 (?) countries, assuming nationals from a country don't need a visa to the sovereignty's main country:
         // if(CountryDataHelpers.matchDestinationToCountryName(feature.properties.name_long, worldMap.visaRequirements.countries[r].name) || CountryDataHelpers.matchDestinationToCountryName(worldMap.visaRequirements.countries[r].name, feature.properties.name_long)) {
         if(CountryDataHelpers.matchDestinationToCountryName(feature.properties.sovereignt, worldMap.visaRequirements.countries[r].name) || CountryDataHelpers.matchDestinationToCountryName(worldMap.visaRequirements.countries[r].name, feature.properties.sovereignt)) {
-          // trace('Loading visa requirements for: ' + feature.properties.name);
+          // log('Loading visa requirements for: ' + feature.properties.name);
           destinations = worldMap.visaRequirements.countries[r].destinations;
           numVisaRequirementsFound++;
         }
@@ -63,12 +64,12 @@ export function createGeometry(worldMap) {
         });
 
         if(destinations.length === 0) {
-          // trace("No visa requirements found for: " + feature.properties.name);
+          // log("Geometry: No visa requirements found for: " + feature.properties.name);
         }
 
         worldMap.countryDropdownChoices.push({text: feature.properties.name_long, value: feature.properties.name_long});
 
-        // trace(feature.properties.name + " | shapes: " + shapes.length + ", total points: " + pointCount);
+        // log("Geometry: " + feature.properties.name + " | shapes: " + shapes.length + ", total points: " + pointCount);
 
       }
     }
@@ -144,10 +145,10 @@ export function createGeometry(worldMap) {
     if( worldMap.countries[i].properties.gdp_per_capita > worldMap.maxGDPPerCapita ) {
       if(worldMap.countries[i].properties.gdp_md_est > 100) {
         worldMap.maxGDPPerCapita = worldMap.countries[i].properties.gdp_md_est / worldMap.countries[i].properties.pop_est * 1000000;
-        // trace( worldMap.countries[i].properties.name_long );
-        // trace( 'population: ' + worldMap.countries[i].properties.pop_est );
-        // trace( 'gdp: ' + worldMap.countries[i].properties.gdp_md_est );
-        // trace( 'gdp per capita: ' + worldMap.maxGDPPerCapita );
+        // log( worldMap.countries[i].properties.name_long );
+        // log( 'population: ' + worldMap.countries[i].properties.pop_est );
+        // log( 'gdp: ' + worldMap.countries[i].properties.gdp_md_est );
+        // log( 'gdp per capita: ' + worldMap.maxGDPPerCapita );
       }
     }
   }
@@ -162,12 +163,12 @@ export function createGeometry(worldMap) {
   if(Config.mergeDataFromMapDataFile2) {
     stringLoaded += ' and \'' + Config.mapDataFile2 + '\'';
   }
-  trace(stringLoaded);
+  log('Geometry: ' + stringLoaded);
 
-  trace('Visa requirements loaded for ' + numVisaRequirementsFound + ' countries from \'' + Config.visaRequirementsFile + '\'');
-  // trace('Max number of visa-free destinations: ' + worldMap.maxNumDestinationsFreeOrOnArrival);
-  // trace('Max number of visa-free sources: ' + worldMap.maxNumSourcesFreeOrOnArrival);
-  // trace('Total population: ' + worldMap.totalPopulation.formatNumber(0));
+  log('Geometry: visa requirements loaded for ' + numVisaRequirementsFound + ' countries from \'' + Config.visaRequirementsFile + '\'');
+  // log('Max number of visa-free destinations: ' + worldMap.maxNumDestinationsFreeOrOnArrival);
+  // log('Max number of visa-free sources: ' + worldMap.maxNumSourcesFreeOrOnArrival);
+  // log('Total population: ' + worldMap.totalPopulation.formatNumber(0));
 
   var m = new THREE.Matrix4();
   var m1 = new THREE.Matrix4();
@@ -329,19 +330,19 @@ export function createGeometry(worldMap) {
     worldMap.scene.add(worldMap.countriesObject3D);
   }
 
-  trace(worldMap.trianglesNumTotal + ' triangles total');
+  log('Geometry: ' + worldMap.trianglesNumTotal + ' triangles total');
 
   var scaleStart = 0.0;
   worldMap.countriesObject3D.scale.set(scaleStart, scaleStart, scaleStart);
-  worldMap.countriesObject3D.rotation.y = - Math.PI * 6.0;
+  worldMap.countriesObject3D.rotation.y = -Math.PI * 6.0;
 
-  trace('Creating meshes took ' + (Date.now() - start) + ' ms');
+  log('Geometry: creating meshes took ' + (Date.now() - start) + ' ms');
 
 };
 
 
-export function updateGeometry(worldMap, computeFaceNormals) {
-  // trace('updateGeometry()');
+export function updateCountriesGeometry(worldMap, computeFaceNormals) {
+  // log('Geometry.updateCountriesGeometry()');
 
   var i;
   var k;
@@ -381,7 +382,7 @@ export function updateGeometry(worldMap, computeFaceNormals) {
 };
 
 
-export function createBufferGeometry(worldMap) {
+export function createCountriesBufferGeometry(worldMap) {
   worldMap.bufferGeometry = new THREE.BufferGeometry();
 
   var positions = new Float32Array( worldMap.trianglesNumTotal * 3 * 3 );
@@ -460,8 +461,8 @@ export function createBufferGeometry(worldMap) {
 };
 
 
-export function updateBufferGeometry(worldMap) {
-  // trace('updateBufferGeometry()');
+export function updateCountriesBufferGeometry(worldMap) {
+  // log('Geometry.updateCountriesBufferGeometry()');
 
   var positions = worldMap.bufferGeometry.getAttribute( 'position' ).array;
   var normals = worldMap.bufferGeometry.getAttribute( 'normal' ).array;
@@ -482,8 +483,8 @@ export function updateBufferGeometry(worldMap) {
   for(i = 0; i < worldMap.countries.length; i++) {
     var vertices = worldMap.countries[i].geometry.vertices;
 
-    // trace( worldMap.countries[i].properties.name_long );
-    // trace( worldMap.countries[i].visa_required );
+    // log( worldMap.countries[i].properties.name_long );
+    // log( worldMap.countries[i].visa_required );
 
     color.set(worldMap.countries[i].color);
 
@@ -557,8 +558,8 @@ export function updateBufferGeometry(worldMap) {
 };
 
 
-export function updateBufferGeometryColors(worldMap) {
-  // trace('updateBufferGeometryColors()');
+export function updateCountriesBufferGeometryColors(worldMap) {
+  // log('Geometry.updateCountriesBufferGeometryColors()');
 
   var colors = worldMap.bufferGeometry.getAttribute( 'color' ).array;
 
@@ -652,7 +653,7 @@ export function getIntersects(worldMap, mouse) {
 
 
 export function createLines(worldMap) {
-  // trace('createLines()');
+  // log('Geometry.createLines()');
 
   if(worldMap.mode !== 'destinations' && worldMap.mode !== 'sources') {
     return;
@@ -764,7 +765,7 @@ export function createLines(worldMap) {
 
 
 export function updateLines(worldMap) {
-  // trace('updateLines()');
+  // log('Geometry.updateLines()');
 
   worldMap.animationProps.lineAnimateOffset += Config.lineAnimateSpeed * worldMap.clock.getDelta();
   worldMap.animationProps.lineAnimateOffset %= Config.lineDashOffsetLimit;
@@ -817,7 +818,7 @@ export function updateLines(worldMap) {
 
 
 export function deleteLinesObject(worldMap) {
-  // trace('deleteLinesObject()');
+  // log('Geometry.deleteLinesObject()');
 
   if(worldMap.linesObject) {
     worldMap.scene.remove(worldMap.linesObject);

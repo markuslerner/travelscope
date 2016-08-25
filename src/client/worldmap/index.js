@@ -6,7 +6,7 @@ import * as d3 from 'd3';
 
 import '../RequestAnimationFrame';
 import Stats from '../Stats';
-import Trace from '../trace-1.4';
+import LogTerminal, { log } from '../LogTerminal';
 
 import '../d3.geo.robinson';
 
@@ -139,7 +139,7 @@ WorldMap.prototype = {
       });
       this.renderer.autoClear = false;
       // this.renderer.setClearColor( 0xBBBBBB, 1 );
-      trace('WebGLRenderer, pixel ratio used: ' + this.renderer.getPixelRatio());
+      log('WebGLRenderer, pixel ratio used: ' + this.renderer.getPixelRatio());
       this.renderer.setPixelRatio(window.devicePixelRatio || 1);
 
     } else {
@@ -150,7 +150,7 @@ WorldMap.prototype = {
         clearColor: 0x000000,
         sortObjects: false
       });
-      trace('CanvasRenderer');
+      log('CanvasRenderer');
     }
 
     this.clock = new THREE.Clock();
@@ -195,7 +195,7 @@ WorldMap.prototype = {
 
 
   initControls: function() {
-    // trace('initControls()');
+    // log('initControls()');
 
     this.controlsTrackball = new THREE.TrackballControls( this.camera, this.renderer.domElement );
     this.controlsTrackball.rotateSpeed = 0.5; // 1.0
@@ -246,21 +246,21 @@ WorldMap.prototype = {
 
 
   createCountries: function() {
-    trace('createCountries()');
+    log('createCountries()');
 
     UI.updateLoadingInfo('Creating map ...');
 
-    Geometry.createGeometry(this);
+    Geometry.createCountriesGeometry(this);
 
-    Geometry.updateGeometry(this, true);
+    Geometry.updateCountriesGeometry(this, true);
 
     worldMap.updateAllCountryColors();
 
     worldMap.animationProps.interpolatePos = 1.0;
 
     if(Config.usesWebGL) {
-      Geometry.createBufferGeometry(this);
-      Geometry.updateBufferGeometry(this);
+      Geometry.createCountriesBufferGeometry(this);
+      Geometry.updateCountriesBufferGeometry(this);
     }
 
 
@@ -324,7 +324,7 @@ WorldMap.prototype = {
   },
 
   updateCountryColorsOneByOne: function() {
-    // trace('updateCountryColorsOneByOne()');
+    // log('updateCountryColorsOneByOne()');
 
     if(this.selectedCountry) {
       this.selectedCountry.color.set(Config.colorCountrySelected);
@@ -341,7 +341,7 @@ WorldMap.prototype = {
         worldMap.updateCountryColors(idLast, worldMap.animationProps.colorChangeID);
 
         if(Config.usesWebGL) {
-          Geometry.updateBufferGeometryColors(worldMap);
+          Geometry.updateCountriesBufferGeometryColors(worldMap);
         }
       })
       .start();
@@ -353,7 +353,7 @@ WorldMap.prototype = {
   },
 
   updateCountryColors: function(start, end, pos) {
-    // trace('updateCountryColors()');
+    // log('updateCountryColors()');
 
     // for(var i = 0 ; i < this.countries.length; i++) {
     var c = new THREE.Color();
@@ -510,7 +510,7 @@ WorldMap.prototype = {
   },
 
   updateCountryHover: function(country) {
-    // trace('updateCountryHover()');
+    // log('updateCountryHover()');
     if(!Config.isTouchDevice) {
       this.intersectedObject = country.mesh;
 
@@ -579,9 +579,9 @@ WorldMap.prototype = {
       }
 
       if(this.geometryNeedsUpdate) {
-        Geometry.updateGeometry(this, false);
+        Geometry.updateCountriesGeometry(this, false);
         if(Config.usesWebGL) {
-          Geometry.updateBufferGeometry(this);
+          Geometry.updateCountriesBufferGeometry(this);
         }
       }
 
@@ -595,7 +595,7 @@ WorldMap.prototype = {
   },
 
   selectCountryFromMap: function(event) {
-    // trace('selectCountryFromMap');
+    // log('selectCountryFromMap');
 
     var intersects = Geometry.getIntersects(this, UI.mouseNormalizedTouchStart);
 
@@ -665,7 +665,7 @@ WorldMap.prototype = {
   },
 
   clearBothSelectedCountries: function() {
-    // trace('clearBothSelectedCountries()');
+    // log('clearBothSelectedCountries()');
 
     if(this.selectedCountry || this.selectedDestinationCountry) {
       Geometry.deleteLinesObject(this);
@@ -756,7 +756,7 @@ WorldMap.prototype = {
   },
 
   setSelectedCountry: function(selectedCountry) {
-    // trace('setSelectedCountry()');
+    // log('setSelectedCountry()');
 
     if(!this.introRunning) {
       if(selectedCountry !== this.selectedCountry) {
@@ -774,7 +774,7 @@ WorldMap.prototype = {
   },
 
   setSelectedDestinationCountry: function(selectedDestinationCountry) {
-    // trace('setSelectedDestinationCountry()');
+    // log('setSelectedDestinationCountry()');
 
     if(!this.introRunning) {
       if(selectedDestinationCountry !== this.selectedDestinationCountry) {
@@ -792,7 +792,7 @@ WorldMap.prototype = {
   },
 
   updateCountrySelection: function() {
-    // trace('updateCountrySelection()');
+    // log('updateCountrySelection()');
 
     var i;
     var destinations;
@@ -871,7 +871,7 @@ WorldMap.prototype = {
 
             }
             if(!found) {
-              // trace('ERROR: ' + destinations[d].d_name + ' could not be matched');
+              // log('ERROR: ' + destinations[d].d_name + ' could not be matched');
             }
           }
 
@@ -897,7 +897,7 @@ WorldMap.prototype = {
           UI.setHeadline( 'Data not available for nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) + '. <div class="notes">Please select a different country or click/tap the background to clear selection.</div>' );
           UI.showSelectedLegend();
 
-          // trace('No visa information found for national from ' + this.selectedCountry.properties.name + '');
+          // log('No visa information found for national from ' + this.selectedCountry.properties.name + '');
         }
 
       } else if(!this.selectedCountry && this.selectedDestinationCountry) {
@@ -1072,6 +1072,10 @@ WorldMap.prototype = {
 
 function init() {
 
+  if(!Config.logTerminalVisible) {
+    LogTerminal.hide();
+  }
+
   if(Config.statsVisible) {
     stats = new Stats();
     stats.domElement.style.position = 'fixed';
@@ -1088,11 +1092,11 @@ function init() {
 
   worldMap = new WorldMap();
 
-  trace('Loading Visa requirements ...');
+  log('Loading Visa requirements ...');
 
   $.when( $.getJSON(Config.visaRequirementsFile) ).then(function(dataRequirements) {
-    trace('Visa requirements loaded.');
-    // trace( 'JSON Data: ' + dataRequirements.countries['Germany'].code );
+    log('Visa requirements loaded.');
+    // log( 'JSON Data: ' + dataRequirements.countries['Germany'].code );
     worldMap.visaRequirements = dataRequirements;
     worldMap.initD3();
     worldMap.initThree();
@@ -1101,11 +1105,11 @@ function init() {
       Geometry.createSphere(worldMap);
     }
 
-    // trace('Loading world map ...');
+    // log('Loading world map ...');
     UI.updateLoadingInfo('Loading world map ...');
 
     $.when( $.getJSON(Config.mapDataFile) ).then(function(dataCountries) {
-      // trace('World map loaded.');
+      // log('World map loaded.');
       worldMap.dataCountries = dataCountries;
 
       /*
@@ -1126,13 +1130,13 @@ function init() {
         }
         if(!found) {
           worldMap.dataCountries.features.push(feature2);
-          // trace('Adding country: ' + feature2.properties.name_long);
+          // log('Adding country: ' + feature2.properties.name_long);
         } else {
-          trace('Duplicate country: ' + feature2.properties.name_long + ', sovereignty: ' + feature2.properties.sovereignt);
+          log('Duplicate country: ' + feature2.properties.name_long + ', sovereignty: ' + feature2.properties.sovereignt);
           count++;
         }
       }
-      trace(count);
+      log(count);
       */
 
       if(Config.mergeDataFromMapDataFile2) {
@@ -1153,7 +1157,7 @@ function init() {
             }
             if(!found) {
               worldMap.dataCountries.features.push(feature2);
-              trace('Adding country: ' + feature2.properties.name);
+              log('Adding country: ' + feature2.properties.name);
             }
           }
 
@@ -1164,10 +1168,10 @@ function init() {
               url: 'php/save_country_data.php',
               data: {mergedCountriesFilename: Config.mergedCountriesFilename, json: jsonPretty},
               success: function() {
-                trace('JSON map data sent');
+                log('JSON map data sent');
               }
             }).done(function( msg ) {
-              trace( 'Response: ' + msg );
+              log( 'Response: ' + msg );
             });
           }
 
@@ -1208,16 +1212,5 @@ function completeInit() {
 
 }
 
-
-
-$(document).ready(function() {
-
-  Trace.init({ showLineNumbers: true });
-  if(!Config.traceVisible) {
-    Trace.div.css('display', 'none');
-  }
-
-  init();
-
-});
+$(document).ready(init);
 
