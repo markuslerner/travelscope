@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import Detector from './three/Detector';
 
-const version = '0.47';
+const version = '0.48';
 const cdnURL = 'http://cdn.markuslerner.com/travelscope/'; // 'http://cdn.markuslerner.com/travelscope/'
 
 
@@ -11,7 +11,7 @@ const config = {
   isTouchDevice: ('ontouchstart' in document.documentElement),
   isMac: navigator.platform.toUpperCase().indexOf('MAC') >= 0,
 
-  logTerminalVisible: true,
+  logTerminalVisible: false,
   statsVisible: false,
 
   rendererContainer: '#container',
