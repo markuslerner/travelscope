@@ -14,6 +14,8 @@ const config = {
   traceVisible: false,
   statsVisible: false,
 
+  rendererContainer: '#container',
+
   // mapDataFile: 'data/all_countries.json',
   // 'all_countries.json', 'all_sovereignties.json'
   // 'ne_50m_admin_0_sovereignty_simplified.json', 'ne_110m_admin_0_sovereignty_simplified.json'

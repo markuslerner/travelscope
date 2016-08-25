@@ -698,7 +698,7 @@ b {
 	text-align: center;
 }
 
-#country-info {
+#country-tooltip {
 	position: absolute;
 	font-size: 15px;
 	color: white;
@@ -717,10 +717,10 @@ b {
 	box-shadow: 0px 3px 40px 5px rgba(0,0,0,0.4);
 }
 
-#country-info .title {
+#country-tooltip .title {
 }
 
-#country-info .details {
+#country-tooltip .details {
 	font-size: 12px;
 	line-height: 18px;
 	max-width: 300px;
@@ -728,7 +728,7 @@ b {
 	display: none;
 }
 
-#country-info .notes {
+#country-tooltip .notes {
 	font-size: 10px;
 	letter-spacing: 0.05em;
 	margin-top: 5px;
