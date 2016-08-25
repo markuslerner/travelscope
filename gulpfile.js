@@ -18,6 +18,7 @@ var sourcemaps = require('gulp-sourcemaps');
 var streamify = require('gulp-streamify');
 var uglify = require('gulp-uglify');
 var gutil = require('gulp-util');
+var livereactload = require('livereactload');
 var envify = require('loose-envify/custom');
 var merge = require('utils-merge');
 var buffer = require('vinyl-buffer');
@@ -102,7 +103,8 @@ gulp.task('watchify', function() {
   process.env.NODE_ENV = 'development';
 
   var args = merge(watchify.args, {
-    debug: true
+    debug: true,
+    plugin: options.dev ? [livereactload] : []
   });
   var bundler = watchify(browserify(options.src + '/client.js', args))
     .transform(babelify, { /* opts */ });
@@ -178,8 +180,9 @@ gulp.task('watch', function() {
   gulp.watch(options.src + '/assets/scss/**/*.css', ['sass']);
   gulp.watch(options.src + '/assets/img/**', ['copy']);
   gulp.watch(options.src + '/assets/*.html', ['copy']);
-  gulp.watch(options.src + '/php/**', ['copy']);
   gulp.watch(options.src + '/assets/*.php', ['copy']);
+  gulp.watch(options.src + '/php/**/*.php', ['copy']);
+  gulp.watch(options.src + '/php/**/*.json', ['copy']);
 });
 
 

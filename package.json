@@ -49,6 +49,7 @@
     "gulp-streamify": "^1.0.2",
     "gulp-uglify": "^2.0.0",
     "gulp-util": "^3.0.7",
+    "livereactload": "^3.0.0",
     "loose-envify": "^1.2.0",
     "utils-merge": "^1.0.0",
     "vinyl-buffer": "^1.0.0",
