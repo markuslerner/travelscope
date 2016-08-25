@@ -11,7 +11,6 @@ import Trace from '../trace-1.4';
 import '../d3.geo.robinson';
 
 import '../three/CanvasRenderer';
-import { transformSVGPath } from '../three/d3-threeD';
 import '../three/PinchZoomControls';
 import '../three/Projector';
 import '../three/TessellateModifier';
@@ -28,8 +27,9 @@ import '../jquery-ui/jquery-ui.custom.combobox';
 import Config from '../config';
 import { formatNumber, toSentenceStart } from '../utils';
 import * as CountryDataHelpers from '../utils/countryDataHelpers';
-import * as UI from './ui';
+import * as Geometry from './geometry';
 import * as Panels from './panel';
+import * as UI from './ui';
 
 
 
@@ -41,8 +41,8 @@ THREE.Vector3.prototype.mix = function(v2, factor) {
 
 if(!Date.now) Date.now = function() { return new Date().getTime(); };
 
-var stats;
 export var worldMap;
+var stats;
 
 
 
@@ -125,6 +125,7 @@ WorldMap.prototype = {
 
     this.geo = new GeoConfig();
   },
+
 
   initThree: function() {
 
@@ -227,6 +228,7 @@ WorldMap.prototype = {
 
   },
 
+
   setMode: function(mode) {
     this.mode = mode;
 
@@ -236,59 +238,9 @@ WorldMap.prototype = {
 
     worldMap.clearBothSelectedCountries();
 
-    /*
-    worldMap.deleteLinesObject();
-    worldMap.updateCountrySelection();
-    worldMap.updateBufferGeometry();
-    */
-
     worldMap.updateCountryColorsOneByOne();
 
     UI.updateModeStatement(worldMap);
-
-  },
-
-  createSphere: function() {
-    this.sphere = new THREE.Mesh( new THREE.PlaneGeometry( 700, 700, 24, 96 ), Config.materialSphere );
-    this.sphere.name = 'sphere';
-    this.scene.add( this.sphere );
-    this.sphere.visible = Config.sphereVisible;
-
-    this.sphereGeometry2D = this.sphere.geometry.clone();
-    var k;
-    for(k = 0; k < this.sphereGeometry2D.vertices.length; k++) {
-      this.sphereGeometry2D.vertices[k].x -= 20;
-      this.sphereGeometry2D.vertices[k].y -= 90;
-      this.sphereGeometry2D.vertices[k].z -= Config.extrudeDepth * 2.0;
-    }
-
-    this.sphereGeometry3D = this.sphere.geometry.clone();
-
-    for(k = 0; k < this.sphere.geometry.vertices.length; k++) {
-      var spherical = this.geo.projection.invert([ -this.sphere.geometry.vertices[k].x, this.sphere.geometry.vertices[k].y * 2.0 + 250 ]); //  * 2.0 + 260
-
-      spherical[0] = THREE.Math.degToRad(spherical[0]);
-      spherical[1] = THREE.Math.degToRad(spherical[1]);
-
-      this.sphereGeometry3D.vertices[k].x = (Config.globeRadius - 1) * Math.cos(spherical[0]) * Math.cos(spherical[1]);
-      this.sphereGeometry3D.vertices[k].y = -(Config.globeRadius - 1) * Math.sin(spherical[1]);
-      this.sphereGeometry3D.vertices[k].z = (Config.globeRadius - 1) * Math.sin(spherical[0]) * Math.cos(spherical[1]);
-
-      /*
-      if(this.sphereGeometry3D.vertices[k].z < 0.0) {
-        this.sphereGeometry3D.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
-        //this.sphereGeometry3D.vertices[k].multiplyScalar(0.5);
-      } else {
-        this.sphereGeometry3D.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
-        //this.sphereGeometry3D.vertices[k].multiplyScalar(1.04);
-      }
-      */
-
-    }
-    // rotate and bake transform into vertices:
-    var m = new THREE.Matrix4();
-    m.makeRotationX( THREE.Math.degToRad(45) );
-    this.sphereGeometry3D.applyMatrix(m);
 
   },
 
@@ -298,349 +250,17 @@ WorldMap.prototype = {
 
     UI.updateLoadingInfo('Creating map ...');
 
-    var data = this.dataCountries;
+    Geometry.createGeometry(this);
 
-    var start = Date.now();
-
-    this.countriesObject3D = new THREE.Object3D();
-
-    this.countries = [];
-
-    this.trianglesNumTotal = 0;
-
-    var globalPointCount = 0;
-    var numVisaRequirementsFound = 0;
-
-    this.countryDropdownChoices = [];
-
-    // features = countries
-    var i;
-    var destinations;
-    for(i = 0; i < data.features.length; i++) {
-      var feature = data.features[i];
-      destinations = [];
-
-      // trace( feature.properties.name );
-      // trace( feature.properties.name_long );
-      // trace( feature.properties.name_sort );
-
-      if(feature.properties.name !== 'Antarctica') { //  && feature.properties.name === 'Germany'
-        for(var r = 0; r < this.visaRequirements.countries.length; r++) {
-          // 199 nationalities travelling to 240 (?) countries, assuming nationals from a country don't need a visa to the sovereignty's main country:
-          // if(CountryDataHelpers.matchDestinationToCountryName(feature.properties.name_long, this.visaRequirements.countries[r].name) || CountryDataHelpers.matchDestinationToCountryName(this.visaRequirements.countries[r].name, feature.properties.name_long)) {
-          if(CountryDataHelpers.matchDestinationToCountryName(feature.properties.sovereignt, this.visaRequirements.countries[r].name) || CountryDataHelpers.matchDestinationToCountryName(this.visaRequirements.countries[r].name, feature.properties.sovereignt)) {
-            // trace('Loading visa requirements for: ' + feature.properties.name);
-            destinations = this.visaRequirements.countries[r].destinations;
-            numVisaRequirementsFound++;
-          }
-        }
-
-        // convert SVG data to three.js Shapes array (all shapes in one country):
-        var t = this.geo.path(feature);
-
-        if(t !== undefined) {
-          var shapes = transformSVGPath( t );
-
-          var pointCount = 0;
-          for(var p = 0; p < shapes.length; p++) {
-            pointCount += shapes[p].getPoints().length;
-          }
-          globalPointCount += pointCount;
-
-          this.countries.push({
-            properties: feature.properties,
-            shapes: shapes,
-            destinations: destinations,
-            numDestinationsFreeOrOnArrival: 0,
-            numSourcesFreeOrOnArrival: 0,
-            color: new THREE.Color(Config.colorCountryDefault),
-            colorLast: new THREE.Color(Config.colorCountryDefault)
-          });
-
-          if(destinations.length === 0) {
-            // trace("No visa requirements found for: " + feature.properties.name);
-          }
-
-          this.countryDropdownChoices.push({text: feature.properties.name_long, value: feature.properties.name_long});
-
-          // trace(feature.properties.name + " | shapes: " + shapes.length + ", total points: " + pointCount);
-
-        }
-      }
-    }
-
-    var d;
-    var country;
-    // remove destinations who's country doesn't exist:
-    for(i = 0; i < this.countries.length; i++) {
-      destinations = this.countries[i].destinations;
-      var destinationsNew = [];
-      for(d = 0; d < destinations.length; d++) {
-        country = CountryDataHelpers.getCountryByName(this.countries, destinations[d].d_name);
-        if(country !== null) {
-          destinationsNew.push(destinations[d]);
-        }
-      }
-      this.countries[i].destinations = destinationsNew;
-
-    }
-
-    // count visa-free destinations:
-    for(i = 0; i < this.countries.length; i++) {
-      destinations = this.countries[i].destinations;
-
-      this.countries[i].numDestinationsFreeOrOnArrival = 0;
-      for(d = 0; d < destinations.length; d++) {
-        if(destinations[d].visa_required === 'no' || destinations[d].visa_required === 'on-arrival' || destinations[d].visa_required === 'free-eu'
-           // || destinations[d].visa_required === 'evisa' || destinations[d].visa_required === 'evisitor' || destinations[d].visa_required === 'eta'
-          ) {
-          this.countries[i].numDestinationsFreeOrOnArrival++;
-        }
-
-      }
-
-      // add main sovereignty, if exists:
-      var mainCountry = CountryDataHelpers.getCountryByName(this.countries, this.countries[i].properties.sovereignt);
-      if(mainCountry && mainCountry.properties.sovereignt !== this.countries[i].properties.name_long) {
-        this.countries[i].numDestinationsFreeOrOnArrival++;
-      }
-
-      if(this.countries[i].numDestinationsFreeOrOnArrival > this.maxNumDestinationsFreeOrOnArrival) {
-        this.maxNumDestinationsFreeOrOnArrival = this.countries[i].numDestinationsFreeOrOnArrival;
-      }
-
-    }
-
-    // count countries from where people can come without a visa > find most open countries:
-    for(i = 0; i < this.countries.length; i++) {
-      destinations = this.countries[i].destinations;
-      for(d = 0; d < destinations.length; d++) {
-        if(destinations[d].visa_required === 'no' || destinations[d].visa_required === 'on-arrival' || destinations[d].visa_required === 'free-eu') {
-          country = CountryDataHelpers.getCountryByName(this.countries, destinations[d].d_name);
-          if(country !== null) {
-            country.numSourcesFreeOrOnArrival++;
-          }
-        }
-      }
-    }
-
-    for(i = 0; i < this.countries.length; i++) {
-      if( this.countries[i].numSourcesFreeOrOnArrival > this.maxNumSourcesFreeOrOnArrival ) {
-        this.maxNumSourcesFreeOrOnArrival = this.countries[i].numSourcesFreeOrOnArrival;
-      }
-      if( this.countries[i].properties.gdp_md_est > this.maxGDP ) {
-        this.maxGDP = this.countries[i].properties.gdp_md_est;
-      }
-      if( this.countries[i].properties.pop_est > this.maxPopulation ) {
-        this.maxPopulation = this.countries[i].properties.pop_est;
-      }
-      this.totalPopulation += this.countries[i].properties.pop_est;
-      this.countries[i].properties.gdp_per_capita = this.countries[i].properties.gdp_md_est / this.countries[i].properties.pop_est * 1000000;
-      if( this.countries[i].properties.gdp_per_capita > this.maxGDPPerCapita ) {
-        if(this.countries[i].properties.gdp_md_est > 100) {
-          this.maxGDPPerCapita = this.countries[i].properties.gdp_md_est / this.countries[i].properties.pop_est * 1000000;
-          // trace( this.countries[i].properties.name_long );
-          // trace( 'population: ' + this.countries[i].properties.pop_est );
-          // trace( 'gdp: ' + this.countries[i].properties.gdp_md_est );
-          // trace( 'gdp per capita: ' + this.maxGDPPerCapita );
-        }
-      }
-    }
-
-    this.countryDropdownChoices.sort((a, b) => {
-      var aName = a.text.toLowerCase();
-      var bName = b.text.toLowerCase();
-      return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
-    });
-
-    var stringLoaded = this.countries.length + ' countries loaded (' + globalPointCount + ' points total) from \'' + Config.mapDataFile + '\'';
-    if(Config.mergeDataFromMapDataFile2) {
-      stringLoaded += ' and \'' + Config.mapDataFile2 + '\'';
-    }
-    trace(stringLoaded);
-
-    trace('Visa requirements loaded for ' + numVisaRequirementsFound + ' countries from \'' + Config.visaRequirementsFile + '\'');
-    // trace('Max number of visa-free destinations: ' + this.maxNumDestinationsFreeOrOnArrival);
-    // trace('Max number of visa-free sources: ' + this.maxNumSourcesFreeOrOnArrival);
-    // trace('Total population: ' + this.totalPopulation.formatNumber(0));
-
-    var m = new THREE.Matrix4();
-    var m1 = new THREE.Matrix4();
-    var m2 = new THREE.Matrix4();
-    m1.makeRotationX( Config.globeRotationX );
-    m2.makeRotationY( Config.globeRotationY );
-    m.multiplyMatrices( m1, m2 );
-
-    for(i = 0; i < this.countries.length; i++) {
-      this.countries[i].colorByFreeDestinations = CountryDataHelpers.getCountryColorByFreeDestinations(this.countries[i].numDestinationsFreeOrOnArrival, this.maxNumDestinationsFreeOrOnArrival);
-      this.countries[i].colorByFreeSources = CountryDataHelpers.getCountryColorByFreeSources(this.countries[i].numSourcesFreeOrOnArrival, this.maxNumSourcesFreeOrOnArrival);
-      this.countries[i].colorByGDP = CountryDataHelpers.getCountryColorByGDP(this.countries[i], this.maxGDP);
-      this.countries[i].colorByGDPPerCapita = CountryDataHelpers.getCountryColorByGDPPerCapita(this.countries[i], this.maxGDPPerCapita);
-      this.countries[i].colorByPopulation = CountryDataHelpers.getCountryColorByPopulation(this.countries[i], this.maxPopulation);
-
-      if(Config.extrudeEnabled) {
-        // create extruded geometry from path Shape:
-        this.countries[i].geometry = new THREE.ExtrudeGeometry( this.countries[i].shapes, {
-          // amount: Config.extrudeDepth * 10,
-          // amount: 0.5 + this.getPopulationRatio(this.countries[i].properties) * 100,
-          amount: this.countries[i].numDestinationsFreeOrOnArrival / this.maxNumDestinationsFreeOrOnArrival * 100,
-          bevelEnabled: false
-        } );
-      } else {
-        // create flat ShapeGeometry from path Shape:
-        this.countries[i].geometry = new THREE.ShapeGeometry( this.countries[i].shapes );
-      }
-
-
-      // subtesselate surface:
-      if(Config.tesselationEnabled) {
-        var tessellateModifier = new THREE.TessellateModifier( Config.tesselationMaxEdgeLength ); // 2
-        for( var n = 0; n < Config.tesselationIterations; n++ ) { // 10
-          tessellateModifier.modify( this.countries[i].geometry );
-        }
-      }
-
-      // 2D Geometry:
-      var k;
-      this.countries[i].geometry2D = this.countries[i].geometry.clone();
-      for(k = 0; k < this.countries[i].geometry2D.vertices.length; k++) {
-        this.countries[i].geometry2D.vertices[k].x += Config.mapOffsetX;
-        this.countries[i].geometry2D.vertices[k].y = -this.countries[i].geometry2D.vertices[k].y + Config.mapOffsetY;
-        // this.countries[i].geometry2D.vertices[k].z += 0;
-      }
-
-      this.trianglesNumTotal += this.countries[i].geometry.faces.length;
-
-      // 2D points meshes
-      this.countries[i].pointsMesh2D = new THREE.Object3D();
-      this.countries[i].center2D = new THREE.Vector3();
-      var vertexCount = 0;
-      for(var s = 0; s < this.countries[i].shapes.length; s++) {
-        var pointsGeometry = this.countries[i].shapes[s].createPointsGeometry();
-        for(k = 0; k < pointsGeometry.vertices.length; k++) {
-          pointsGeometry.vertices[k].x += Config.mapOffsetX;
-          pointsGeometry.vertices[k].y = -pointsGeometry.vertices[k].y + Config.mapOffsetY;
-          pointsGeometry.vertices[k].z += 0.2;
-
-          this.countries[i].center2D.add(pointsGeometry.vertices[k]);
-          vertexCount++;
-        }
-        var line = new THREE.Line( pointsGeometry, Config.materialCountryBorder );
-        this.countries[i].pointsMesh2D.add(line);
-      }
-      this.countries[i].center2D.divideScalar(vertexCount);
-
-      CountryDataHelpers.correctCenter(this.countries[i]);
-
-      // 3D Geometry:
-      this.countries[i].geometry3D = this.countries[i].geometry.clone();
-      for(k = 0; k < this.countries[i].geometry.vertices.length; k++) {
-        var spherical = this.geo.projection.invert([this.countries[i].geometry.vertices[k].x, this.countries[i].geometry.vertices[k].y]);
-        spherical[0] = THREE.Math.degToRad(spherical[0]);
-        spherical[1] = THREE.Math.degToRad(spherical[1]);
-
-        // this.countries[i].geometry3D.vertices[k].x = Config.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
-        // this.countries[i].geometry3D.vertices[k].y = - Config.globeRadius * Math.sin(spherical[1]);
-        // this.countries[i].geometry3D.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
-
-        this.countries[i].geometry3D.vertices[k].x = Config.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
-        this.countries[i].geometry3D.vertices[k].y = -Config.globeRadius * Math.sin(spherical[1]);
-        if(this.countries[i].geometry.vertices[k].z < Config.extrudeDepth) {
-          this.countries[i].geometry3D.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
-          // this.countries[i].geometry3D.vertices[k].multiplyScalar(0.5);
-        } else {
-          this.countries[i].geometry3D.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
-          this.countries[i].geometry3D.vertices[k].multiplyScalar(1.002);
-          if(Config.extrudeEnabled) {
-            this.countries[i].geometry3D.vertices[k].multiplyScalar( 1 + this.countries[i].numDestinationsFreeOrOnArrival / this.maxNumDestinationsFreeOrOnArrival * 0.5);
-          }
-        }
-      }
-      // rotate and bake transform into vertices:
-      this.countries[i].geometry3D.applyMatrix(m);
-
-      this.countries[i].center3D = new THREE.Vector3();
-      vertexCount = 0;
-      for(k = 0; k < this.countries[i].geometry3D.vertices.length; k++) {
-        this.countries[i].center3D.add(this.countries[i].geometry3D.vertices[k]);
-        vertexCount++;
-      }
-      this.countries[i].center3D.divideScalar(vertexCount);
-
-      // this.countries[i].center3D.copy(this.countries[i].center2D);
-      spherical = this.geo.projection.invert([this.countries[i].center2D.x - Config.mapOffsetX, -this.countries[i].center2D.y + Config.mapOffsetY]);
-      spherical[0] = THREE.Math.degToRad(spherical[0]);
-      spherical[1] = THREE.Math.degToRad(spherical[1]);
-      this.countries[i].center3D.x = Config.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
-      this.countries[i].center3D.y = -Config.globeRadius * Math.sin(spherical[1]);
-      this.countries[i].center3D.z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
-      this.countries[i].center3D.applyMatrix4(m);
-
-
-      // 3D points meshes
-      this.countries[i].pointsMesh3D = new THREE.Object3D();
-      for(s = 0; s < this.countries[i].shapes.length; s++) {
-        pointsGeometry = this.countries[i].shapes[s].createPointsGeometry();
-        for(k = 0; k < pointsGeometry.vertices.length; k++) {
-          spherical = this.geo.projection.invert([pointsGeometry.vertices[k].x, pointsGeometry.vertices[k].y]);
-
-          spherical[0] = THREE.Math.degToRad(spherical[0]);
-          spherical[1] = THREE.Math.degToRad(spherical[1]);
-
-          pointsGeometry.vertices[k].x = Config.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
-          pointsGeometry.vertices[k].y = -Config.globeRadius * Math.sin(spherical[1]);
-          pointsGeometry.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
-
-          pointsGeometry.vertices[k].multiplyScalar(1.004);
-
-        }
-
-        line = new THREE.Line( pointsGeometry, Config.materialCountryBorder );
-        this.countries[i].pointsMesh3D.add(line);
-      }
-      // rotate and bake transform into vertices:
-      this.countries[i].pointsMesh3D.applyMatrix(m);
-
-
-      this.countries[i].mesh = new THREE.Mesh(this.countries[i].geometry, Config.materialCountryDefault); // this.countries[i].material // this.materialCountryDefault
-      this.countries[i].mesh.name = this.countries[i].properties.name_long;
-      this.countries[i].mesh.countryObject = this.countries[i];
-      if(!Config.usesWebGL) {
-        this.countries[i].mesh.material = new THREE.MeshPhongMaterial({
-          color: new THREE.Color(0xFF0000),
-          transparent: false,
-          wireframe: false,
-          shading: THREE.SmoothShading,
-          side: THREE.DoubleSide,
-          overdraw: true
-        });
-      }
-
-      this.countriesObject3D.add(this.countries[i].mesh);
-
-    } // for this.countries.length initial geometry creation end
-
-    if(!Config.usesWebGL) {
-      this.scene.add(this.countriesObject3D);
-    }
-
-    trace(this.trianglesNumTotal + ' triangles total');
-
-    var scaleStart = 0.0;
-    this.countriesObject3D.scale.set(scaleStart, scaleStart, scaleStart);
-    this.countriesObject3D.rotation.y = - Math.PI * 6.0;
-
-    this.updateGeometry(true);
-
-    trace('Creating meshes took ' + (Date.now() - start) + ' ms');
+    Geometry.updateGeometry(this, true);
 
     worldMap.updateAllCountryColors();
 
     worldMap.animationProps.interpolatePos = 1.0;
 
     if(Config.usesWebGL) {
-      worldMap.createBufferGeometry();
-      this.updateBufferGeometry();
+      Geometry.createBufferGeometry(this);
+      Geometry.updateBufferGeometry(this);
     }
 
 
@@ -673,7 +293,6 @@ WorldMap.prototype = {
         .onComplete(function() {
           worldMap.geometryNeedsUpdate = true;
           worldMap.introRunning = false;
-
           worldMap.controls.enabled = true;
 
           UI.initSourceCountryDropDown(worldMap);
@@ -704,125 +323,6 @@ WorldMap.prototype = {
 
   },
 
-  updateGeometry: function(computeFaceNormals) {
-    // trace('updateGeometry()');
-
-    var i;
-    var k;
-    for(i = 0; i < this.countries.length; i++) {
-      for(k = 0; k < this.countries[i].geometry.vertices.length; k++) {
-        this.countries[i].geometry.vertices[k].copy(this.countries[i].geometry2D.vertices[k]);
-        this.countries[i].geometry.vertices[k].mix(this.countries[i].geometry3D.vertices[k], this.animationProps.interpolatePos);
-      }
-      // this.countries[i].geometry.verticesNeedUpdate = true; // required to update mesh, also for picking to work
-
-      /*
-      this.countries[i].geometry.normalsNeedUpdate = true;
-      this.countries[i].geometry.uvsNeedUpdate = true;
-      this.countries[i].geometry.elementsNeedUpdate = true;
-      this.countries[i].geometry.tangentsNeedUpdate = true;
-      this.countries[i].geometry.lineDistancesNeedUpdate = true;
-      this.countries[i].geometry.colorsNeedUpdate = true;
-      this.countries[i].geometry.buffersNeedUpdate = true;
-      */
-
-      this.countries[i].geometry.computeBoundingSphere(); // required for picking to work after updating vertices
-      if(computeFaceNormals) this.countries[i].geometry.computeFaceNormals(); // required for shading to look correct
-
-    }
-
-    // transform sphere:
-    if(this.sphere) {
-      for(k = 0; k < this.sphere.geometry.vertices.length; k++) {
-        this.sphere.geometry.vertices[k].copy(this.sphereGeometry2D.vertices[k]);
-        this.sphere.geometry.vertices[k].mix(this.sphereGeometry3D.vertices[k], this.animationProps.interpolatePos * this.animationProps.interpolatePos);
-      }
-      this.sphere.geometry.verticesNeedUpdate = true; // required to update mesh
-
-      this.sphere.geometry.computeBoundingSphere(); // required for picking to work after updating vertices
-      this.sphere.geometry.computeFaceNormals(); // required for shading to look correct
-    }
-  },
-
-
-  createBufferGeometry: function() {
-    this.bufferGeometry = new THREE.BufferGeometry();
-
-    var positions = new Float32Array( this.trianglesNumTotal * 3 * 3 );
-    var normals = new Float32Array( this.trianglesNumTotal * 3 * 3 );
-    var colors = new Float32Array( this.trianglesNumTotal * 3 * 3 );
-
-    var color = new THREE.Color();
-    color.set(Config.colorCountryDefault);
-
-    var index = 0;
-    var i, f;
-    for(i = 0; i < this.countries.length; i++) {
-      var vertices = this.countries[i].geometry.vertices;
-
-      for(f = 0; f < this.countries[i].geometry.faces.length; f++) {
-        var face = this.countries[i].geometry.faces[f];
-
-        // positions
-
-        positions[ index ] = vertices[ face.a ].x;
-        positions[ index + 1 ] = vertices[ face.a ].y;
-        positions[ index + 2 ] = vertices[ face.a ].z;
-
-        positions[ index + 3 ] = vertices[ face.b ].x;
-        positions[ index + 4 ] = vertices[ face.b ].y;
-        positions[ index + 5 ] = vertices[ face.b ].z;
-
-        positions[ index + 6 ] = vertices[ face.c ].x;
-        positions[ index + 7 ] = vertices[ face.c ].y;
-        positions[ index + 8 ] = vertices[ face.c ].z;
-
-        // normals
-
-        normals[ index ] = face.normal.x;
-        normals[ index + 1 ] = face.normal.y;
-        normals[ index + 2 ] = face.normal.z;
-
-        normals[ index + 3 ] = face.normal.x;
-        normals[ index + 4 ] = face.normal.y;
-        normals[ index + 5 ] = face.normal.z;
-
-        normals[ index + 6 ] = face.normal.x;
-        normals[ index + 7 ] = face.normal.y;
-        normals[ index + 8 ] = face.normal.z;
-
-        // colors
-
-        colors[ index ] = color.r;
-        colors[ index + 1 ] = color.g;
-        colors[ index + 2 ] = color.b;
-
-        colors[ index + 3 ] = color.r;
-        colors[ index + 4 ] = color.g;
-        colors[ index + 5 ] = color.b;
-
-        colors[ index + 6 ] = color.r;
-        colors[ index + 7 ] = color.g;
-        colors[ index + 8 ] = color.b;
-
-        index += 9;
-
-      }
-    } // for this.countries.length buffer geometry creation end
-
-    this.bufferGeometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-    this.bufferGeometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-    this.bufferGeometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
-
-    this.bufferGeometry.verticesNeedUpdate = true;
-    this.bufferGeometry.computeBoundingSphere();
-    // this.bufferGeometry.computeVertexNormals();
-
-    var mesh = new THREE.Mesh( this.bufferGeometry, Config.materialMap );
-    this.scene.add( mesh );
-
-  },
-
   updateCountryColorsOneByOne: function() {
     // trace('updateCountryColorsOneByOne()');
 
@@ -840,9 +340,8 @@ WorldMap.prototype = {
 
         worldMap.updateCountryColors(idLast, worldMap.animationProps.colorChangeID);
 
-        // worldMap.updateBufferGeometry();
         if(Config.usesWebGL) {
-          worldMap.updateBufferGeometryColors();
+          Geometry.updateBufferGeometryColors(worldMap);
         }
       })
       .start();
@@ -1010,137 +509,6 @@ WorldMap.prototype = {
     }
   },
 
-  updateBufferGeometry: function() {
-    // trace('updateBufferGeometry()');
-
-    var positions = this.bufferGeometry.getAttribute( 'position' ).array;
-    var normals = this.bufferGeometry.getAttribute( 'normal' ).array;
-    var colors = this.bufferGeometry.getAttribute( 'color' ).array;
-
-    var m = new THREE.Matrix4();
-    var m1 = new THREE.Matrix4();
-    var m2 = new THREE.Matrix4();
-    m1.makeRotationY( this.countriesObject3D.rotation.y );
-    m2.makeScale( this.countriesObject3D.scale.x, this.countriesObject3D.scale.y, this.countriesObject3D.scale.z );
-    m.multiplyMatrices( m1, m2 );
-
-    var color = new THREE.Color();
-    var v = new THREE.Vector3();
-
-    var index = 0;
-    var i, f;
-    for(i = 0; i < this.countries.length; i++) {
-      var vertices = this.countries[i].geometry.vertices;
-
-      // trace( this.countries[i].properties.name_long );
-      // trace( this.countries[i].visa_required );
-
-      color.set(this.countries[i].color);
-
-      for(f = 0; f < this.countries[i].geometry.faces.length; f++) {
-        var face = this.countries[i].geometry.faces[f];
-
-        // positions
-
-        v.copy( vertices[ face.a ] );
-        v.applyMatrix4(m);
-
-        positions[ index ] = v.x;
-        positions[ index + 1 ] = v.y;
-        positions[ index + 2 ] = v.z;
-
-        v.copy( vertices[ face.b ] );
-        v.applyMatrix4(m);
-
-        positions[ index + 3 ] = v.x;
-        positions[ index + 4 ] = v.y;
-        positions[ index + 5 ] = v.z;
-
-        v.copy( vertices[ face.c ] );
-        v.applyMatrix4(m);
-
-        positions[ index + 6 ] = v.x;
-        positions[ index + 7 ] = v.y;
-        positions[ index + 8 ] = v.z;
-
-        // normals
-
-        normals[ index ] = face.normal.x;
-        normals[ index + 1 ] = face.normal.y;
-        normals[ index + 2 ] = face.normal.z;
-
-        normals[ index + 3 ] = face.normal.x;
-        normals[ index + 4 ] = face.normal.y;
-        normals[ index + 5 ] = face.normal.z;
-
-        normals[ index + 6 ] = face.normal.x;
-        normals[ index + 7 ] = face.normal.y;
-        normals[ index + 8 ] = face.normal.z;
-
-        // colors
-
-        colors[ index ] = color.r;
-        colors[ index + 1 ] = color.g;
-        colors[ index + 2 ] = color.b;
-
-        colors[ index + 3 ] = color.r;
-        colors[ index + 4 ] = color.g;
-        colors[ index + 5 ] = color.b;
-
-        colors[ index + 6 ] = color.r;
-        colors[ index + 7 ] = color.g;
-        colors[ index + 8 ] = color.b;
-
-        index += 9;
-
-      }
-    } // for this.countries.length buffer geometry update end
-
-    this.bufferGeometry.attributes.position.needsUpdate = true;
-    this.bufferGeometry.attributes.normal.needsUpdate = true;
-    this.bufferGeometry.attributes.color.needsUpdate = true;
-
-    // this.bufferGeometry.colorsNeedUpdate = true;
-    this.bufferGeometry.computeBoundingSphere();
-    // this.bufferGeometry.computeVertexNormals();
-
-  },
-
-
-  updateBufferGeometryColors: function() {
-    // trace('updateBufferGeometryColors()');
-
-    var colors = this.bufferGeometry.getAttribute( 'color' ).array;
-
-    var color = new THREE.Color();
-
-    var index = 0;
-    var i, f;
-    for(i = 0; i < this.countries.length; i++) {
-      color.set(this.countries[i].color);
-
-      for(f = 0; f < this.countries[i].geometry.faces.length; f++) {
-        colors[ index ] = color.r;
-        colors[ index + 1 ] = color.g;
-        colors[ index + 2 ] = color.b;
-
-        colors[ index + 3 ] = color.r;
-        colors[ index + 4 ] = color.g;
-        colors[ index + 5 ] = color.b;
-
-        colors[ index + 6 ] = color.r;
-        colors[ index + 7 ] = color.g;
-        colors[ index + 8 ] = color.b;
-
-        index += 9;
-
-      }
-    } // for this.countries.length buffer geometry update end
-
-    this.bufferGeometry.attributes.color.needsUpdate = true;
-
-  },
-
   updateCountryHover: function(country) {
     // trace('updateCountryHover()');
     if(!Config.isTouchDevice) {
@@ -1174,24 +542,13 @@ WorldMap.prototype = {
     this.intersectedObject = null;
   },
 
-  toScreenXY: function(pos3D) {
-    var v = pos3D.project( this.camera );
-    var percX = (v.x + 1) / 2;
-    var percY = (-v.y + 1) / 2;
-
-    var left = percX * window.innerWidth;
-    var top = percY * window.innerHeight;
-
-    return new THREE.Vector2(left, top);
-  },
-
   animate: function() {
 
     if(this.inited) {
       if(!Config.isTouchDevice && !this.introRunning) {
         this.intersectedObjectBefore = this.intersectedObject;
 
-        var intersects = this.getIntersects();
+        var intersects = Geometry.getIntersects(this, UI.mouseNormalized);
 
         if( intersects.length > 0 ) {
           // if( this.intersectedObject !== intersects[ 0 ].object && intersects[ 0 ].object.countryObject && intersects[ 0 ].object.countryObject !== this.selectedCountry ) {
@@ -1214,13 +571,6 @@ WorldMap.prototype = {
           }
         }
 
-        /*
-        if(!this.geometryNeedsUpdate && (this.intersectedObjectBefore !== this.intersectedObject) ) {
-          this.updateAllCountryColors();
-          this.updateBufferGeometry();
-        }
-        */
-
         if(this.intersectedObject) {
           $('body').css( 'cursor', 'pointer' );
         } else {
@@ -1229,14 +579,14 @@ WorldMap.prototype = {
       }
 
       if(this.geometryNeedsUpdate) {
-        this.updateGeometry(false);
+        Geometry.updateGeometry(this, false);
         if(Config.usesWebGL) {
-          this.updateBufferGeometry();
+          Geometry.updateBufferGeometry(this);
         }
       }
 
       if(this.selectedCountry || this.selectedDestinationCountry) {
-        this.updateLines();
+        Geometry.updateLines(this);
       }
 
       this.render();
@@ -1244,36 +594,10 @@ WorldMap.prototype = {
 
   },
 
-  getIntersects: function() {
-    var vector = new THREE.Vector3();
-    vector.copy(UI.mouseNormalized);
-    vector.unproject( this.camera );
-
-    this.raycaster.set( this.camera.position, vector.sub( this.camera.position ).normalize() );
-
-    var intersects = this.raycaster.intersectObjects( this.countriesObject3D.children );
-    intersects.sort( function( a, b ) { return a.distance - b.distance; } );
-
-    return intersects;
-  },
-
-  getIntersectsMouseDown: function() {
-    var vector = new THREE.Vector3();
-    vector.copy(UI.mouseNormalizedTouchStart);
-    vector.unproject( this.camera );
-
-    this.raycaster.set( this.camera.position, vector.sub( this.camera.position ).normalize() );
-
-    var intersects = this.raycaster.intersectObjects( this.countriesObject3D.children );
-    intersects.sort( function( a, b ) { return a.distance - b.distance; } );
-
-    return intersects;
-  },
-
   selectCountryFromMap: function(event) {
     // trace('selectCountryFromMap');
 
-    var intersects = this.getIntersectsMouseDown();
+    var intersects = Geometry.getIntersects(this, UI.mouseNormalizedTouchStart);
 
     if( intersects.length > 0 ) {
       if(intersects[ 0 ].object.countryObject && this.selectedCountry !== intersects[ 0 ].object.countryObject ) {
@@ -1338,16 +662,13 @@ WorldMap.prototype = {
 
     this.updateCountryColorsOneByOne();
 
-    // this.updateAllCountryColors();
-    // this.updateBufferGeometry();
-
   },
 
   clearBothSelectedCountries: function() {
     // trace('clearBothSelectedCountries()');
 
     if(this.selectedCountry || this.selectedDestinationCountry) {
-      this.deleteLinesObject();
+      Geometry.deleteLinesObject(this);
       for(var i = 0; i < this.countries.length; i++) {
         this.countries[i].visa_required = '';
         this.countries[i].notes = '';
@@ -1378,7 +699,7 @@ WorldMap.prototype = {
 
   clearSelectedSourceCountry: function() {
     if(this.selectedCountry) {
-      this.deleteLinesObject();
+      Geometry.deleteLinesObject(this);
       for(var i = 0; i < this.countries.length; i++) {
         this.countries[i].visa_required = '';
         this.countries[i].notes = '';
@@ -1404,7 +725,7 @@ WorldMap.prototype = {
 
   clearSelectedDestinationCountry: function() {
     if(this.selectedDestinationCountry) {
-      this.deleteLinesObject();
+      Geometry.deleteLinesObject(this);
       for(var i = 0; i < this.countries.length; i++) {
         this.countries[i].visa_required = '';
         this.countries[i].notes = '';
@@ -1426,189 +747,6 @@ WorldMap.prototype = {
     }
     this.updateCountrySelection();
 
-  },
-
-  getLineMaterial: function(country) {
-    var material = Config.materialLineDefault;
-    if(country.visa_required === 'no') {
-      material = Config.materialLineVisaNotRequired;
-    } else if(country.visa_required === 'on-arrival') {
-      material = Config.materialLineVisaOnArrival;
-    } else if(country.visa_required === 'free-eu') {
-      material = Config.materialLineVisaFreeEU;
-    } else if(country.visa_required === 'yes') {
-      material = Config.materialLineVisaRequired;
-    } else if(country.visa_required === 'admission-refused') {
-      material = Config.materialLineVisaAdmissionRefused;
-    } else if(country.visa_required === '') {
-      material = Config.materialLineVisaDataNotAvailable;
-    } else { // special
-      material = Config.materialLineVisaSpecial;
-    }
-    return material;
-  },
-
-  createLines: function() {
-    // trace('createLines()');
-
-    if(this.mode !== 'destinations' && this.mode !== 'sources') {
-      return;
-    }
-
-    if(this.selectedCountry || this.selectedDestinationCountry) {
-      var points2D;
-      var points3D;
-      var line;
-      var c;
-
-      this.deleteLinesObject();
-
-      this.linesObject = new THREE.Object3D();
-      this.scene.add(this.linesObject);
-
-      if(this.selectedCountry && this.selectedDestinationCountry) {
-        points2D = [];
-        points3D = [];
-
-        if(this.mode === 'destinations') {
-          points2D.push( this.selectedCountry.center2D );
-          points2D.push( this.selectedDestinationCountry.center2D );
-
-          points3D.push( this.selectedCountry.center3D );
-          points3D.push( this.selectedDestinationCountry.center3D );
-        } else {
-          points2D.push( this.selectedDestinationCountry.center2D );
-          points2D.push( this.selectedCountry.center2D );
-
-          points3D.push( this.selectedDestinationCountry.center3D );
-          points3D.push( this.selectedCountry.center3D );
-        }
-
-        this.selectedDestinationCountry.spline2D = new THREE.Spline( points2D );
-        this.selectedDestinationCountry.spline3D = new THREE.Spline( points3D );
-
-        this.selectedDestinationCountry.splineLength = points2D[0].distanceTo(points2D[1]);
-        this.selectedDestinationCountry.splineHeight = this.selectedDestinationCountry.splineLength * 0.25;
-        this.selectedDestinationCountry.geometrySpline = new THREE.Geometry();
-
-        line = new THREE.Line( this.selectedDestinationCountry.geometrySpline, this.getLineMaterial(this.selectedDestinationCountry), THREE.LineStrip );
-        this.linesObject.add(line);
-
-      } else if(this.selectedCountry && !this.selectedDestinationCountry) {
-        if(this.mode === 'destinations') {
-          for(c = 0; c < this.countries.length; c++) {
-            if(this.countries[c].visa_required === 'no' || this.countries[c].visa_required === 'on-arrival' || this.countries[c].visa_required === 'free-eu') {
-              points2D = [];
-              points2D.push( this.selectedCountry.center2D );
-              points2D.push( this.countries[c].center2D );
-              this.countries[c].spline2D = new THREE.Spline( points2D );
-
-              points3D = [];
-              points3D.push( this.selectedCountry.center3D );
-              points3D.push( this.countries[c].center3D );
-              this.countries[c].spline3D = new THREE.Spline( points3D );
-
-              this.countries[c].splineLength = points2D[0].distanceTo(points2D[1]);
-              this.countries[c].splineHeight = this.countries[c].splineLength * 0.25;
-              this.countries[c].geometrySpline = new THREE.Geometry();
-
-              line = new THREE.Line( this.countries[c].geometrySpline, this.getLineMaterial(this.countries[c]), THREE.LineStrip );
-              this.linesObject.add(line);
-            }
-          }
-        }
-
-      } else if(!this.selectedCountry && this.selectedDestinationCountry) {
-        if(this.mode === 'sources') {
-          for(c = 0; c < this.countries.length; c++) {
-            if(this.countries[c].visa_required === 'no' || this.countries[c].visa_required === 'on-arrival' || this.countries[c].visa_required === 'free-eu') {
-              points2D = [];
-              points2D.push( this.selectedDestinationCountry.center2D );
-              points2D.push( this.countries[c].center2D );
-              this.countries[c].spline2D = new THREE.Spline( points2D );
-
-              points3D = [];
-              points3D.push( this.selectedDestinationCountry.center3D );
-              points3D.push( this.countries[c].center3D );
-              this.countries[c].spline3D = new THREE.Spline( points3D );
-
-              this.countries[c].splineLength = points2D[0].distanceTo(points2D[1]);
-              this.countries[c].splineHeight = this.countries[c].splineLength * 0.25;
-              this.countries[c].geometrySpline = new THREE.Geometry();
-
-              line = new THREE.Line( this.countries[c].geometrySpline, this.getLineMaterial(this.countries[c]), THREE.LineStrip );
-              this.linesObject.add(line);
-            }
-          }
-        }
-      }
-
-      this.animationProps.lineAnimatePos = 0;
-      this.animationProps.lineAnimateOffset = 0;
-
-      this.tweenLines = new TWEEN.Tween(this.animationProps)
-        .to({lineAnimatePos: 1}, Config.lineAnimateDuration)
-        .onStart(function() {
-        })
-        .onUpdate(function(time) {
-          // worldMap.updateLines(time);
-        })
-        .easing(TWEEN.Easing.Sinusoidal.Out)
-        .start();
-    }
-
-  },
-
-  updateLines: function(time) {
-    // trace('updateLines()');
-
-    this.animationProps.lineAnimateOffset += Config.lineAnimateSpeed * this.clock.getDelta();
-    this.animationProps.lineAnimateOffset %= Config.lineDashOffsetLimit;
-
-    if(this.selectedCountry || this.selectedDestinationCountry) {
-
-      for(var c = 0; c < this.countries.length; c++) {
-        var offset = this.animationProps.lineAnimateOffset / this.countries[c].splineLength;
-
-        // if(this.countries[c].visa_required === 'no' || this.countries[c].visa_required === 'on-arrival' || this.countries[c].visa_required === 'free-eu') {
-        if(this.countries[c].geometrySpline) {
-          var subdivisions = 30;
-          for(var i = 0; i < subdivisions; i++) {
-            var index;
-            index = i / subdivisions * this.animationProps.lineAnimatePos;
-            index += offset;
-            if(this.mode === 'sources') {
-              index = 1 - index;
-            }
-            index = Math.min(index, 1);
-            index = Math.max(index, 0);
-
-            var position2D = this.countries[c].spline2D.getPoint( index );
-            var position3D = this.countries[c].spline3D.getPoint( index );
-
-            var z = 0;
-
-            if(index < 0.5) {
-              z = TWEEN.Easing.Sinusoidal.Out( index * 2 ) * this.countries[c].splineHeight;
-            } else {
-              z = TWEEN.Easing.Sinusoidal.Out( 1 - (index - 0.5) * 2 ) * this.countries[c].splineHeight;
-            }
-
-            this.countries[c].geometrySpline.vertices[ i ] = new THREE.Vector3( position2D.x, position2D.y, position2D.z );
-            this.countries[c].geometrySpline.vertices[ i ].z += z;
-
-            var v3D = new THREE.Vector3( position3D.x, position3D.y, position3D.z );
-            v3D.setLength(Config.globeRadius + z);
-
-            this.countries[c].geometrySpline.vertices[ i ].lerp(v3D, this.animationProps.interpolatePos);
-
-          }
-          this.countries[c].geometrySpline.verticesNeedUpdate = true;
-          this.countries[c].geometrySpline.lineDistancesNeedUpdate = true;
-          this.countries[c].geometrySpline.computeLineDistances();
-        }
-      }
-    }
   },
 
   trackEvent: function(category, action) {
@@ -1908,19 +1046,10 @@ WorldMap.prototype = {
 
     UI.updateCountryList(this);
     if(Config.usesWebGL) {
-      this.createLines();
+      Geometry.createLines(this);
     }
     this.updateCountryColorsOneByOne();
 
-  },
-
-  deleteLinesObject: function() {
-    // trace('deleteLinesObject()');
-
-    if(this.linesObject) {
-      this.scene.remove(this.linesObject);
-      this.linesObject = null;
-    }
   },
 
   render: function() {
@@ -1969,7 +1098,7 @@ function init() {
     worldMap.initThree();
 
     if(Config.sphereEnabled) {
-      worldMap.createSphere();
+      Geometry.createSphere(worldMap);
     }
 
     // trace('Loading world map ...');

@@ -199,11 +199,6 @@ export function createCountryList(worldMap) {
       }
     }
 
-    worldMap.updateCountryColorsOneByOne();
-    if(Config.usesWebGL) {
-      worldMap.updateBufferGeometry();
-    }
-
   });
 
   if(!Config.isTouchDevice) {
@@ -215,9 +210,6 @@ export function createCountryList(worldMap) {
         worldMap.updateCountryHover(country);
         if(!worldMap.geometryNeedsUpdate && (worldMap.intersectedObjectBefore !== worldMap.intersectedObject) ) {
           worldMap.updateAllCountryColors();
-          if(Config.usesWebGL) {
-            worldMap.updateBufferGeometry();
-          }
         }
       }
 
@@ -740,10 +732,6 @@ export function initSourceCountryDropDown(worldMap) {
           worldMap.updateCountryHover(selectedCountryNew);
         }
 
-        worldMap.updateCountryColorsOneByOne();
-        if(Config.usesWebGL) {
-          worldMap.updateBufferGeometry();
-        }
       }
     }
   });
@@ -844,10 +832,6 @@ export function initDestinationCountryDropDown(worldMap) {
           worldMap.updateCountryHover(selectedDestinationCountryNew);
         }
 
-        worldMap.updateCountryColorsOneByOne();
-        if(Config.usesWebGL) {
-          worldMap.updateBufferGeometry();
-        }
       }
     }
   });
