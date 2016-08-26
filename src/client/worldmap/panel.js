@@ -1,11 +1,13 @@
 import $ from 'jquery';
 import * as TWEEN from 'tween.js';
 
-import * as UI from './ui';
+import * as UI from './userinterface';
 
 
 
 var activePanel = null;
+
+
 
 export function initPanels() {
   $('#button_about').click(function(event) {

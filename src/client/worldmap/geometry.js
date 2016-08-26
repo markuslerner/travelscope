@@ -69,7 +69,7 @@ export function createCountriesGeometry(worldMap) {
 
         worldMap.countryDropdownChoices.push({text: feature.properties.name_long, value: feature.properties.name_long});
 
-        // log("Geometry: " + feature.properties.name + " | shapes: " + shapes.length + ", total points: " + pointCount);
+        // log("Geometry" + feature.properties.name + " | shapes: " + shapes.length + ", total points: " + pointCount);
 
       }
     }

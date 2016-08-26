@@ -29,7 +29,7 @@ import { formatNumber, toSentenceStart } from '../utils';
 import * as CountryDataHelpers from '../utils/countryDataHelpers';
 import * as Geometry from './geometry';
 import * as Panels from './panel';
-import * as UI from './ui';
+import * as UI from './userinterface';
 
 
 
@@ -234,7 +234,7 @@ WorldMap.prototype = {
 
     UI.updateLegend(this);
 
-    UI.collapseNavBar();
+    // UI.collapseNavBar();
 
     worldMap.clearBothSelectedCountries();
 
@@ -528,6 +528,8 @@ WorldMap.prototype = {
         return;
       }
 
+      country.listItem.addClass('hover');
+
       UI.updateCountryTooltip(this, country);
 
     }
@@ -538,6 +540,9 @@ WorldMap.prototype = {
     if(this.countryBorder) {
       this.scene.remove(this.countryBorder);
       this.countryBorder = null;
+    }
+    if(this.intersectedObject !== undefined && this.intersectedObject !== null) {
+      this.intersectedObject.countryObject.listItem.removeClass('hover');
     }
     this.intersectedObject = null;
   },
@@ -719,6 +724,7 @@ WorldMap.prototype = {
 
       UI.updateModeStatement(this);
     }
+
     this.updateCountrySelection();
 
   },

@@ -25,7 +25,6 @@ select {
 }
 
 h1 {
-	color: white;
 	font-size: 30px;
 	font-weight: 400;
 	margin: 0;
@@ -41,7 +40,6 @@ h3 {
 	line-height: 24px;
 	font-weight: 400;
 	margin: 0px 0 15px 0;
-	color: #fff;
 }
 
 p {
@@ -147,21 +145,6 @@ b {
 	/* background-color: transparent !important; */
 }
 
-
-@media (max-width: 850px) {
-  .navbar-default .navbar-nav .open .dropdown-menu > li > a {
-    color: #ecf0f1;
-  }
-  .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
-    color: #ffffff;
-  }
-  .navbar-default .navbar-nav .open .dropdown-menu > .active > a, .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
-    color: #ffffff;
-    background-color: #5d5c5c;
-  }
-}
-
-
 .immybox.immybox_witharrow {
 }
 .immybox_results {
@@ -171,9 +154,14 @@ b {
 	-webkit-overflow-scrolling: touch;
 	max-height:20em;
 	background-color:white;
-	border:1px solid #ccc;
+	border: 1px solid #777777;
+  border-top: none;
 	z-index:9001;
+  background-color: #222222;
+  color: #dddddd;
+  max-height: 420px;
 }
+
 .immybox_results p.immybox_moreinfo,.immybox_results p.immybox_noresults {
 	color:#ccc;
 	font-style:italic;
@@ -183,7 +171,9 @@ b {
 .immybox_results ul {
 	list-style-type:none;
 	margin:0;
+  margin-top: -1px;
 	padding:0;
+  // border: 1px solid #777777;
 }
 .immybox_results ul li {
 	padding:0.25em 1em;
@@ -192,12 +182,15 @@ b {
 	-khtml-user-select:none;
 	-webkit-user-select:none;
 	user-select:none;
+  padding: 0.75em 0.75em;
 }
 .immybox_results ul li.immybox_choice {
 	cursor:pointer;
 }
 .immybox_results ul li.immybox_choice.active {
 	background-color:#f1f1f1;
+  background-color: #444444;
+  color: white;
 }
 .immybox_results ul li.immybox_choice .highlight {
 	text-decoration:underline;
@@ -390,20 +383,6 @@ b {
 	margin-left: 0;
 }
 
-.immybox_results {
-	background-color: #222222;
-	color: #dddddd;
-	border: none;
-	max-height: 420px;
-}
-.immybox_results ul li {
-	padding: 0.75em 0.75em;
-}
-.immybox_results ul li.immybox_choice.active {
-	background-color: #444444;
-	color: white;
-}
-
 #arrow_right {
 	float: left;
 	top: 18px;
@@ -450,7 +429,6 @@ b {
 	font-size: 24px; /* 15px */
 	font-weight: 400;
 	line-height: 34px; /* 22px */
-	color: white;
 	pointer-events: none;
 	width: 100%;
 	max-width: 650px;
@@ -516,12 +494,12 @@ b {
 	position: absolute;
 	top: 0;
 	left: 0;
-	color: #ccc;
+	color: #bbb;
 	cursor: pointer;
 	pointer-events: auto;
 }
 
-#country_list li:hover, #country_list li.selected {
+#country_list li:hover, #country_list li.selected, #country_list li.hover {
 	color: #fff;
 }
 
@@ -1060,6 +1038,34 @@ b {
 		margin-left: 15px;
 	}
 
+  #map_mode {
+    width: 291px;
+    margin: 8px 0 0 15px;
+    font-size: 12px;
+  }
+
+  #map_mode .dropdown-toggle .dropdown-label {
+    width: 210px;
+  }
+
+  .navbar-default .navbar-nav .open .dropdown-menu {
+    border: 1px solid #999999;
+    padding-bottom: 0px;
+    margin-top: -5px;
+  }
+
+  .navbar-default .navbar-nav .open .dropdown-menu > li > a {
+    color: #ecf0f1;
+    background-color: #222222;
+  }
+  .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
+    color: #ffffff;
+  }
+  .navbar-default .navbar-nav .open .dropdown-menu > .active > a, .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
+    color: #ffffff;
+    background-color: #5d5c5c;
+  }
+
 	#arrow_right {
 		display: none;
 	}
@@ -1085,16 +1091,6 @@ b {
 		left: 160px;
 		top: -8px;
 		right: auto;
-	}
-
-	#map_mode {
-		width: 291px;
-		margin: 8px 0 0 15px;
-		font-size: 12px;
-	}
-
-	#map_mode .dropdown-toggle .dropdown-label {
-		width: 210px;
 	}
 
 	.navbar-default .navbar-nav > li > a {
@@ -1128,10 +1124,23 @@ b {
 		left: 15px;
 	}
 
+  .country_dropdown_container {
+    width: calc(100% - 30px);
+  }
+
 	.country_dropdown {
 		top: 110px;
 		left: 15px;
+    width: 100%;
 	}
+
+  #map_mode {
+    width: calc(100% - 30px);
+  }
+
+  #map_mode .dropdown-toggle .dropdown-label {
+    width: calc(100% - 60px);
+  }
 
 	#travelscope {
 		font-size: 15px;
