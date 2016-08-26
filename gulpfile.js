@@ -18,7 +18,6 @@ var sourcemaps = require('gulp-sourcemaps');
 var streamify = require('gulp-streamify');
 var uglify = require('gulp-uglify');
 var gutil = require('gulp-util');
-var livereactload = require('livereactload');
 var envify = require('loose-envify/custom');
 var merge = require('utils-merge');
 var buffer = require('vinyl-buffer');
@@ -104,7 +103,7 @@ gulp.task('watchify', function() {
 
   var args = merge(watchify.args, {
     debug: true,
-    plugin: options.dev ? [livereactload] : []
+    plugin: options.dev ? [] : []
   });
   var bundler = watchify(browserify(options.src + '/client.js', args))
     .transform(babelify, { /* opts */ });
