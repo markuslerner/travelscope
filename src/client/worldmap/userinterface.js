@@ -41,10 +41,6 @@ export function init(worldMap) {
 
 
 export function completeInit() {
-  if($(window).width() > 861) {
-    $('#ce_badge').fadeIn(600);
-  }
-
   uiReady = true;
 };
 
@@ -1204,11 +1200,6 @@ function onWindowResize() {
     worldMap.render();
 
     if(uiReady) {
-      if($(window).width() > 861) {
-        $('#ce_badge').stop().fadeIn(600);
-      } else {
-        $('#ce_badge').stop().fadeOut(600);
-      }
     }
   }
 
