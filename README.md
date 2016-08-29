@@ -94,8 +94,6 @@ $ npm run clean
     │       └── userinterface.js   # UI functions
     ├── client.js                  # Main JS file
     ├── index.html                 # Main HTML page container for app used for development
-    ├── index.php                  # Server side page container for app
-    ├── php                        # Server side files for parsing visa requirements from Wikipedia
     └── scss                       # SCSS source files
 ```
 

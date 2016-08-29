@@ -63,3 +63,6 @@ public/
 .env
 .azk
 
+# Server-side files
+php/
+src/index.php
