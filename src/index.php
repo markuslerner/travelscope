@@ -90,7 +90,7 @@
       var VISA_REQUIREMENTS_URL = '<?=$latest_visa_requirements_filename;?>';
     </script>
 
-    <script type="text/javascript" src="js/client.js"></script>
+    <script type="text/javascript" src="<?=CDN_URL?>js/client.js"></script>
 
   </head>
 
@@ -162,7 +162,7 @@
 				<li id="logo_ml">
 					<a href="http://www.markuslerner.com/" target="_blank">
 						<span class="text">Concept/development:</span>
-						<img alt="Markus Lerner Design" src="img/ml-white.svg"/>
+						<img alt="Markus Lerner Design" src="assets/img/ml-white.svg"/>
 					</a>
 				</li>
 			</ul>
@@ -230,9 +230,15 @@
 				<div class="section">
 					<h3>News</h3>
 					<p>
-						<small>5 April 2016</small><br/>
-						Travelscope just got selected as an Official Honoree at <a href="https://pv.webbyawards.com/2016/websites/general-website/netart/honorees" target="_new">The 20th Annual Webby Awards</a> in the Web: NetArt category.
+						<small>29 August 2016</small><br/>
+						Upon many requests, I decided to publish the source code if this project on GitHub: <a href="https://github.com/markuslerner/travelscope" target="_blank">https://github.com/markuslerner/travelscope</a>
+            <br/>
+            When I started coding in 2014, I used jQuery and jquery-UI for all the interactions and UI updates. Nowadays I would rather use a libray like <a href="https://facebook.github.io/react/" target="_blank">React</a>.
 					</p>
+          <p>
+            <small>5 April 2016</small><br/>
+            Travelscope just got selected as an Official Honoree at <a href="https://pv.webbyawards.com/2016/websites/general-website/netart/honorees" target="_new">The 20th Annual Webby Awards</a> in the Web: NetArt category.
+          </p>
 					<p>
 						<small>5 Oct 2015</small><br/>
 						Canvas mode for browsers that don't support WebGL is now supported.
@@ -350,10 +356,6 @@ var rsypgei = ['m','=','p','r','e','c','l','t','a','"','s','s','e','c','t','s','
 	<div id="loading">
 		<div class="title">Loading world map and visa data</div>
 		<div class="details"></div>
-	</div>
-
-	<div id="ce_badge">
-		<a href="http://www.chromeexperiments.com/experiment/travelscope/" target="_blank"><img src="img/badges-chrome_experiments_png/b4.png" alt="See my Experiment on ChromeExperiments.com" /></a>
 	</div>
 
 	<script type="text/javascript">
