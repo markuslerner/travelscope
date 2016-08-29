@@ -62,11 +62,43 @@ Gulp will run a server on your local machine at port 3000. Whenever you change a
 $ npm run deploy
 ```
 
-## Delete public (dev) and distribution (dist) folder
+## Delete development (public) and distribution (dist) folder
 
 ```bash
 $ npm run clean
 ```
+
+## Application Structure
+
+
+```
+.
+├── dist                           # Distribution folder created by gulp/browserify
+├── public                         # Development folder created by gulp/browserify
+└── src                            # Application source code
+    ├── assets                     # Asset files
+    │   ├── fonts                  # Font files
+    │   └── img                    # Image files
+    ├── client                     # Application JS folder
+    │   ├── config.js              # Application settings file
+    │   ├── jquery                 # jQuery plugins
+    │   ├── jquery-ui              # jQuery UI
+    │   ├── LogTerminal            # Window overlay log terminal
+    │   ├── thirdparty             # Thirdparty JS files
+    │   ├── three                  # Three.js extras
+    │   ├── utils                  # Utility function
+    │   └── worldmap               # Application core files
+    │       ├── geometry.js        # Geometry functions
+    │       ├── index.js           # Main application file
+    │       ├── panel.js           # UI Panel for displaying content
+    │       └── userinterface.js   # UI functions
+    ├── client.js                  # Main JS file
+    ├── index.html                 # Main HTML page container for app used for development
+    ├── index.php                  # Server side page container for app
+    ├── php                        # Server side files for parsing visa requirements from Wikipedia
+    └── scss                       # SCSS source files
+```
+
 
 – Markus Lerner, [@markuslerner](https://twitter.com/markuslerner)
 
