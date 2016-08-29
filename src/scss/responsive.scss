@@ -74,6 +74,11 @@
     bottom: 15px;
   }
 
+  #social {
+    right: 140px;
+    bottom: 10px;
+  }
+
   .last_update {
     left: 15px;
     bottom: 12px;
@@ -97,11 +102,6 @@
   #logterminal {
     top: 200px !important;
     left: 0px !important;
-  }
-
-  #ce_badge {
-    top: 55px;
-    right: 245px;
   }
 
 }
@@ -207,6 +207,10 @@
     margin-top: 10px;
   }
 
+  #social {
+    display: none;
+  }
+
 }
 
 
@@ -292,6 +296,10 @@
 
   p {
     margin: 0px 0 12px 0;
+  }
+
+  #slider_zoom {
+    visibility: hidden;
   }
 
 }

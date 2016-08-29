@@ -623,7 +623,6 @@ export function initGeneralElements(worldMap) {
     worldMap.setMode($(this).data('mode'));
   });
 
-
   if(!Config.isTouchDevice) {
     $('#view_switch_flat').tipsy({gravity: 's', fade: true, offset: 10});
     $('#view_switch_spherical').tipsy({gravity: 's', fade: true, offset: 10});
@@ -1070,6 +1069,7 @@ export function updateModeStatement(worldMap) {
 
     $('#legend_main').fadeIn(800);
     $('#slider_zoom').fadeIn(800);
+    $('#social').fadeIn(800);
     $('#view_switch').fadeIn(800);
     $('#last_update_wikipedia').fadeIn(800);
     if($(window).width() > 480) {

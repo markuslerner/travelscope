@@ -753,6 +753,45 @@ b {
   }
 }
 
+#social {
+  position: absolute;
+  right: 150px;
+  bottom: 30px;
+  font-size: 1.4em;
+  font-weight: normal;
+  -webkit-font-smoothing: antialiased;
+  display: none;
+
+  i {
+    display: inline-block;
+    border-radius: 50%;
+    overflow: hidden;
+    color: white;
+    width: 2.2em;
+    height: 2.2em;
+    text-align: center;
+    padding-top: 0.5em;
+    cursor: pointer;
+    opacity: 0.75;
+    transition: all .2s ease-in-out;
+
+    &:hover {
+      white-space: normal;
+      opacity: 1;
+    }
+
+    &.icon-facebook {
+    }
+
+    &.icon-twitter-bird {
+      font-size: 0.8em;
+      padding-top: 0.1em;
+    }
+
+  }
+
+}
+
 #keyboardhint {
 	position: fixed;
 	top: 100px;
@@ -887,24 +926,34 @@ b {
 	-webkit-border-radius: 6px;
 }
 
-.ui-slider .ui-slider-handle {
-	width: 12px;
-	height: 12px;
-	cursor: pointer;
-	border-radius: 6px;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
-	top: 0px; /* -4px */
-	margin-left: -5px; /* -4px */
-	background-color: #ddd;
-	border: none;
+.ui-slider {
+  .ui-slider-handle {
+  	width: 12px;
+  	height: 12px;
+  	cursor: pointer;
+  	border-radius: 6px;
+  	-moz-border-radius: 6px;
+  	-webkit-border-radius: 6px;
+  	top: 0px; /* -4px */
+  	margin-left: -5px; /* -4px */
+  	background-color: #ddd;
+  	border: none;
+    transition: background-color .2s ease-in-out;
 
-  &:focus, &:hover {
-    background-color: #fff;
-    border: none;
-    outline: none;
+    &:focus, &:hover {
+      background-color: #fff;
+      border: none;
+      outline: none;
+    }
   }
 
+  &:focus, &:hover {
+    .ui-slider-handle {
+      background-color: #fff;
+      border: none;
+      outline: none;
+    }
+  }
 }
 
 #slider_zoom {
@@ -943,6 +992,7 @@ b {
   border: none;
   background-color: #555;
   color: #ddd;
+  transition: all .2s ease-in-out;
 
   &:focus {
     outline: none;
