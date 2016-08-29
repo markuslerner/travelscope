@@ -64,5 +64,5 @@ public/
 .azk
 
 # Server-side files
-php/
+src/php/
 src/index.php
