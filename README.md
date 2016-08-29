@@ -9,11 +9,12 @@ The weight and the travel freedom attached to a passport vary drastically across
 
 This project aims to cast some light on these structures. The default <i>Visa-free destinations</i> mode shows a <a href="https://en.wikipedia.org/wiki/Choropleth_map" target=“_blank”>choropleth map</a>, which is shaded based on the number of destination countries an individual of a certain nationality can travel to without a visa or with visa on arrival.
 
-This project uses the following libaries:
+This project uses the following libaries/technologies:
 
 * [bootstrap](http://getbootstrap.com/) Bootstrap 3: HTML, CSS, and JS framework
 * [three.js](https://github.com/mrdoob/three.js) lightweight JavaScript 3D library using WebGL
 * [d3](https://github.com/d3/d3) D3 (or D3.js) is a JavaScript library for visualizing data using web standards
+* [Sass](http://sass-lang.com/) powerful CSS extension language 
 * [gulp](http://gulpjs.com/) as a task runner
 * [browserify](http://browserify.org/) for bundling
 * [watchify](https://github.com/substack/watchify) for watching browserify builds
