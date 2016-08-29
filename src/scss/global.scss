@@ -242,7 +242,7 @@ b {
     width: 100%;
     height: 250px;
     opacity: 0.8;
-    background: url('/assets/img/gradient-top-left.png') no-repeat;
+    background: url('../assets/img/gradient-top-left.png') no-repeat;
     pointer-events: none;
   }
 
@@ -276,7 +276,7 @@ b {
   }
 
   .cancel {
-    background: url('/assets/img/close.svg') transparent;
+    background: url('../assets/img/close.svg') transparent;
     width: 30px;
     height: 30px;
     display: block;
@@ -839,7 +839,7 @@ b {
   }
 
   .panel-close {
-    background: url('/assets/img/close.svg');
+    background: url('../assets/img/close.svg');
     width: 50px;
     height: 50px;
     color: white;
@@ -925,7 +925,7 @@ b {
     display: block;
     width: 25px;
     height: 16px;
-    background-image: url(/assets/img/icon-worldmap_flat_25px_white.png);
+    background-image: url(../assets/img/icon-worldmap_flat_25px_white.png);
     background-repeat: no-repeat;
     background-position: center;
     margin-left: 0px;
