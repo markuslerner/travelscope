@@ -3,7 +3,7 @@ Interactive worldmap of visa-free travel
 
 ## About
 
-A visual exploration of the travel freedom attached to passports using Three.js and D3.js.
+A visual exploration of the travel freedom attached to passports using [three.js](https://github.com/mrdoob/three.js) and [d3](https://github.com/d3/d3).
 
 The weight and the travel freedom attached to a passport vary drastically across nationalities. International visa-regulations are very complex and often non-transparent. They reflect the economical and geopolitical situations as well as the relationships of countries.
 
