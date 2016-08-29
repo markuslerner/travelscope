@@ -52,7 +52,7 @@ gulp.task('lint', function() {
 
 // Compile Our Sass (development and production)
 gulp.task('sass', function() {
-  return gulp.src(options.src + '/assets/scss/main.scss')
+  return gulp.src(options.src + '/scss/main.scss')
     .pipe(plumber())
     .pipe(gulpif(options.dev, sourcemaps.init()))
     .pipe(sass())
@@ -111,7 +111,7 @@ gulp.task('watchify', function() {
   bundleJS(bundler, true);
 
   bundler.on('update', function() {
-    bundleJS(bundler, false);
+    bundleJS(bundler, true);
   });
 });
 
@@ -161,25 +161,24 @@ gulp.task('copy', function() {
   gulp.src(options.src + '/assets/img/**')
     .pipe(gulp.dest(options.dest + '/assets/img'));
 
-  gulp.src(options.src + '/assets/*.html')
+  gulp.src(options.src + '/*.html')
     .pipe(gulp.dest(options.dest));
 
   gulp.src(options.src + '/php/**')
     .pipe(gulp.dest(options.dest + '/php'));
 
-  gulp.src(options.src + '/assets/*.php')
+  gulp.src(options.src + '/*.php')
     .pipe(gulp.dest(options.dest));
 });
 
 
 // Watch Files For Changes (development)
 gulp.task('watch', function() {
-  // gulp.watch(options.src + '/client/**/*.js*', ['scripts']);
-  gulp.watch(options.src + '/assets/scss/**/*.scss', ['sass']);
-  gulp.watch(options.src + '/assets/scss/**/*.css', ['sass']);
+  gulp.watch(options.src + '/scss/**/*.scss', ['sass']);
+  gulp.watch(options.src + '/scss/**/*.css', ['sass']);
   gulp.watch(options.src + '/assets/img/**', ['copy']);
-  gulp.watch(options.src + '/assets/*.html', ['copy']);
-  gulp.watch(options.src + '/assets/*.php', ['copy']);
+  gulp.watch(options.src + '/*.html', ['copy']);
+  gulp.watch(options.src + '/*.php', ['copy']);
   gulp.watch(options.src + '/php/**/*.php', ['copy']);
   gulp.watch(options.src + '/php/**/*.json', ['copy']);
 });

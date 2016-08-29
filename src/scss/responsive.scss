@@ -1,0 +1,297 @@
+
+@media all and (-webkit-min-device-pixel-ratio : 1.5) {
+  .icon-worldmap-flat {
+    background-image: url(/assets/img/icon-worldmap_flat_50px_white.png);
+  }
+}
+
+
+@media only screen and (max-width: 1200px) {
+
+  h1 {
+    top: -10px;
+    left: 15px;
+  }
+
+  h2 {
+    top: 30px;
+    left: 15px;
+  }
+
+  .navbar-default .navbar-brand {
+    font-size: 18px;
+    font-weight: 400;
+
+    padding-left: 15px;
+    padding-right: 30px;
+  }
+
+  .navbar-default .navbar-brand .beta {
+    font-size: 9px;
+    font-weight: 400;
+  }
+
+  #logo_ml {
+    margin-right: 1px;
+  }
+
+  #nationality {
+    top: 90px;
+    left: 15px;
+  }
+
+  .country_dropdown {
+    width: 180px;
+    padding: 0.25em 0.5em 0.4em 2.1em;
+  }
+
+  #travelscope {
+    left: 15px;
+    top: 60px;
+    width: calc(100% - 450px);
+    font-size: 20px; /* 15px */
+    line-height: 27px; /* 22px */
+    font-weight: 300;
+  }
+
+  #map_mode {
+    margin: 8px 0 0 0;
+  }
+
+  #button_country_list {
+    right: 15px;
+    top: 65px;
+  }
+
+  #country_list {
+    right: 15px;
+    top: 105px;
+    height: calc(100% - 170px);
+  }
+
+  #view_switch {
+    right: 15px;
+    bottom: 15px;
+  }
+
+  .last_update {
+    left: 15px;
+    bottom: 12px;
+  }
+
+  .panel .details {
+    font-size: 15px;
+    line-height: 22px;
+    font-weight: 300;
+  }
+
+  .legend {
+    left: 15px;
+    bottom: 30px;
+  }
+
+  .legend .colors .box {
+    margin: 2px 5px 5px 0;
+  }
+
+  #logterminal {
+    top: 200px !important;
+    left: 0px !important;
+  }
+
+  #ce_badge {
+    top: 55px;
+    right: 245px;
+  }
+
+}
+
+
+@media only screen and (max-width: 1100px) {
+
+  #logo_ml {
+    width: 70px;
+  }
+
+  #logo_ml .text {
+    display: none;
+  }
+
+}
+
+
+@media only screen and (max-width: 1023px) {
+
+  .country_dropdown_container {
+    .country_dropdown {
+      width: 120px;
+    }
+  }
+
+}
+
+
+
+@media only screen and (max-width: 860px) {
+
+  #travelscope {
+    width: calc(100% - 250px);
+  }
+
+  #slider_zoom {
+    display: none;
+  }
+
+  .country_dropdown_container {
+    margin-left: 15px;
+    width: 290px;
+
+    .country_dropdown {
+      width: 290px;
+    }
+
+    .cancel {
+      right: 3px;
+    }
+
+  }
+
+  #destination_country_dropdown_container {
+    margin-left: 15px;
+  }
+
+  #map_mode {
+    width: 291px;
+    margin: 8px 0 0 15px;
+    font-size: 12px;
+  }
+
+  #map_mode .dropdown-toggle .dropdown-label {
+    width: 210px;
+  }
+
+  #arrow_right {
+    display: none;
+  }
+
+  #logo_ml {
+    width: 100%;
+    text-align: left;
+  }
+
+  #logo_ml a {
+    height: 40px;
+  }
+
+  #logo_ml .text {
+    font-size: 12px;
+    right: auto;
+    top: 11px;
+    display: block;
+    color: #fff;
+  }
+
+  #logo_ml img {
+    left: 160px;
+    top: -8px;
+    right: auto;
+  }
+
+  .navbar-default .navbar-nav > li > a {
+    font-size: 12px;
+  }
+
+  .panel {
+    width: 100%;
+    height: calc(100% - 50px);
+    margin-top: 10px;
+  }
+
+}
+
+
+@media only screen and (max-width: 480px) {
+
+  h1 {
+    top: -5px;
+    left: 15px;
+    font-size: 20px;
+  }
+
+  h2 {
+    top: 25px;
+    left: 15px;
+  }
+
+  #nationality {
+    top: 80px;
+    left: 15px;
+  }
+
+  .country_dropdown_container {
+    width: calc(100% - 30px);
+
+    .country_dropdown {
+      top: 110px;
+      left: 15px;
+      width: 100%;
+    }
+  }
+
+  #map_mode {
+    width: calc(100% - 30px);
+  }
+
+  #map_mode .dropdown-toggle .dropdown-label {
+    width: calc(100% - 60px);
+  }
+
+  #travelscope {
+    font-size: 15px;
+    line-height: 22px;
+    font-weight: 300;
+    top: 60px;
+    left: 15px;
+    width: calc(100% - 40px);
+  }
+
+  #button_country_list {
+    top: 160px;
+    right: 15px;
+    display: none;
+  }
+
+  #country_list {
+    right: 15px;
+    height: calc(100% - 420px);
+  }
+
+  #view_switch {
+    right: 15px;
+    bottom: 35px;
+  }
+
+  .legend {
+    left: 15px;
+  }
+
+  .legend .range {
+    width: 150px;
+  }
+
+  .panel .inside {
+    margin: 12px 14px 22px 18px;
+    padding-right: 10px;
+  }
+
+  .panel .details {
+    font-size: 15px;
+    line-height: 22px;
+    font-weight: 300;
+  }
+
+  p {
+    margin: 0px 0 12px 0;
+  }
+
+}

@@ -120,7 +120,7 @@
 			<ul class="nav navbar-nav">
 
 			<li id="country_dropdown_container" class="country_dropdown_container">
-				<form action="#">
+				<form action="#" autocomplete="off">
 					<input type="text" name="country_dropdown" id="country_dropdown" class="country_dropdown" autocomplete="off" disabled />
 					<span class="glyphicon glyphicon-search"></span>
 					<span class="cancel"></span>
@@ -130,7 +130,7 @@
 			<div id="arrow_right" class="glyphicon glyphicon-arrow-right"></div>
 
 			<li id="destination_country_dropdown_container" class="country_dropdown_container">
-				<form action="#">
+				<form action="#" autocomplete="off">
 					<input type="text" name="destination_country_dropdown" id="destination_country_dropdown" class="country_dropdown" autocomplete="off" disabled />
 					<span class="glyphicon glyphicon-search"></span>
 					<span class="cancel"></span>
@@ -139,7 +139,7 @@
 
 			<li id="map_mode" class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-					 <span style="color: #ccc;">Mode: </span><span data-bind="label" class="dropdown-label"> Visa-free destinations</span>&nbsp;<span class="caret"></span>
+					 <span class="mode">Mode: </span><span data-bind="label" class="dropdown-label"> Visa-free destinations</span>&nbsp;<span class="caret"></span>
 				</a>
 				 <ul class="dropdown-menu" role="menu">
 				   <li><a href="#" class="mode" data-mode="destinations">Visa-free destinations</a></li>

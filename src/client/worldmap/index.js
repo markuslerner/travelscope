@@ -4,11 +4,11 @@ import * as THREE from 'three';
 import * as TWEEN from 'tween.js';
 import * as d3 from 'd3';
 
-import '../RequestAnimationFrame';
-import Stats from '../Stats';
+import '../thirdparty/RequestAnimationFrame';
+import Stats from '../thirdparty/Stats';
 import LogTerminal, { log } from '../LogTerminal';
 
-import '../d3.geo.robinson';
+import '../thirdparty/d3.geo.robinson';
 
 import '../three/CanvasRenderer';
 import '../three/PinchZoomControls';
@@ -1085,7 +1085,7 @@ function init() {
   if(Config.statsVisible) {
     stats = new Stats();
     stats.domElement.style.position = 'fixed';
-    stats.domElement.style.top = '150px';
+    stats.domElement.style.top = '0px';
     stats.domElement.style.right = '0px';
     $('body').append( stats.domElement );
   }
