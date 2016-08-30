@@ -1101,7 +1101,7 @@ function init() {
   log('Loading Visa requirements ...');
 
   $.when( $.getJSON(Config.visaRequirementsFile) ).then(function(dataRequirements) {
-    log('Visa requirements loaded.');
+    log('Visa requirements loaded for ' + dataRequirements.countries.length + ' sovereignties');
     // log( 'JSON Data: ' + dataRequirements.countries['Germany'].code );
     worldMap.visaRequirements = dataRequirements;
     worldMap.initD3();

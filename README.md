@@ -9,6 +9,8 @@ The weight and the travel freedom attached to a passport vary drastically across
 
 This project aims to cast some light on these structures. The default <i>Visa-free destinations</i> mode shows a <a href="https://en.wikipedia.org/wiki/Choropleth_map" target=“_blank”>choropleth map</a>, which is shaded based on the number of destination countries an individual of a certain nationality can travel to without a visa or with visa on arrival.
 
+The visa requirements are pulled from <a href="http://en.wikipedia.org/wiki/Category:Visa_requirements_by_nationality" target="_new">Wikipedia</a> in regular intervals and matched to the countries/territories via the sovereignty of the respective country/territory.
+
 This project uses the following libaries/technologies:
 
 * [bootstrap](http://getbootstrap.com/) Bootstrap 3: HTML, CSS, and JS framework
