@@ -1069,7 +1069,9 @@ export function updateModeStatement(worldMap) {
 
     $('#legend_main').fadeIn(800);
     $('#slider_zoom').fadeIn(800);
-    $('#social').fadeIn(800);
+    if($(window).width() > 860) {
+      $('#social').fadeIn(800);
+    }
     $('#view_switch').fadeIn(800);
     $('#last_update_wikipedia').fadeIn(800);
     if($(window).width() > 480) {
@@ -1194,6 +1196,11 @@ function onWindowResize() {
       } else {
         $('#button_country_list').hide();
         $('#country_list').hide();
+      }
+      if($(window).width() > 860) {
+        $('#social').show();
+      } else {
+        $('#social').hide();
       }
     }
 

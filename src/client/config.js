@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import Detector from './three/Detector';
 
-const version = '1.0.1';
+const version = '1.0.2';
 const cdnURL = 'http://cdn.markuslerner.com/travelscope/'; // 'http://cdn.markuslerner.com/travelscope/'
 
 
@@ -32,9 +32,9 @@ const config = {
   saveMapData: false,
   mergedCountriesFilename: '/data/all_countries.json',
 
-  introRotateDuration: 400, // 4000
-  introWarpDelay: 200, // 2000
-  introWarpDuration: 250, // 2500
+  introRotateDuration: 4000, // 4000
+  introWarpDelay: 2000, // 2000
+  introWarpDuration: 2500, // 2500
 
   lineAnimateDuration: 800,
   lineAnimateSpeed: 10.0,
