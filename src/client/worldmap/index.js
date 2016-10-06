@@ -489,7 +489,6 @@ WorldMap.prototype = {
         } else {
           c.set(country.colorByPopulation);
         }
-
       }
 
       if(pos < 1) {
@@ -676,6 +675,7 @@ WorldMap.prototype = {
       Geometry.deleteLinesObject(this);
       for(var i = 0; i < this.countries.length; i++) {
         this.countries[i].visa_required = '';
+        this.countries[i].visa_title = '';
         this.countries[i].notes = '';
       }
       if(this.selectedCountry) {
@@ -707,6 +707,7 @@ WorldMap.prototype = {
       Geometry.deleteLinesObject(this);
       for(var i = 0; i < this.countries.length; i++) {
         this.countries[i].visa_required = '';
+        this.countries[i].visa_title = '';
         this.countries[i].notes = '';
       }
       if(this.selectedCountry) {
@@ -734,6 +735,7 @@ WorldMap.prototype = {
       Geometry.deleteLinesObject(this);
       for(var i = 0; i < this.countries.length; i++) {
         this.countries[i].visa_required = '';
+        this.countries[i].visa_title = '';
         this.countries[i].notes = '';
       }
       if(this.selectedDestinationCountry) {
@@ -809,6 +811,7 @@ WorldMap.prototype = {
 
     for(i = 0; i < this.countries.length; i++) {
       this.countries[i].visa_required = '';
+      this.countries[i].visa_title = '';
       this.countries[i].notes = '';
     }
 
@@ -822,10 +825,18 @@ WorldMap.prototype = {
           for(d = 0; d < destinations.length; d++) {
             if( (CountryDataHelpers.matchDestinationToCountryName(destinations[d].d_name, this.selectedDestinationCountry.properties.name_long) || CountryDataHelpers.matchDestinationToCountryName(this.selectedDestinationCountry.properties.name_long, destinations[d].d_name)) && this.selectedDestinationCountry.properties.name_long !== this.selectedCountry.properties.name_long) {
               this.selectedDestinationCountry.visa_required = destinations[d].visa_required;
+              this.selectedDestinationCountry.visa_title = destinations[d].visa_title;
               this.selectedDestinationCountry.notes = destinations[d].notes;
 
               this.visaInformationFound = true;
-              UI.setHeadline( CountryDataHelpers.getCountryDetailsByVisaStatus(this.selectedDestinationCountry) + ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle(this.selectedCountry) + ' travelling to ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedDestinationCountry ) + '.<br/><div class="notes">' + this.selectedDestinationCountry.notes + '</div>' );
+              UI.setHeadline(
+                // CountryDataHelpers.getCountryDetailsByVisaStatus(this.selectedDestinationCountry) +
+                '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(this.selectedDestinationCountry) + '</span> ' +
+                ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle(this.selectedCountry) +
+                ' travelling to ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedDestinationCountry ) +
+                '.<br/>' +
+                '<div class="notes">' + this.selectedDestinationCountry.notes +
+                '</div>' );
 
               break;
             }
@@ -837,7 +848,12 @@ WorldMap.prototype = {
             mainCountry.visa_required = 'no';
             mainCountry.notes = 'National of same sovereignty (exceptions may exist)';
             this.visaInformationFound = true;
-            UI.setHeadline( CountryDataHelpers.getCountryDetailsByVisaStatus(this.selectedDestinationCountry) + ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) + ' travelling to ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedDestinationCountry ) + '.<br/><div class="notes">' + this.selectedDestinationCountry.notes + '</div>' );
+            UI.setHeadline(
+              // CountryDataHelpers.getCountryDetailsByVisaStatus(this.selectedDestinationCountry) +
+              '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(this.selectedDestinationCountry) + '</span> ' +
+              ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) +
+              ' travelling to ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedDestinationCountry ) +
+              '.<br/><div class="notes">' + this.selectedDestinationCountry.notes + '</div>' );
           }
 
         } else {
@@ -865,6 +881,7 @@ WorldMap.prototype = {
 
                 ) {
                 this.countries[c].visa_required = destinations[d].visa_required;
+                this.countries[c].visa_title = destinations[d].visa_title;
                 this.countries[c].notes = destinations[d].notes;
 
                 if(destinations[d].visa_required === 'no' || destinations[d].visa_required === 'on-arrival' || destinations[d].visa_required === 'free-eu') {
@@ -894,7 +911,10 @@ WorldMap.prototype = {
 
           this.visaInformationFound = true;
 
-          UI.setHeadline( 'Nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) + ' can to travel to <b>' + this.selectedCountry.numDestinationsFreeOrOnArrival + ' countries</b> (' + this.selectedCountry.populationPercentage + '&nbsp;% of the global population) without a visa or with visa on arrival.');
+          UI.setHeadline(
+            'Nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry )+
+            ' can to travel to <b>' + this.selectedCountry.numDestinationsFreeOrOnArrival + ' countries</b> (' +
+            this.selectedCountry.populationPercentage + '&nbsp;% of the global population) without a visa or with visa on arrival.');
           UI.showSelectedLegend();
 
         } else {
@@ -922,10 +942,16 @@ WorldMap.prototype = {
           for(d = 0; d < destinations.length; d++) {
             if( (CountryDataHelpers.matchDestinationToCountryName(destinations[d].d_name, this.selectedDestinationCountry.properties.name_long) || CountryDataHelpers.matchDestinationToCountryName(this.selectedDestinationCountry.properties.name_long, destinations[d].d_name)) && this.selectedDestinationCountry.properties.name_long !== this.selectedCountry.properties.name_long) {
               this.selectedDestinationCountry.visa_required = destinations[d].visa_required;
+              this.selectedDestinationCountry.visa_title = destinations[d].visa_title;
               this.selectedDestinationCountry.notes = destinations[d].notes;
 
               this.visaInformationFound = true;
-              UI.setHeadline( CountryDataHelpers.getCountryDetailsByVisaStatus(this.selectedDestinationCountry) + ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) + ' travelling to ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedDestinationCountry ) + '.<br/><div class="notes">' + this.selectedDestinationCountry.notes + '</div>' );
+              UI.setHeadline(
+                // CountryDataHelpers.getCountryDetailsByVisaStatus(this.selectedDestinationCountry) +
+                '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(this.selectedDestinationCountry) + '</span> ' +
+                ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) +
+                ' travelling to ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedDestinationCountry ) +
+                '.<br/><div class="notes">' + this.selectedDestinationCountry.notes + '</div>' );
 
               break;
             }
@@ -936,7 +962,12 @@ WorldMap.prototype = {
             this.selectedDestinationCountry.visa_required = 'no';
             this.selectedDestinationCountry.notes = 'National of same sovereignty (exceptions may exist)';
             this.visaInformationFound = true;
-            UI.setHeadline( CountryDataHelpers.getCountryDetailsByVisaStatus(this.selectedDestinationCountry) + ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) + ' travelling to ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedDestinationCountry ) + '.<br/><div class="notes">' + this.selectedDestinationCountry.notes + '</div>' );
+            UI.setHeadline(
+              '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(this.selectedDestinationCountry) + '</span> ' +
+              // CountryDataHelpers.getCountryDetailsByVisaStatus(this.selectedDestinationCountry) +
+              ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) +
+              ' travelling to ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedDestinationCountry ) +
+              '.<br/><div class="notes">' + this.selectedDestinationCountry.notes + '</div>' );
           }
 
         } else {
@@ -956,6 +987,7 @@ WorldMap.prototype = {
           for(d = 0; d < destinations.length; d++) {
             if( CountryDataHelpers.matchDestinationToCountryName(destinations[d].d_name, this.selectedDestinationCountry.properties.name_long) || CountryDataHelpers.matchDestinationToCountryName(this.selectedDestinationCountry.properties.name_long, destinations[d].d_name) ) {
               this.countries[i].visa_required = destinations[d].visa_required;
+              this.countries[i].visa_title = destinations[d].visa_title;
               this.countries[i].notes = destinations[d].notes;
 
               if(destinations[d].visa_required === 'no' || destinations[d].visa_required === 'on-arrival' || destinations[d].visa_required === 'free-eu') {

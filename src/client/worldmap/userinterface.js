@@ -60,10 +60,11 @@ export function createLegend(worldMap) {
   $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorCountrySelected.getHexString() + '"></div><div class="text">Selected country/nationality</div></div>');
   $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaNotRequired.getHexString() + '"></div><div class="text">Visa not required</div></div>');
   $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaOnArrival.getHexString() + '"></div><div class="text">Visa on arrival</div></div>');
+  $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaETA.getHexString() + '"></div><div class="text">Electronic Travel Authorization</div></div>');
   $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaFreeEU.getHexString() + '"></div><div class="text">EU freedom of movement</div></div>');
   $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaSpecial.getHexString() + '"></div><div class="text">Special regulations</div></div>');
-  $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaRequired.getHexString() + '"></div><div class="text">Visa required</div></div>');
   $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaAdmissionRefused.getHexString() + '"></div><div class="text">Admission refused</div></div>');
+  $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaRequired.getHexString() + '"></div><div class="text">Visa required</div></div>');
   $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaDataNotAvailable.getHexString() + '"></div><div class="text">Data not available</div></div>');
 
 };
@@ -878,7 +879,12 @@ export function updateCountryTooltip(worldMap, country) {
 
       } else if(country === worldMap.selectedDestinationCountry) {
         if(worldMap.visaInformationFound) {
-          $('#country-tooltip .details').html( CountryDataHelpers.getCountryDetailsByVisaStatus(country) + ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle(worldMap.selectedCountry) + '.<br/><div class="notes">' + country.notes + '</div>');
+          $('#country-tooltip .details').html(
+            // CountryDataHelpers.getCountryDetailsByVisaStatus(country) +
+            '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(country) + '</span> ' +
+            ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle(worldMap.selectedCountry) +
+            '.<br/>' +
+            '<div class="notes">' + country.notes + '</div>');
         } else {
           $('#country-tooltip .details').html( 'Data not available.' );
         }
@@ -890,7 +896,12 @@ export function updateCountryTooltip(worldMap, country) {
 
       } else {
         if(worldMap.visaInformationFound) {
-          $('#country-tooltip .details').html( CountryDataHelpers.getCountryDetailsByVisaStatus(country) + ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle(worldMap.selectedCountry) + '.<br/><div class="notes">' + country.notes + '</div>');
+          $('#country-tooltip .details').html(
+            // CountryDataHelpers.getCountryDetailsByVisaStatus(country) +
+            '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(country) + '</span> ' +
+            ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle(worldMap.selectedCountry) +
+            '.<br/>' +
+            '<div class="notes">' + country.notes + '</div>');
         } else {
           $('#country-tooltip .details').html( 'Data not available.' );
         }
@@ -911,7 +922,12 @@ export function updateCountryTooltip(worldMap, country) {
 
       } else if(country === worldMap.selectedCountry) {
         if(worldMap.visaInformationFound) {
-          $('#country-tooltip .details').html( CountryDataHelpers.getCountryDetailsByVisaStatus(worldMap.selectedDestinationCountry) + ' in ' + worldMap.selectedDestinationCountry.properties.name_long + ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle(worldMap.selectedCountry) + '.<br/><div class="notes">' + worldMap.selectedDestinationCountry.notes + '</div>');
+          $('#country-tooltip .details').html(
+            '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(worldMap.selectedDestinationCountry) + '</span> ' +
+            // CountryDataHelpers.getCountryDetailsByVisaStatus(worldMap.selectedDestinationCountry) +
+            ' in ' + worldMap.selectedDestinationCountry.properties.name_long +
+            ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle(worldMap.selectedCountry) +
+            '.<br/><div class="notes">' + worldMap.selectedDestinationCountry.notes + '</div>');
         } else {
           $('#country-tooltip .details').html( 'Data not available.' );
         }
@@ -926,7 +942,12 @@ export function updateCountryTooltip(worldMap, country) {
 
       } else {
         if(worldMap.visaInformationFound) {
-          $('#country-tooltip .details').html( CountryDataHelpers.getCountryDetailsByVisaStatus(country) + ' in ' + worldMap.selectedDestinationCountry.properties.name_long + ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle(country) + '.<br/><div class="notes">' + country.notes + '</div>');
+          $('#country-tooltip .details').html(
+            // CountryDataHelpers.getCountryDetailsByVisaStatus(country) +
+            '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(country) + '</span> ' +
+            ' in ' + worldMap.selectedDestinationCountry.properties.name_long +
+            ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle(country) +
+            '.<br/><div class="notes">' + country.notes + '</div>');
         } else {
           $('#country-tooltip .details').html( 'Data not available.' );
         }

@@ -505,6 +505,10 @@ b {
 	-webkit-font-smoothing: antialiased;
 	display: none;
 
+  .visa-title {
+    font-weight: bold;
+  }
+
   .notes {
     font-size: 12px;
     line-height: 18px;
@@ -819,6 +823,7 @@ b {
 	display: none;
 	z-index: 500;
 	box-shadow: 0px 3px 40px 5px rgba(0,0,0,0.4);
+  // -webkit-font-smoothing: antialiased;
 
   .title {
   }
@@ -829,6 +834,10 @@ b {
     max-width: 300px;
     margin-top: 5px;
     display: none;
+  }
+
+  .visa-title {
+    font-weight: 400;
   }
 
   .notes {

@@ -132,6 +132,9 @@ export function getCountryColorByVisaStatus(country) {
   } else if(country.visa_required === 'on-arrival') {
     c = Config.colorVisaOnArrival;
 
+  } else if(country.visa_required === 'eta') {
+    c = Config.colorVisaETA;
+
   } else if(country.visa_required === 'free-eu') {
     c = Config.colorVisaFreeEU;
 
@@ -198,6 +201,15 @@ export function getCountryColorByPopulation(country, maxPopulation) {
   color.lerp(Config.colorMaxDestinations, m);
   // color.copyLinearToGamma(color);
   return color;
+};
+
+
+export function getCountryVisaTitle(country) {
+  if(country.visa_title === '') {
+    return 'Special regulations';
+  } else {
+    return country.visa_title;
+  }
 };
 
 
