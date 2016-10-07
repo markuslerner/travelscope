@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import Detector from './three/Detector';
 
-const version = '1.1';
+const version = '1.2';
 const cdnURL = 'http://cdn.markuslerner.com/travelscope/'; // 'http://cdn.markuslerner.com/travelscope/'
 
 

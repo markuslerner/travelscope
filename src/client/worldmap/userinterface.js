@@ -14,7 +14,6 @@ import { log } from '../LogTerminal';
 export const mouse = new THREE.Vector2();
 export const mouseNormalized = new THREE.Vector3( 0, 0, 1 );
 export const mouseNormalizedTouchStart = new THREE.Vector3( 0, 0, 1 );
-export var countrySelectionChanged = false;
 
 var selectCountryOnTouchEnd = true;
 var isMouseDown = false;
@@ -164,38 +163,61 @@ export function showSelectedLegend() {
 
 export function createCountryList(worldMap) {
   $('body').append('<div id="country_list_container"><ul id="country_list"></ul></div>');
+
+  var count = 0;
   for(var i = 0; i < worldMap.countries.length; i++) {
     var country = worldMap.countries[i];
-    var li = $('<li><div class="container"><span class="box"></span><span class="number"></span><span class="text">' + worldMap.countries[i].properties.name_long + '</span></div></li>');
-    $('#country_list').append(li);
 
-    li.data('height', li.height());
+    if(country.properties.sovereignt === country.properties.name_long) { // add only sovereignties:
+      var li = $('<li><div class="container"><span class="box"></span><span class="number"></span><span class="text">' + country.properties.name_long + '</span></div></li>');
+      $('#country_list').append(li);
 
-    /*
-    var width = parseInt(country.numDestinationsFreeOrOnArrival / worldMap.maxNumDestinationsFreeOrOnArrival * 200);
-    var num = country.numDestinationsFreeOrOnArrival;
-    if(country.destinations.length === 0) {
-      num = "?";
+      li.data('height', li.height());
+
+      /*
+      var width = parseInt(country.numDestinationsFreeOrOnArrival / worldMap.maxNumDestinationsFreeOrOnArrival * 200);
+      var num = country.numDestinationsFreeOrOnArrival;
+      if(country.destinations.length === 0) {
+        num = "?";
+      }
+      li.find('.box').css('width', width + 'px');
+      li.find('.box').css('background-color', '#' + country.colorByFreeDestinations.getHexString());
+      li.find('.number').html(num);
+      */
+
+      li.data('country', country);
+      country.listItem = li;
+
+      count++;
     }
-    li.find('.box').css('width', width + 'px');
-    li.find('.box').css('background-color', '#' + country.colorByFreeDestinations.getHexString());
-    li.find('.number').html(num);
-    */
-
-    li.data('country', country);
-    country.listItem = li;
   }
+  $('#button_country_list .title').html('Countries (' + count + ')');
+
   $('#country_list li').click(function(event) {
     var selectedCountryNew = $(this).data('country');
 
-    if(worldMap.selectedCountry !== selectedCountryNew) {
-      if(event.ctrlKey || event.altKey || event.metaKey) {
-        worldMap.setSelectedDestinationCountry(selectedCountryNew);
-        worldMap.trackEvent('destinationCountryListClick', selectedCountryNew.properties.name_long);
-      } else {
-        worldMap.setSelectedCountry(selectedCountryNew);
-        worldMap.trackEvent('sourceCountryListClick', selectedCountryNew.properties.name_long);
+    if(worldMap.mode === 'sources') {
+      if(worldMap.selectedDestinationCountry !== selectedCountryNew) {
+        if(event.ctrlKey || event.altKey || event.metaKey) {
+          worldMap.setSelectedCountry(selectedCountryNew);
+          worldMap.trackEvent('sourceCountryListClick', selectedCountryNew.properties.name_long);
+        } else {
+          worldMap.setSelectedDestinationCountry(selectedCountryNew);
+          worldMap.trackEvent('destinationCountryListClick', selectedCountryNew.properties.name_long);
+        }
       }
+
+    } else {
+      if(worldMap.selectedCountry !== selectedCountryNew) {
+        if(event.ctrlKey || event.altKey || event.metaKey) {
+          worldMap.setSelectedDestinationCountry(selectedCountryNew);
+          worldMap.trackEvent('destinationCountryListClick', selectedCountryNew.properties.name_long);
+        } else {
+          worldMap.setSelectedCountry(selectedCountryNew);
+          worldMap.trackEvent('sourceCountryListClick', selectedCountryNew.properties.name_long);
+        }
+      }
+
     }
 
   });
@@ -236,6 +258,7 @@ export function createCountryList(worldMap) {
 
 
 export function updateCountryList(worldMap) {
+  // log('updateCountryList()');
 
   if($('#country_list').is(':visible')) {
 
@@ -315,7 +338,7 @@ function sortCountryListByFreeDestinations() {
     $('#country_list').addClass('narrownumbers');
     $('#country_list').removeClass('widenumbers');
 
-    li.each(function() {
+    li.each(function(index) {
       var country = $(this).data('country');
       // var width = parseInt(country.numDestinationsFreeOrOnArrival / worldMap.maxNumDestinationsFreeOrOnArrival * 200);
       var num = country.numDestinationsFreeOrOnArrival;
@@ -326,6 +349,9 @@ function sortCountryListByFreeDestinations() {
       // $(this).find('.box').css('width', width + 'px');
       $(this).find('.box').css('background-color', '#' + country.colorByFreeDestinations.getHexString());
       $(this).find('.number').html(num);
+
+      $(this).find('.text').html( (index + 1) + '. ' + $(this).data('country').properties.name_long );
+
     });
 
     repositionCountryList(li);
@@ -335,53 +361,56 @@ function sortCountryListByFreeDestinations() {
 
 function sortCountryListByCurrentFreeSourcesOrDestinations() {
   var newSorting = 'sources-or-destinations';
-  if(countryListSorting !== newSorting || countrySelectionChanged) {
-    countryListSorting = newSorting;
-    countrySelectionChanged = false;
+  // if(countryListSorting !== newSorting || countrySelectionChanged) {
+  countryListSorting = newSorting;
 
-    var li = $('#country_list').children('li');
-    li.sort(function(a, b) {
-      var aCountry = $(a).data('country');
-      var bCountry = $(b).data('country');
+  var li = $('#country_list').children('li');
+  li.sort(function(a, b) {
+    var aCountry = $(a).data('country');
+    var bCountry = $(b).data('country');
 
-      var aName = 3 + aCountry.properties.name_long;
-      if(aCountry.visa_required === 'no' || aCountry.visa_required === 'on-arrival') {
-        aName = 2 + aCountry.properties.name_long;
-      } else if(aCountry.visa_required === 'free-eu') {
-        aName = 1 + aCountry.properties.name_long;
-      } else if(aCountry === worldMap.selectedCountry) {
-        aName = 0 + aCountry.properties.name_long;
-      }
-      var bName = 3 + bCountry.properties.name_long;
-      if(bCountry.visa_required === 'no' || bCountry.visa_required === 'on-arrival') {
-        bName = 2 + bCountry.properties.name_long;
-      } else if(bCountry.visa_required === 'free-eu') {
-        bName = 1 + bCountry.properties.name_long;
-      } else if(bCountry === worldMap.selectedCountry) {
-        bName = 0 + bCountry.properties.name_long;
-      }
+    var aName = 3 + aCountry.properties.name_long;
+    if(aCountry.visa_required === 'no' || aCountry.visa_required === 'on-arrival') {
+      aName = 2 + aCountry.properties.name_long;
+    } else if(aCountry.visa_required === 'free-eu') {
+      aName = 1 + aCountry.properties.name_long;
+    } else if(aCountry === worldMap.selectedCountry) {
+      aName = 0 + aCountry.properties.name_long;
+    }
+    var bName = 3 + bCountry.properties.name_long;
+    if(bCountry.visa_required === 'no' || bCountry.visa_required === 'on-arrival') {
+      bName = 2 + bCountry.properties.name_long;
+    } else if(bCountry.visa_required === 'free-eu') {
+      bName = 1 + bCountry.properties.name_long;
+    } else if(bCountry === worldMap.selectedCountry) {
+      bName = 0 + bCountry.properties.name_long;
+    }
 
-      return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
-    });
+    return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
+  });
 
-    $('#country_list').addClass('numberhidden');
-    $('#country_list').removeClass('narrownumbers');
-    $('#country_list').removeClass('widenumbers');
+  $('#country_list').addClass('numberhidden');
+  $('#country_list').removeClass('narrownumbers');
+  $('#country_list').removeClass('widenumbers');
 
-    /*
-    li.each(function() {
-      var t = new TWEEN.Tween({ temp: 0, box: $(this).find('.box'), country: $(this).data('country') })
-        .to({ temp: 0 }, 1000)
-        .onUpdate(function() {
-          this.box.css('background-color', '#' + this.country.color.getHexString());
-        })
-        .start();
+  li.each(function(index, element) {
+    $(this).find('.text').html( $(this).data('country').properties.name_long );
+  });
 
-    });
-    */
+  /*
+  li.each(function() {
+    var t = new TWEEN.Tween({ temp: 0, box: $(this).find('.box'), country: $(this).data('country') })
+      .to({ temp: 0 }, 1000)
+      .onUpdate(function() {
+        this.box.css('background-color', '#' + this.country.color.getHexString());
+      })
+      .start();
 
-    repositionCountryList(li);
-  }
+  });
+  */
+
+  repositionCountryList(li);
+  // }
 }
 
 
@@ -402,7 +431,7 @@ function sortCountryListByFreeSources() {
     $('#country_list').addClass('narrownumbers');
     $('#country_list').removeClass('widenumbers');
 
-    li.each(function() {
+    li.each(function(index) {
       var country = $(this).data('country');
       // var width = parseInt(country.numSourcesFreeOrOnArrival / worldMap.maxNumSourcesFreeOrOnArrival * 200);
       var num = country.numSourcesFreeOrOnArrival;
@@ -410,6 +439,9 @@ function sortCountryListByFreeSources() {
       // $(this).find('.box').css('width', width + 'px');
       $(this).find('.box').css('background-color', '#' + country.colorByFreeSources.getHexString());
       $(this).find('.number').html(num);
+
+      $(this).find('.text').html( (index + 1) + '. ' + $(this).data('country').properties.name_long );
+
     });
 
     repositionCountryList(li);
@@ -433,7 +465,7 @@ function sortCountryListByGDP() {
     $('#country_list').removeClass('narrownumbers');
     $('#country_list').addClass('widenumbers');
 
-    li.each(function() {
+    li.each(function(index) {
       var country = $(this).data('country');
       var num = Math.round(country.properties.gdp_md_est);
       if(num > 1000) {
@@ -443,6 +475,9 @@ function sortCountryListByGDP() {
         num = formatNumber(num, 0) + ' m USD';
       }
       $(this).find('.number').html(num);
+
+      $(this).find('.text').html( (index + 1) + '. ' + $(this).data('country').properties.name_long );
+
     });
 
     repositionCountryList(li);
@@ -466,11 +501,14 @@ function sortCountryListByGDPPerCapita() {
     $('#country_list').removeClass('narrownumbers');
     $('#country_list').addClass('widenumbers');
 
-    li.each(function() {
+    li.each(function(index) {
       var country = $(this).data('country');
       var num = Math.round(country.properties.gdp_per_capita);
       num = formatNumber(num, 0) + ' USD';
       $(this).find('.number').html(num);
+
+      $(this).find('.text').html( (index + 1) + '. ' + $(this).data('country').properties.name_long );
+
     });
 
     repositionCountryList(li);
@@ -494,7 +532,7 @@ function sortCountryListByPopulation() {
     $('#country_list').removeClass('narrownumbers');
     $('#country_list').addClass('widenumbers');
 
-    li.each(function() {
+    li.each(function(index) {
       var country = $(this).data('country');
       var num = country.properties.pop_est;
       if(num > 1000000) {
@@ -503,6 +541,9 @@ function sortCountryListByPopulation() {
         num = formatNumber(num, 0);
       }
       $(this).find('.number').html(num);
+
+      $(this).find('.text').html( (index + 1) + '. ' + $(this).data('country').properties.name_long );
+
     });
 
     repositionCountryList(li);

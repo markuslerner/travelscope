@@ -67,7 +67,11 @@ export function createCountriesGeometry(worldMap) {
           // log("Geometry: No visa requirements found for: " + feature.properties.name);
         }
 
-        worldMap.countryDropdownChoices.push({text: feature.properties.name_long, value: feature.properties.name_long});
+        if(feature.properties.sovereignt === feature.properties.name_long) {
+          worldMap.countryDropdownChoices.push({text: feature.properties.name_long, value: feature.properties.name_long});
+        } else {
+          worldMap.countryDropdownChoices.push({text: feature.properties.name_long + ' (' + feature.properties.sovereignt + ')', value: feature.properties.name_long});
+        }
 
         // log("Geometry" + feature.properties.name + " | shapes: " + shapes.length + ", total points: " + pointCount);
 
@@ -126,12 +130,14 @@ export function createCountriesGeometry(worldMap) {
 
   // count countries from where people can come without a visa > find most open countries:
   for(i = 0; i < worldMap.countries.length; i++) {
-    destinations = worldMap.countries[i].destinations;
-    for(d = 0; d < destinations.length; d++) {
-      if(destinations[d].visa_required === 'no' || destinations[d].visa_required === 'on-arrival' || destinations[d].visa_required === 'free-eu') {
-        country = CountryDataHelpers.getCountryByName(worldMap.countries, destinations[d].d_name);
-        if(country !== null) {
-          country.numSourcesFreeOrOnArrival++;
+    if(worldMap.countries[i].properties.sovereignt === worldMap.countries[i].properties.name_long) {
+      destinations = worldMap.countries[i].destinations;
+      for(d = 0; d < destinations.length; d++) {
+        if(destinations[d].visa_required === 'no' || destinations[d].visa_required === 'on-arrival' || destinations[d].visa_required === 'free-eu') {
+          country = CountryDataHelpers.getCountryByName(worldMap.countries, destinations[d].d_name);
+          if(country !== null) {
+            country.numSourcesFreeOrOnArrival++;
+          }
         }
       }
     }

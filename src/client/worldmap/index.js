@@ -527,7 +527,7 @@ WorldMap.prototype = {
         return;
       }
 
-      country.listItem.addClass('hover');
+      if(country.listItem !== undefined) country.listItem.addClass('hover');
 
       UI.updateCountryTooltip(this, country);
 
@@ -541,7 +541,7 @@ WorldMap.prototype = {
       this.countryBorder = null;
     }
     if(this.intersectedObject !== undefined && this.intersectedObject !== null) {
-      this.intersectedObject.countryObject.listItem.removeClass('hover');
+      if(this.intersectedObject.countryObject.listItem !== undefined) this.intersectedObject.countryObject.listItem.removeClass('hover');
     }
     this.intersectedObject = null;
   },
@@ -679,10 +679,10 @@ WorldMap.prototype = {
         this.countries[i].notes = '';
       }
       if(this.selectedCountry) {
-        this.selectedCountry.listItem.removeClass('selected');
+        if(this.selectedCountry.listItem !== undefined) this.selectedCountry.listItem.removeClass('selected');
       }
       if(this.selectedDestinationCountry) {
-        this.selectedDestinationCountry.listItem.removeClass('selected');
+        if(this.selectedDestinationCountry.listItem !== undefined) this.selectedDestinationCountry.listItem.removeClass('selected');
       }
       this.selectedCountry = null;
       this.selectedDestinationCountry = null;
@@ -711,7 +711,7 @@ WorldMap.prototype = {
         this.countries[i].notes = '';
       }
       if(this.selectedCountry) {
-        this.selectedCountry.listItem.removeClass('selected');
+        if(this.selectedCountry.listItem !== undefined) this.selectedCountry.listItem.removeClass('selected');
       }
       this.selectedCountry = null;
 
@@ -739,7 +739,7 @@ WorldMap.prototype = {
         this.countries[i].notes = '';
       }
       if(this.selectedDestinationCountry) {
-        this.selectedDestinationCountry.listItem.removeClass('selected');
+        if(this.selectedDestinationCountry.listItem !== undefined) this.selectedDestinationCountry.listItem.removeClass('selected');
       }
       this.selectedDestinationCountry = null;
 
@@ -767,13 +767,10 @@ WorldMap.prototype = {
     // log('setSelectedCountry()');
 
     if(!this.introRunning) {
-      if(selectedCountry !== this.selectedCountry) {
-        UI.countrySelectionChanged = true;
-      }
       this.selectedCountry = selectedCountry;
 
       if(this.selectedCountry) {
-        this.selectedCountry.listItem.addClass('selected');
+        if(this.selectedCountry.listItem !== undefined) this.selectedCountry.listItem.addClass('selected');
         UI.setSourceCountryDropdownValue(this.selectedCountry.properties.name_long);
       }
 
@@ -785,13 +782,10 @@ WorldMap.prototype = {
     // log('setSelectedDestinationCountry()');
 
     if(!this.introRunning) {
-      if(selectedDestinationCountry !== this.selectedDestinationCountry) {
-        UI.countrySelectionChanged = true;
-      }
       this.selectedDestinationCountry = selectedDestinationCountry;
 
       if(this.selectedDestinationCountry) {
-        this.selectedDestinationCountry.listItem.addClass('selected');
+        if(this.selectedDestinationCountry.listItem !== undefined) this.selectedDestinationCountry.listItem.addClass('selected');
         UI.setDestinationCountryDropdownValue(this.selectedDestinationCountry.properties.name_long);
       }
 
@@ -808,6 +802,8 @@ WorldMap.prototype = {
     var mainCountry;
     var value;
     var html;
+    var sovereignty = '';
+    var sovereigntyDestination = '';
 
     for(i = 0; i < this.countries.length; i++) {
       this.countries[i].visa_required = '';
@@ -822,6 +818,16 @@ WorldMap.prototype = {
 
         destinations = this.selectedCountry.destinations;
         if( destinations.length > 0 ) {
+          sovereignty = '';
+          if(this.selectedCountry.properties.sovereignt !== this.selectedCountry.properties.name_long) {
+            sovereignty = ' (' + this.selectedCountry.properties.sovereignt + ')';
+          }
+
+          sovereigntyDestination = '';
+          if(this.selectedDestinationCountry.properties.sovereignt !== this.selectedDestinationCountry.properties.name_long) {
+            sovereigntyDestination = ' (' + this.selectedDestinationCountry.properties.sovereignt + ')';
+          }
+
           for(d = 0; d < destinations.length; d++) {
             if( (CountryDataHelpers.matchDestinationToCountryName(destinations[d].d_name, this.selectedDestinationCountry.properties.name_long) || CountryDataHelpers.matchDestinationToCountryName(this.selectedDestinationCountry.properties.name_long, destinations[d].d_name)) && this.selectedDestinationCountry.properties.name_long !== this.selectedCountry.properties.name_long) {
               this.selectedDestinationCountry.visa_required = destinations[d].visa_required;
@@ -829,11 +835,14 @@ WorldMap.prototype = {
               this.selectedDestinationCountry.notes = destinations[d].notes;
 
               this.visaInformationFound = true;
+
               UI.setHeadline(
                 // CountryDataHelpers.getCountryDetailsByVisaStatus(this.selectedDestinationCountry) +
                 '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(this.selectedDestinationCountry) + '</span> ' +
                 ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle(this.selectedCountry) +
+                sovereignty +
                 ' travelling to ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedDestinationCountry ) +
+                sovereigntyDestination +
                 '.<br/>' +
                 '<div class="notes">' + this.selectedDestinationCountry.notes +
                 '</div>' );
@@ -848,11 +857,14 @@ WorldMap.prototype = {
             mainCountry.visa_required = 'no';
             mainCountry.notes = 'National of same sovereignty (exceptions may exist)';
             this.visaInformationFound = true;
+
             UI.setHeadline(
               // CountryDataHelpers.getCountryDetailsByVisaStatus(this.selectedDestinationCountry) +
               '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(this.selectedDestinationCountry) + '</span> ' +
               ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) +
+              sovereignty +
               ' travelling to ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedDestinationCountry ) +
+              sovereigntyDestination +
               '.<br/><div class="notes">' + this.selectedDestinationCountry.notes + '</div>' );
           }
 
@@ -911,8 +923,14 @@ WorldMap.prototype = {
 
           this.visaInformationFound = true;
 
+          sovereignty = '';
+          if(this.selectedCountry.properties.sovereignt !== this.selectedCountry.properties.name_long) {
+            sovereignty = ' (' + this.selectedCountry.properties.sovereignt + ')';
+          }
+
           UI.setHeadline(
-            'Nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry )+
+            'Nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) +
+            sovereignty +
             ' can to travel to <b>' + this.selectedCountry.numDestinationsFreeOrOnArrival + ' countries</b> (' +
             this.selectedCountry.populationPercentage + '&nbsp;% of the global population) without a visa or with visa on arrival.');
           UI.showSelectedLegend();
@@ -937,6 +955,16 @@ WorldMap.prototype = {
       if(this.selectedCountry && this.selectedDestinationCountry) {
         this.visaInformationFound = false;
 
+        sovereignty = '';
+        if(this.selectedCountry.properties.sovereignt !== this.selectedCountry.properties.name_long) {
+          sovereignty = ' (' + this.selectedCountry.properties.sovereignt + ')';
+        }
+
+        sovereigntyDestination = '';
+        if(this.selectedDestinationCountry.properties.sovereignt !== this.selectedDestinationCountry.properties.name_long) {
+          sovereigntyDestination = ' (' + this.selectedDestinationCountry.properties.sovereignt + ')';
+        }
+
         destinations = this.selectedCountry.destinations;
         if( destinations.length > 0 ) {
           for(d = 0; d < destinations.length; d++) {
@@ -946,11 +974,14 @@ WorldMap.prototype = {
               this.selectedDestinationCountry.notes = destinations[d].notes;
 
               this.visaInformationFound = true;
+
               UI.setHeadline(
                 // CountryDataHelpers.getCountryDetailsByVisaStatus(this.selectedDestinationCountry) +
                 '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(this.selectedDestinationCountry) + '</span> ' +
                 ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) +
+                sovereignty +
                 ' travelling to ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedDestinationCountry ) +
+                sovereigntyDestination +
                 '.<br/><div class="notes">' + this.selectedDestinationCountry.notes + '</div>' );
 
               break;
@@ -966,7 +997,9 @@ WorldMap.prototype = {
               '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(this.selectedDestinationCountry) + '</span> ' +
               // CountryDataHelpers.getCountryDetailsByVisaStatus(this.selectedDestinationCountry) +
               ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) +
+              sovereignty +
               ' travelling to ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedDestinationCountry ) +
+              sovereigntyDestination +
               '.<br/><div class="notes">' + this.selectedDestinationCountry.notes + '</div>' );
           }
 
@@ -1011,7 +1044,17 @@ WorldMap.prototype = {
         var populationPercentage = Math.round( this.selectedDestinationCountry.populationAccepted / this.totalPopulation * 100 * 10 ) / 10;
         populationPercentage = formatNumber(populationPercentage, 1);
 
-        UI.setHeadline( toSentenceStart( CountryDataHelpers.getCountryNameWithArticle(this.selectedDestinationCountry) ) + ' grants nationals from <b>' + this.selectedDestinationCountry.numSourcesFreeOrOnArrival + ' countries</b> (' + populationPercentage + '&nbsp;% of the global population) access visa-free or with visa on arrival.');
+        sovereigntyDestination = '';
+        if(this.selectedDestinationCountry.properties.sovereignt !== this.selectedDestinationCountry.properties.name_long) {
+          sovereigntyDestination = ' (' + this.selectedDestinationCountry.properties.sovereignt + ')';
+        }
+
+        UI.setHeadline(
+          toSentenceStart( CountryDataHelpers.getCountryNameWithArticle(this.selectedDestinationCountry) ) +
+          sovereigntyDestination +
+          ' grants nationals from <b>' + this.selectedDestinationCountry.numSourcesFreeOrOnArrival +
+          ' countries</b> (' + populationPercentage +
+          '&nbsp;% of the global population) access visa-free or with visa on arrival.');
         UI.showSelectedLegend();
 
       } else {

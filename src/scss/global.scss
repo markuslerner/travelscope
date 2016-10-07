@@ -304,7 +304,7 @@ b {
   }
 
   .country_dropdown {
-    width: 190px;
+    width: 200px;
     // border: 1px solid #aaa;
     border: 1px solid transparent;
     font-size: 14px;
@@ -384,6 +384,11 @@ b {
     cursor:pointer;
     padding: 0.5em 0.75em;
   }
+
+  ul li.immybox_choice .sovereignty {
+    color: #999;
+  }
+
   ul li.immybox_choice.active {
     background-color:#f1f1f1;
     background-color: #444444;
@@ -596,6 +601,10 @@ b {
 
   li .container {
     position: relative;
+  }
+
+  li .container.is-sovereignty {
+    border: 1px solid red;
   }
 
   li .box {
