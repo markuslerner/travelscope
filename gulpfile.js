@@ -23,6 +23,8 @@ var merge = require('utils-merge');
 var buffer = require('vinyl-buffer');
 var source = require('vinyl-source-stream');
 var watchify = require('watchify');
+var del = require('del');
+var runSequence = require('run-sequence');
 
 const options = {
   dev: true,
@@ -36,6 +38,10 @@ gulp.task('prepare-deploy', function() {
   options.dev = false;
   options.dest = 'dist';
 });
+
+
+// Clean output directory
+gulp.task('clean', () => del(['public/*', 'dist/*'], {dot: true}));
 
 
 // Es lint javascript (development and production)
@@ -61,7 +67,9 @@ gulp.task('sass', function() {
       browserSync.notify(err.message, 3000);
       this.emit('end');
     })
-    .pipe(gulpif(!options.dev, autoprefixer()))
+    .pipe(gulpif(!options.dev, autoprefixer({
+      browsers: ['last 2 versions']
+    })))
     .pipe(gulpif(!options.dev, minifyCSS({
       keepBreaks: true
     })))
@@ -108,11 +116,14 @@ gulp.task('watchify', function() {
   var bundler = watchify(browserify(options.src + '/client.js', args))
     .transform(babelify, { /* opts */ });
 
-  bundleJS(bundler, true);
+  bundler.on('log', gutil.log);
 
   bundler.on('update', function() {
-    bundleJS(bundler, true);
+    bundleJS(bundler);
   });
+
+  bundleJS(bundler);
+
 });
 
 
@@ -129,12 +140,12 @@ gulp.task('build', function() {
       NODE_ENV: 'production'
     }));
 
-  bundleJS(bundler, false);
+  bundleJS(bundler);
 });
 
 
 // Bundle Javascript (development and production)
-function bundleJS(bundler, refreshAfterBundling) {
+function bundleJS(bundler) {
   return bundler.bundle()
     .on('error', mapError)
     .pipe(source('client.js'))
@@ -149,7 +160,7 @@ function bundleJS(bundler, refreshAfterBundling) {
     // write source maps:
     .pipe(gulpif(options.dev, sourcemaps.write('.')))
     .pipe(gulp.dest(options.dest + '/js'))
-    .pipe(gulpif(options.dev && refreshAfterBundling, browserSync.stream()));
+    .pipe(gulpif(options.dev, browserSync.stream()));
 }
 
 
@@ -167,15 +178,6 @@ gulp.task('copy', function() {
 });
 
 
-// Watch Files For Changes (development)
-gulp.task('watch', function() {
-  gulp.watch(options.src + '/scss/**/*.scss', ['sass']);
-  gulp.watch(options.src + '/scss/**/*.css', ['sass']);
-  gulp.watch(options.src + '/assets/img/**', ['copy']);
-  gulp.watch(options.src + '/*.html', ['copy']);
-});
-
-
 // Static server (development)
 gulp.task('browser-sync', function() {
   browserSync.init({
@@ -186,11 +188,38 @@ gulp.task('browser-sync', function() {
 
     reloadDelay: 300
   });
+});
+
+
+// Watch files for changes (development)
+gulp.task('watch', function() {
+  gulp.watch(options.src + '/scss/**/*.scss', ['sass']);
+  gulp.watch(options.src + '/scss/**/*.css', ['sass']);
+  gulp.watch(options.src + '/assets/img/**', ['copy']);
+  gulp.watch(options.src + '/*.html', ['copy']);
+
   gulp.watch(options.dest + '/*.html').on('change', browserSync.reload);
 });
 
 
-gulp.task('default', ['lint', 'sass', 'copy', 'watch', 'watchify', 'browser-sync']);
+gulp.task('default', callback =>
+  runSequence(
+    'clean',
+    ['sass', 'lint', 'copy', 'watchify'],
+    'browser-sync',
+    'watch',
+    callback
+  )
+);
 
-gulp.task('deploy', ['prepare-deploy', 'lint', 'sass', 'copy', 'build']);
+
+gulp.task('deploy', callback =>
+  runSequence(
+    'clean',
+    'prepare-deploy',
+    ['sass', 'lint', 'copy'],
+    'build',
+    callback
+  )
+);
 
