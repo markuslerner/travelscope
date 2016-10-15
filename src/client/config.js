@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import Detector from './three/Detector';
 
-const version = '1.2';
-const cdnURL = 'http://cdn.markuslerner.com/travelscope/'; // 'http://cdn.markuslerner.com/travelscope/'
+const mapVersion = '1.0';
+const cdnURL = '//cdn.markuslerner.com/travelscope/'; // 'http://cdn.markuslerner.com/travelscope/'
 
 
 
@@ -21,8 +21,8 @@ const config = {
   // 'ne_50m_admin_0_sovereignty_simplified.json', 'ne_110m_admin_0_sovereignty_simplified.json'
   // 'ne_50m_admin_0_countries_simplified.json', 'ne_110m_admin_0_countries_simplified'
   mapDataFile: IS_DESKTOP && Detector.webgl
-    ? cdnURL + 'data/ne_50m_admin_0_countries_simplified.json?v=' + version
-    : cdnURL + 'data/all_countries.json?v=' + version,
+    ? cdnURL + 'data/ne_50m_admin_0_countries_simplified.json?v=' + mapVersion
+    : cdnURL + 'data/all_countries.json?v=' + mapVersion,
 
   // visaRequirementsFile: '/data/visa_requirements.json',
   visaRequirementsFile: cdnURL + VISA_REQUIREMENTS_URL,
