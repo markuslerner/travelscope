@@ -14,6 +14,7 @@
     "Else": true
   },
   "rules": {
+    "comma-dangle": ["error", "only-multiline"],
     "semi" : [2, "always"],
     "generator-star-spacing": 0,
     "babel/generator-star-spacing": 1,
