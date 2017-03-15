@@ -55,14 +55,21 @@ build/Release
 # Dependency directory
 node_modules
 
-# Production folder
-dist
+# Development folder
+dev
 
-# Deployment files
-public/
+# Production folder
+public/assets
+public/css
+public/js
+public/src
+public/images
+public/index.html
+
 .env
 .azk
 
-# Server-side files
-src/php/
-src/index.php
+# composer
+composer.phar
+/vendor/
+

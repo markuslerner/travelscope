@@ -29,19 +29,24 @@ var runSequence = require('run-sequence');
 const options = {
   dev: true,
   src: 'src',
-  dest: 'public'
+  dest: 'dev',
 };
 
 
 // Set deployment variables and path (production)
 gulp.task('prepare-deploy', function() {
   options.dev = false;
-  options.dest = 'dist';
+  options.dest = 'public';
 });
 
 
-// Clean output directory
-gulp.task('clean', () => del(['public/*', 'dist/*'], {dot: true}));
+// Clean dev directory
+gulp.task('clean', () => {
+  if(options.dev) {
+    return del([options.dest + '/*'], {dot: false});
+  }
+  return true;
+});
 
 
 // Es lint javascript (development and production)
@@ -73,7 +78,9 @@ gulp.task('sass', function() {
     .pipe(gulpif(!options.dev, minifyCSS({
       keepBreaks: true
     })))
-    .pipe(browserSync.stream())
+    .pipe(browserSync.reload({
+      stream: true
+    }))
     .pipe(gulpif(options.dev, sourcemaps.write()))
     .pipe(plumber.stop())
     .pipe(gulp.dest(options.dest + '/css'))
@@ -107,14 +114,15 @@ function mapError(err) {
 
 // Watch Javascript files for changes (development)
 gulp.task('watchify', function() {
-  process.env.NODE_ENV = 'development';
-
   var args = merge(watchify.args, {
-    debug: true,
-    plugin: options.dev ? [] : []
+    debug: options.dev,
+    plugin: []
   });
   var bundler = watchify(browserify(options.src + '/client.js', args))
-    .transform(babelify, { /* opts */ });
+    .transform(babelify, { /* opts */ })
+    .transform(envify({
+      NODE_ENV: 'development',
+    }));
 
   bundler.on('log', gutil.log);
 
@@ -129,14 +137,13 @@ gulp.task('watchify', function() {
 
 // Build for production
 gulp.task('build', function() {
-  process.env.NODE_ENV = 'production';
-
   var args = merge(watchify.args, {
     debug: false
   });
   var bundler = browserify(options.src + '/client.js', args)
     .transform(babelify, { /* opts */ })
-    .transform(envify({
+    .transform({global: true}, envify({ // global is important here!
+      _: 'purge',
       NODE_ENV: 'production'
     }));
 
@@ -160,7 +167,9 @@ function bundleJS(bundler) {
     // write source maps:
     .pipe(gulpif(options.dev, sourcemaps.write('.')))
     .pipe(gulp.dest(options.dest + '/js'))
-    .pipe(gulpif(options.dev, browserSync.stream()));
+    .pipe(gulpif(options.dev, browserSync.reload({
+      stream: true
+    })));
 }
 
 
@@ -172,8 +181,10 @@ gulp.task('copy', function() {
   gulp.src(options.src + '/assets/img/**')
     .pipe(gulp.dest(options.dest + '/assets/img'));
 
-  gulp.src(options.src + '/*.html')
-    .pipe(gulp.dest(options.dest));
+  if(options.dev) {
+    gulp.src(options.src + '/*.html')
+      .pipe(gulp.dest(options.dest));
+  }
 
 });
 
@@ -215,7 +226,6 @@ gulp.task('default', callback =>
 
 gulp.task('deploy', callback =>
   runSequence(
-    'clean',
     'prepare-deploy',
     ['sass', 'lint', 'copy'],
     'build',
