@@ -34,7 +34,10 @@ First, clone or download:
 
 ```bash
 $ git clone https://github.com/markuslerner/travelscope.git
-// or
+```
+or
+
+```bash
 $ wget -O travelscope.zip https://github.com/markuslerner/travelscope/archive/master.zip
 $ unzip travelscope.zip
 ```
@@ -52,34 +55,44 @@ $ cd <my-project-name>
 $ npm install
 ```
 
-## Running Dev Server
+
+### Install gulp globally
+
+Only, if gulp isn't installed yet.
 
 ```bash
-$ npm start
+$ sudo npm install --global gulp-cli
+```
+
+
+## Running dev server
+
+Files are compiled to `dev` folder, which is automatically created, if it doesn't exist.
+
+```bash
+$ gulp
 ```
 
 Gulp will run a server on your local machine at port 3000. Whenever you change a source file it will re-compile client.js and reload your browser.
 
 
-## Building distribution files (dist folder)
+## Building production files
+
+Files are compiled to `public` folder.
 
 ```bash
-$ npm run deploy
+$ gulp deploy
 ```
 
-## Delete development (public) and distribution (dist) folder
-
-```bash
-$ npm run clean
-```
 
 ## Application Structure
 
 
 ```
 .
-├── dist                           # Distribution folder created by gulp/browserify
-├── public                         # Development folder created by gulp/browserify
+├── dev                            # Development folder created by gulp/browserify
+├── public                         # Distribution folder
+│   └── index.php                  # Production index.php file
 └── src                            # Application source code
     ├── assets                     # Asset files
     │   ├── fonts                  # Font files
@@ -103,5 +116,5 @@ $ npm run clean
 ```
 
 
-– Markus Lerner, [@markuslerner](https://twitter.com/markuslerner)
+– Markus Lerner, [markuslerner.com](http://www.markuslerner.com)
 
