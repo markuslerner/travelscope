@@ -931,7 +931,7 @@ WorldMap.prototype = {
           UI.setHeadline(
             'Nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) +
             sovereignty +
-            ' can to travel to <b>' + this.selectedCountry.numDestinationsFreeOrOnArrival + ' countries</b> (' +
+            ' can travel to <b>' + this.selectedCountry.numDestinationsFreeOrOnArrival + ' countries</b> (' +
             this.selectedCountry.populationPercentage + '&nbsp;% of the global population) without a visa or with visa on arrival.');
           UI.showSelectedLegend();
 
