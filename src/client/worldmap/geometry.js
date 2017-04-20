@@ -708,7 +708,7 @@ export function createLines(worldMap) {
       worldMap.selectedDestinationCountry.splineHeight = worldMap.selectedDestinationCountry.splineLength * 0.25;
       worldMap.selectedDestinationCountry.geometrySpline = new THREE.Geometry();
 
-      line = new THREE.Line( worldMap.selectedDestinationCountry.geometrySpline, getLineMaterial(worldMap.selectedDestinationCountry), THREE.LineStrip );
+      line = new THREE.Line( worldMap.selectedDestinationCountry.geometrySpline, CountryDataHelpers.getLineMaterial(worldMap.selectedDestinationCountry), THREE.LineStrip );
       worldMap.linesObject.add(line);
 
     } else if(worldMap.selectedCountry && !worldMap.selectedDestinationCountry) {
@@ -729,7 +729,7 @@ export function createLines(worldMap) {
             worldMap.countries[c].splineHeight = worldMap.countries[c].splineLength * 0.25;
             worldMap.countries[c].geometrySpline = new THREE.Geometry();
 
-            line = new THREE.Line( worldMap.countries[c].geometrySpline, getLineMaterial(worldMap.countries[c]), THREE.LineStrip );
+            line = new THREE.Line( worldMap.countries[c].geometrySpline, CountryDataHelpers.getLineMaterial(worldMap.countries[c]), THREE.LineStrip );
             worldMap.linesObject.add(line);
           }
         }
@@ -753,7 +753,7 @@ export function createLines(worldMap) {
             worldMap.countries[c].splineHeight = worldMap.countries[c].splineLength * 0.25;
             worldMap.countries[c].geometrySpline = new THREE.Geometry();
 
-            line = new THREE.Line( worldMap.countries[c].geometrySpline, getLineMaterial(worldMap.countries[c]), THREE.LineStrip );
+            line = new THREE.Line( worldMap.countries[c].geometrySpline, CountryDataHelpers.getLineMaterial(worldMap.countries[c]), THREE.LineStrip );
             worldMap.linesObject.add(line);
           }
         }
@@ -837,27 +837,6 @@ export function deleteLinesObject(worldMap) {
     worldMap.scene.remove(worldMap.linesObject);
     worldMap.linesObject = null;
   }
-};
-
-
-function getLineMaterial(country) {
-  var material = Config.materialLineDefault;
-  if(country.visa_required === 'no') {
-    material = Config.materialLineVisaNotRequired;
-  } else if(country.visa_required === 'on-arrival') {
-    material = Config.materialLineVisaOnArrival;
-  } else if(country.visa_required === 'free-eu') {
-    material = Config.materialLineVisaFreeEU;
-  } else if(country.visa_required === 'yes') {
-    material = Config.materialLineVisaRequired;
-  } else if(country.visa_required === 'admission-refused') {
-    material = Config.materialLineVisaAdmissionRefused;
-  } else if(country.visa_required === '') {
-    material = Config.materialLineVisaDataNotAvailable;
-  } else { // special
-    material = Config.materialLineVisaSpecial;
-  }
-  return material;
 };
 
 

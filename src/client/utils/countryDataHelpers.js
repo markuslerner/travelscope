@@ -155,6 +155,37 @@ export function getCountryColorByVisaStatus(country) {
 };
 
 
+export function getLineMaterial(country) {
+  var material = Config.materialLineDefault;
+
+  if(country.visa_required === 'no') {
+    material = Config.materialLineVisaNotRequired;
+
+  } else if(country.visa_required === 'on-arrival') {
+    material = Config.materialLineVisaOnArrival;
+
+  } else if(country.visa_required === 'eta') {
+    material = Config.materialLineVisaETA;
+
+  } else if(country.visa_required === 'free-eu') {
+    material = Config.materialLineVisaFreeEU;
+
+  } else if(country.visa_required === 'yes') {
+    material = Config.materialLineVisaRequired;
+
+  } else if(country.visa_required === 'admission-refused') {
+    material = Config.materialLineVisaAdmissionRefused;
+
+  } else if(country.visa_required === '') {
+    material = Config.materialLineVisaDataNotAvailable;
+
+  } else { // special
+    material = Config.materialLineVisaSpecial;
+  }
+  return material;
+};
+
+
 export function getCountryColorByFreeDestinations(numDestinations, maxNumDestinationsFreeOrOnArrival) {
   var m = numDestinations / maxNumDestinationsFreeOrOnArrival;
   var color = new THREE.Color(Config.colorZeroDestinations);
