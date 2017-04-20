@@ -918,8 +918,8 @@ WorldMap.prototype = {
             this.selectedCountry.populationReachable += mainCountry.properties.pop_est;
           }
 
-          this.selectedCountry.populationPercentage = Math.round( this.selectedCountry.populationReachable / this.totalPopulation * 100 * 10 ) / 10;
-          this.selectedCountry.populationPercentage = formatNumber(this.selectedCountry.populationPercentage, 1);
+          // this.selectedCountry.populationPercentage = Math.round( this.selectedCountry.populationReachable / this.totalPopulation * 100 * 10 ) / 10;
+          // this.selectedCountry.populationPercentage = formatNumber(this.selectedCountry.populationPercentage, 1);
 
           this.visaInformationFound = true;
 
@@ -931,9 +931,10 @@ WorldMap.prototype = {
           UI.setHeadline(
             'Nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) +
             sovereignty +
-            ' can travel to <b>' + this.selectedCountry.numDestinationsFreeOrOnArrival + ' countries</b> (' +
-            this.selectedCountry.populationPercentage + '&nbsp;% of the global population) without a visa or with visa on arrival.');
+            ' can travel to <b>' + this.selectedCountry.numDestinationsFreeOrOnArrival + ' countries</b> without a visa or with visa on arrival.');
           UI.showSelectedLegend();
+
+          // this.selectedCountry.populationPercentage + '&nbsp;% of the global population)
 
         } else {
           this.visaInformationFound = false;
@@ -1041,8 +1042,8 @@ WorldMap.prototype = {
           }
         }
 
-        var populationPercentage = Math.round( this.selectedDestinationCountry.populationAccepted / this.totalPopulation * 100 * 10 ) / 10;
-        populationPercentage = formatNumber(populationPercentage, 1);
+        // var populationPercentage = Math.round( this.selectedDestinationCountry.populationAccepted / this.totalPopulation * 100 * 10 ) / 10;
+        // populationPercentage = formatNumber(populationPercentage, 1);
 
         sovereigntyDestination = '';
         if(this.selectedDestinationCountry.properties.sovereignt !== this.selectedDestinationCountry.properties.name_long) {
@@ -1053,9 +1054,10 @@ WorldMap.prototype = {
           toSentenceStart( CountryDataHelpers.getCountryNameWithArticle(this.selectedDestinationCountry) ) +
           sovereigntyDestination +
           ' grants nationals from <b>' + this.selectedDestinationCountry.numSourcesFreeOrOnArrival +
-          ' countries</b> (' + populationPercentage +
-          '&nbsp;% of the global population) access visa-free or with visa on arrival.');
+          ' countries</b> access visa-free or with visa on arrival.');
         UI.showSelectedLegend();
+
+        // (' + populationPercentage + '&nbsp;% of the global population)
 
       } else {
         // nothing selected
