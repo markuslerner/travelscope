@@ -4,7 +4,7 @@
 	$description = "A visual exploration of the travel freedom attached to passports";
 
 	define('CDN_URL', '//cdn.markuslerner.com/travelscope/'); // http://cdn.markuslerner.com/travelscope/
-	define('VERSION', '1.3.1');
+	define('VERSION', '1.3.2');
 
 	$visa_requirements_folder = "data/visa_requirements";
 
@@ -167,7 +167,7 @@
 				<li><a href="#" id="button_disclaimer">Disclaimer</a></li>
 
 				<li id="logo_ml">
-					<a href="http://www.markuslerner.com/" target="_blank">
+					<a href="https://www.markuslerner.com/" target="_blank">
 						<span class="text">Concept/development:</span>
 						<img alt="Markus Lerner Design" src="assets/img/ml-white.svg"/>
 					</a>
@@ -310,7 +310,7 @@
 					</p>
 
 					<p>
-					Concept, design & coding: <a href="http://www.markuslerner.com/" target="_blank">Markus Lerner</a>
+					Concept, design & coding: <a href="https://www.markuslerner.com/" target="_blank">Markus Lerner</a>
 					</p>
 
 					<p>
@@ -391,7 +391,7 @@ var rsypgei = ['m','=','p','r','e','c','l','t','a','"','s','s','e','c','t','s','
     <i class="icon-facebook" onclick="
       FB.ui({
         method: 'share',
-        href: 'http://www.markuslerner.com/travelscope'
+        href: 'https://www.markuslerner.com/travelscope'
       }, function(response){});
       event.preventDefault();
       event.stopPropagation();
@@ -399,7 +399,7 @@ var rsypgei = ['m','=','p','r','e','c','l','t','a','"','s','s','e','c','t','s','
 
     <i class="icon-twitter-bird" onclick="
     console.log('test');
-      var url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent('Interactive worldmap of visa-free travel. http://www.markuslerner.com/travelscope/ by @markuslerner #dataviz');
+      var url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent('Interactive worldmap of visa-free travel. https://www.markuslerner.com/travelscope/ by @markuslerner #dataviz');
       window.open(url, '_blank', 'width=640,height=320');
       event.preventDefault();
       event.stopPropagation();
