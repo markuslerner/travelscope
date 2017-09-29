@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import Detector from './three/Detector';
 
 const mapVersion = '1.0';
-const cdnURL = '//cdn.markuslerner.com/travelscope/'; // 'http://cdn.markuslerner.com/travelscope/'
+const cdnURL = 'https://cdn.markuslerner.com/travelscope/'; // 'http://cdn.markuslerner.com/travelscope/'
 
 
 
