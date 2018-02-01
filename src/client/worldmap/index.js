@@ -1175,9 +1175,15 @@ function init() {
 
   worldMap = new WorldMap();
 
-  log('Loading Visa requirements ...');
+  log('Loading Visa requirements from \'' + Config.visaRequirementsFile + '\' ...');
 
-  $.when( $.getJSON(Config.visaRequirementsFile) ).then(function(dataRequirements) {
+  $.when( $.getJSON(Config.visaRequirementsFile)
+    .fail(function(error) {
+      console.error('Error loading visa requirements', error);
+      UI.updateLoadingInfo('<span class="error">Error loading visa requirements.<br/>Please try again later.</span>');
+
+    })
+  ).then(function(dataRequirements) {
     log('Visa requirements loaded for ' + dataRequirements.countries.length + ' sovereignties');
     // log( 'JSON Data: ' + dataRequirements.countries['Germany'].code );
     worldMap.visaRequirements = dataRequirements;
@@ -1192,7 +1198,7 @@ function init() {
     UI.updateLoadingInfo('Loading world map ...');
 
     $.when( $.getJSON(Config.mapDataFile) ).then(function(dataCountries) {
-      // log('World map loaded.');
+      log('World map loaded.');
       worldMap.dataCountries = dataCountries;
 
       /*
@@ -1296,4 +1302,3 @@ function completeInit() {
 }
 
 $(document).ready(init);
-
