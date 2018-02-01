@@ -81,7 +81,7 @@ Gulp will run a server on your local machine at port 3000. Whenever you change a
 Files are compiled to `public` folder.
 
 ```bash
-$ gulp deploy
+$ gulp build
 ```
 
 
@@ -117,4 +117,3 @@ $ gulp deploy
 
 
 – Markus Lerner, [markuslerner.com](http://www.markuslerner.com)
-

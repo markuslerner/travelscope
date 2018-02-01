@@ -33,8 +33,8 @@ const options = {
 };
 
 
-// Set deployment variables and path (production)
-gulp.task('prepare-deploy', function() {
+// Set deployment variables and path (force production)
+gulp.task('prepare-production', function() {
   options.dev = false;
   options.dest = 'public';
 });
@@ -135,8 +135,8 @@ gulp.task('watchify', function() {
 });
 
 
-// Build for production
-gulp.task('build', function() {
+// Build and bundle for production
+gulp.task('build-bundle', function() {
   var args = merge(watchify.args, {
     debug: false
   });
@@ -224,12 +224,11 @@ gulp.task('default', callback =>
 );
 
 
-gulp.task('deploy', callback =>
+gulp.task('build', callback =>
   runSequence(
-    'prepare-deploy',
+    'prepare-production',
     ['sass', 'lint', 'copy'],
-    'build',
+    'build-bundle',
     callback
   )
 );
-

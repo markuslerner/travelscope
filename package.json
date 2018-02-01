@@ -10,7 +10,7 @@
   "scripts": {
     "start": "gulp",
     "dev": "gulp",
-    "deploy": "gulp deploy",
+    "build": "gulp build",
     "clean": "gulp clean"
   },
   "main": "src/client.js",
