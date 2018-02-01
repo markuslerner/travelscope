@@ -1238,7 +1238,7 @@ function onWindowResize() {
 
   $('#slider_zoom').css('left', (viewportWidth - $('#slider_zoom').width()) / 2 + 'px');
 
-  if(worldMap) {
+  if(worldMap && worldMap.renderer && worldMap.renderer.setSize) {
     worldMap.renderer.setSize( viewportWidth, viewportHeight );
 
     if(Config.usesWebGL) {
@@ -1396,4 +1396,3 @@ function onTouchEnd(event) {
 function onDoubleTap(event) {
   // log('onDoubleTap()');
 }
-
