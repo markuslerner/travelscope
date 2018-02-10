@@ -167,9 +167,21 @@ export function createCountryList(worldMap) {
   var count = 0;
   for(var i = 0; i < worldMap.countries.length; i++) {
     var country = worldMap.countries[i];
+    var name = country.properties.name_long;
+    var type = country.properties.type;
 
-    if(country.properties.sovereignt === country.properties.name_long) { // add only sovereignties:
-      var li = $('<li><div class="container"><span class="box"></span><span class="number"></span><span class="text">' + country.properties.name_long + '</span></div></li>');
+    // if(name === 'Serbia' || name === 'French Polynesia') {
+    // if(type !== 'Sovereign country') { // Disputed
+    // console.log(name, '| ' + type);
+    // }
+    // }
+
+    // add only sovereignties:
+    // if(country.properties.sovereignt === country.properties.name_long) {
+    // if(country.properties.scalerank === 1) {
+    // if(country.properties.homepart === 1) {
+    if(type === 'Sovereign country') { //  || type === 'Disputed'
+      var li = $('<li><div class="container"><span class="box"></span><span class="number"></span><span class="text">' + name + '</span></div></li>');
       $('#country_list').append(li);
 
       li.data('height', li.height());
@@ -905,7 +917,8 @@ export function collapseNavBar() {
 export function updateCountryTooltip(worldMap, country) {
   // log('updateCountryTooltip()');
 
-  if(country.properties.name_long === country.properties.sovereignt) {
+  // if(country.properties.name_long === country.properties.sovereignt) {
+  if(country.properties.type === 'Sovereign country') {
     $('#country-tooltip .title').html( country.properties.name_long );
   } else {
     $('#country-tooltip .title').html( country.properties.name_long + ' (' + country.properties.sovereignt + ')' );
