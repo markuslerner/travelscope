@@ -468,7 +468,7 @@ WorldMap.prototype = {
       } else if(this.mode === 'gdp') {
         if( country === this.selectedCountry ) {
           c.set(Config.colorCountrySelected);
-        } else if(country.properties.gdp_md_est > 100) {
+        } else if(country.gdp > 100) {
           c.set(country.colorByGDP);
         } else {
           c.set(Config.colorVisaDataNotAvailable);
@@ -477,7 +477,7 @@ WorldMap.prototype = {
       } else if(this.mode === 'gdp-per-capita') {
         if( country === this.selectedCountry ) {
           c.set(Config.colorCountrySelected);
-        } else if(country.properties.gdp_md_est > 100) {
+        } else if(country.gdp > 100) {
           c.set(country.colorByGDPPerCapita);
         } else {
           c.set(Config.colorVisaDataNotAvailable);
@@ -610,29 +610,29 @@ WorldMap.prototype = {
           if(this.mode === 'destinations') {
             if(event.ctrlKey || event.altKey || event.metaKey) {
               this.setSelectedDestinationCountry(intersects[ 0 ].object.countryObject);
-              this.trackEvent('destinationCountryMapClick', intersects[ 0 ].object.countryObject.properties.name_long);
+              this.trackEvent('destinationCountryMapClick', intersects[ 0 ].object.countryObject.name);
             } else {
               this.setSelectedCountry(intersects[ 0 ].object.countryObject);
-              this.trackEvent('sourceCountryMapClick', intersects[ 0 ].object.countryObject.properties.name_long);
+              this.trackEvent('sourceCountryMapClick', intersects[ 0 ].object.countryObject.name);
             }
           } else if(this.mode === 'sources') {
             if(event.ctrlKey || event.altKey || event.metaKey) {
               this.setSelectedCountry(intersects[ 0 ].object.countryObject);
-              this.trackEvent('sourceCountryMapClick', intersects[ 0 ].object.countryObject.properties.name_long);
+              this.trackEvent('sourceCountryMapClick', intersects[ 0 ].object.countryObject.name);
             } else {
               this.setSelectedDestinationCountry(intersects[ 0 ].object.countryObject);
-              this.trackEvent('destinationCountryMapClick', intersects[ 0 ].object.countryObject.properties.name_long);
+              this.trackEvent('destinationCountryMapClick', intersects[ 0 ].object.countryObject.name);
             }
 
           } else {
             // this.setSelectedCountry(intersects[ 0 ].object.countryObject);
-            // this.trackEvent('mapClickSourceCountry', intersects[ 0 ].object.countryObject.properties.name_long);
+            // this.trackEvent('mapClickSourceCountry', intersects[ 0 ].object.countryObject.name);
             if(event.ctrlKey || event.altKey || event.metaKey) {
               this.setSelectedDestinationCountry(intersects[ 0 ].object.countryObject);
-              this.trackEvent('destinationCountryMapClick', intersects[ 0 ].object.countryObject.properties.name_long);
+              this.trackEvent('destinationCountryMapClick', intersects[ 0 ].object.countryObject.name);
             } else {
               this.setSelectedCountry(intersects[ 0 ].object.countryObject);
-              this.trackEvent('sourceCountryMapClick', intersects[ 0 ].object.countryObject.properties.name_long);
+              this.trackEvent('sourceCountryMapClick', intersects[ 0 ].object.countryObject.name);
             }
 
           }
@@ -771,7 +771,7 @@ WorldMap.prototype = {
 
       if(this.selectedCountry) {
         if(this.selectedCountry.listItem !== undefined) this.selectedCountry.listItem.addClass('selected');
-        UI.setSourceCountryDropdownValue(this.selectedCountry.properties.name_long);
+        UI.setSourceCountryDropdownValue(this.selectedCountry.name);
       }
 
       this.updateCountrySelection();
@@ -786,7 +786,7 @@ WorldMap.prototype = {
 
       if(this.selectedDestinationCountry) {
         if(this.selectedDestinationCountry.listItem !== undefined) this.selectedDestinationCountry.listItem.addClass('selected');
-        UI.setDestinationCountryDropdownValue(this.selectedDestinationCountry.properties.name_long);
+        UI.setDestinationCountryDropdownValue(this.selectedDestinationCountry.name);
       }
 
       this.updateCountrySelection();
@@ -819,17 +819,19 @@ WorldMap.prototype = {
         destinations = this.selectedCountry.destinations;
         if( destinations.length > 0 ) {
           sovereignty = '';
-          if(this.selectedCountry.properties.sovereignt !== this.selectedCountry.properties.name_long) {
-            sovereignty = ' (' + this.selectedCountry.properties.sovereignt + ')';
+
+          if(!CountryDataHelpers.isCountry(this.selectedCountry)) {
+            sovereignty = ' (' + this.selectedCountry.sovereignt + ')';
           }
 
           sovereigntyDestination = '';
-          if(this.selectedDestinationCountry.properties.sovereignt !== this.selectedDestinationCountry.properties.name_long) {
-            sovereigntyDestination = ' (' + this.selectedDestinationCountry.properties.sovereignt + ')';
+
+          if(!CountryDataHelpers.isCountry(this.selectedDestinationCountry)) {
+            sovereigntyDestination = ' (' + this.selectedDestinationCountry.sovereignt + ')';
           }
 
           for(d = 0; d < destinations.length; d++) {
-            if( (CountryDataHelpers.matchDestinationToCountryName(destinations[d].d_name, this.selectedDestinationCountry.properties.name_long) || CountryDataHelpers.matchDestinationToCountryName(this.selectedDestinationCountry.properties.name_long, destinations[d].d_name)) && this.selectedDestinationCountry.properties.name_long !== this.selectedCountry.properties.name_long) {
+            if( (CountryDataHelpers.matchDestinationToCountryName(destinations[d].d_name, this.selectedDestinationCountry.name) || CountryDataHelpers.matchDestinationToCountryName(this.selectedDestinationCountry.name, destinations[d].d_name)) && this.selectedDestinationCountry.name !== this.selectedCountry.name) {
               this.selectedDestinationCountry.visa_required = destinations[d].visa_required;
               this.selectedDestinationCountry.visa_title = destinations[d].visa_title;
               this.selectedDestinationCountry.notes = destinations[d].notes;
@@ -852,7 +854,7 @@ WorldMap.prototype = {
           }
 
           // add main sovereignty, if exists:
-          mainCountry = CountryDataHelpers.getCountryByName(this.countries, this.selectedCountry.properties.sovereignt);
+          mainCountry = CountryDataHelpers.getCountryByName(this.countries, this.selectedCountry.sovereignt);
           if(mainCountry && mainCountry.visa_required === '') {
             mainCountry.visa_required = 'no';
             mainCountry.notes = 'National of same sovereignty (exceptions may exist)';
@@ -882,14 +884,14 @@ WorldMap.prototype = {
             var found = false;
 
             for(var c = 0; c < this.countries.length; c++) {
-              // if( (CountryDataHelpers.matchDestinationToCountryName(destinations[d].d_name, this.countries[c].properties.name_long) || CountryDataHelpers.matchDestinationToCountryName(this.countries[c].properties.name_long, destinations[d].d_name)) && this.countries[c].properties.name_long !== this.selectedCountry.properties.name_long) {
+              // if( (CountryDataHelpers.matchDestinationToCountryName(destinations[d].d_name, this.countries[c].name) || CountryDataHelpers.matchDestinationToCountryName(this.countries[c].name, destinations[d].d_name)) && this.countries[c].name !== this.selectedCountry.name) {
               if(
-                // ( destinations[d].d_name === this.countries[c].properties.sovereignt) ||
+                // ( destinations[d].d_name === this.countries[c].sovereignt) ||
                 (
-                   CountryDataHelpers.matchDestinationToCountryName(destinations[d].d_name, this.countries[c].properties.name_long) ||
-                   CountryDataHelpers.matchDestinationToCountryName(this.countries[c].properties.name_long, destinations[d].d_name)
+                   CountryDataHelpers.matchDestinationToCountryName(destinations[d].d_name, this.countries[c].name) ||
+                   CountryDataHelpers.matchDestinationToCountryName(this.countries[c].name, destinations[d].d_name)
                 ) &&
-                  this.countries[c].properties.name_long !== this.selectedCountry.properties.name_long
+                  this.countries[c].name !== this.selectedCountry.name
 
                 ) {
                 this.countries[c].visa_required = destinations[d].visa_required;
@@ -897,7 +899,7 @@ WorldMap.prototype = {
                 this.countries[c].notes = destinations[d].notes;
 
                 if(destinations[d].visa_required === 'no' || destinations[d].visa_required === 'on-arrival' || destinations[d].visa_required === 'free-eu') {
-                  this.selectedCountry.populationReachable += this.countries[c].properties.pop_est;
+                  this.selectedCountry.populationReachable += this.countries[c].population;
                 }
 
                 found = true;
@@ -911,11 +913,11 @@ WorldMap.prototype = {
           }
 
           // add main sovereignty, if exists:
-          mainCountry = CountryDataHelpers.getCountryByName(this.countries, this.selectedCountry.properties.sovereignt);
+          mainCountry = CountryDataHelpers.getCountryByName(this.countries, this.selectedCountry.sovereignt);
           if(mainCountry && mainCountry.visa_required === '') {
             mainCountry.visa_required = 'no';
             mainCountry.notes = 'National of same sovereignty (exceptions may exist)';
-            this.selectedCountry.populationReachable += mainCountry.properties.pop_est;
+            this.selectedCountry.populationReachable += mainCountry.population;
           }
 
           // this.selectedCountry.populationPercentage = Math.round( this.selectedCountry.populationReachable / this.totalPopulation * 100 * 10 ) / 10;
@@ -924,8 +926,8 @@ WorldMap.prototype = {
           this.visaInformationFound = true;
 
           sovereignty = '';
-          if(this.selectedCountry.properties.sovereignt !== this.selectedCountry.properties.name_long) {
-            sovereignty = ' (' + this.selectedCountry.properties.sovereignt + ')';
+          if(!CountryDataHelpers.isCountry(this.selectedCountry)) {
+            sovereignty = ' (' + this.selectedCountry.sovereignt + ')';
           }
 
           UI.setHeadline(
@@ -942,7 +944,7 @@ WorldMap.prototype = {
           UI.setHeadline( 'Data not available for nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) + '. <div class="notes">Please select a different country or click/tap the background to clear selection.</div>' );
           UI.showSelectedLegend();
 
-          // log('No visa information found for national from ' + this.selectedCountry.properties.name + '');
+          // log('No visa information found for national from ' + this.selectedCountry.name + '');
         }
 
       } else if(!this.selectedCountry && this.selectedDestinationCountry) {
@@ -957,19 +959,19 @@ WorldMap.prototype = {
         this.visaInformationFound = false;
 
         sovereignty = '';
-        if(this.selectedCountry.properties.sovereignt !== this.selectedCountry.properties.name_long) {
-          sovereignty = ' (' + this.selectedCountry.properties.sovereignt + ')';
+        if(!CountryDataHelpers.isCountry(this.selectedCountry)) {
+          sovereignty = ' (' + this.selectedCountry.sovereignt + ')';
         }
 
         sovereigntyDestination = '';
-        if(this.selectedDestinationCountry.properties.sovereignt !== this.selectedDestinationCountry.properties.name_long) {
-          sovereigntyDestination = ' (' + this.selectedDestinationCountry.properties.sovereignt + ')';
+        if(!CountryDataHelpers.isCountry(this.selectedDestinationCountry)) {
+          sovereigntyDestination = ' (' + this.selectedDestinationCountry.sovereignt + ')';
         }
 
         destinations = this.selectedCountry.destinations;
         if( destinations.length > 0 ) {
           for(d = 0; d < destinations.length; d++) {
-            if( (CountryDataHelpers.matchDestinationToCountryName(destinations[d].d_name, this.selectedDestinationCountry.properties.name_long) || CountryDataHelpers.matchDestinationToCountryName(this.selectedDestinationCountry.properties.name_long, destinations[d].d_name)) && this.selectedDestinationCountry.properties.name_long !== this.selectedCountry.properties.name_long) {
+            if( (CountryDataHelpers.matchDestinationToCountryName(destinations[d].d_name, this.selectedDestinationCountry.name) || CountryDataHelpers.matchDestinationToCountryName(this.selectedDestinationCountry.name, destinations[d].d_name)) && this.selectedDestinationCountry.name !== this.selectedCountry.name) {
               this.selectedDestinationCountry.visa_required = destinations[d].visa_required;
               this.selectedDestinationCountry.visa_title = destinations[d].visa_title;
               this.selectedDestinationCountry.notes = destinations[d].notes;
@@ -990,7 +992,7 @@ WorldMap.prototype = {
           }
 
           // check, if selected destination country has the same sovereignty
-          if(this.selectedCountry.properties.sovereignt === this.selectedDestinationCountry.properties.sovereignt) {
+          if(this.selectedCountry.sovereignt === this.selectedDestinationCountry.sovereignt) {
             this.selectedDestinationCountry.visa_required = 'no';
             this.selectedDestinationCountry.notes = 'National of same sovereignty (exceptions may exist)';
             this.visaInformationFound = true;
@@ -1019,13 +1021,13 @@ WorldMap.prototype = {
         for(i = 0; i < this.countries.length; i++) {
           destinations = this.countries[i].destinations;
           for(d = 0; d < destinations.length; d++) {
-            if( CountryDataHelpers.matchDestinationToCountryName(destinations[d].d_name, this.selectedDestinationCountry.properties.name_long) || CountryDataHelpers.matchDestinationToCountryName(this.selectedDestinationCountry.properties.name_long, destinations[d].d_name) ) {
+            if( CountryDataHelpers.matchDestinationToCountryName(destinations[d].d_name, this.selectedDestinationCountry.name) || CountryDataHelpers.matchDestinationToCountryName(this.selectedDestinationCountry.name, destinations[d].d_name) ) {
               this.countries[i].visa_required = destinations[d].visa_required;
               this.countries[i].visa_title = destinations[d].visa_title;
               this.countries[i].notes = destinations[d].notes;
 
               if(destinations[d].visa_required === 'no' || destinations[d].visa_required === 'on-arrival' || destinations[d].visa_required === 'free-eu') {
-                this.selectedDestinationCountry.populationAccepted += this.countries[i].properties.pop_est;
+                this.selectedDestinationCountry.populationAccepted += this.countries[i].population;
               }
             }
           }
@@ -1033,12 +1035,12 @@ WorldMap.prototype = {
         this.visaInformationFound = true;
 
         // add all countries width same sovereignty like destination country:
-        var countries = CountryDataHelpers.getAllCountriesWithSameSovereignty(this.countries, this.selectedDestinationCountry.properties.sovereignt);
+        var countries = CountryDataHelpers.getAllCountriesWithSameSovereignty(this.countries, this.selectedDestinationCountry.sovereignt);
         for(i = 0; i < countries.length; i++) {
           if(countries[i].visa_required === '') {
             countries[i].visa_required = 'no';
             countries[i].notes = 'National of same sovereignty (exceptions may exist)';
-            this.selectedDestinationCountry.populationAccepted += countries[i].properties.pop_est;
+            this.selectedDestinationCountry.populationAccepted += countries[i].population;
           }
         }
 
@@ -1046,8 +1048,8 @@ WorldMap.prototype = {
         // populationPercentage = formatNumber(populationPercentage, 1);
 
         sovereigntyDestination = '';
-        if(this.selectedDestinationCountry.properties.sovereignt !== this.selectedDestinationCountry.properties.name_long) {
-          sovereigntyDestination = ' (' + this.selectedDestinationCountry.properties.sovereignt + ')';
+        if(!CountryDataHelpers.isCountry(this.selectedDestinationCountry)) {
+          sovereigntyDestination = ' (' + this.selectedDestinationCountry.sovereignt + ')';
         }
 
         UI.setHeadline(
@@ -1066,8 +1068,8 @@ WorldMap.prototype = {
     } else if(this.mode === 'gdp') {
       html = '';
       if(this.selectedCountry) {
-        if(this.selectedCountry.properties.gdp_md_est > 100) {
-          value = this.selectedCountry.properties.gdp_md_est / 1000;
+        if(this.selectedCountry.gdp > 100) {
+          value = this.selectedCountry.gdp / 1000;
           value = formatNumber(value, 1) + ' Billion USD';
           html += 'GDP of ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) + ': ' + value + '<br/>';
         } else {
@@ -1075,8 +1077,8 @@ WorldMap.prototype = {
         }
       }
       if(this.selectedDestinationCountry) {
-        if(this.selectedDestinationCountry.properties.gdp_md_est > 100) {
-          value = this.selectedDestinationCountry.properties.gdp_md_est / 1000;
+        if(this.selectedDestinationCountry.gdp > 100) {
+          value = this.selectedDestinationCountry.gdp / 1000;
           value = formatNumber(value, 1) + ' Billion USD';
           html += 'GDP of ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedDestinationCountry ) + ': ' + value + '<br/>';
         } else {
@@ -1090,16 +1092,16 @@ WorldMap.prototype = {
     } else if(this.mode === 'gdp-per-capita') {
       html = '';
       if(this.selectedCountry) {
-        if(this.selectedCountry.properties.gdp_md_est > 100) {
-          value = Math.round(this.selectedCountry.properties.gdp_md_est / this.selectedCountry.properties.pop_est * 1000000);
+        if(this.selectedCountry.gdp > 100) {
+          value = Math.round(this.selectedCountry.gdp / this.selectedCountry.population * 1000000);
           html += 'GDP per capita of ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) + ': ' + formatNumber(value, 0) + ' USD<br/>';
         } else {
           html += 'Data for ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) + ' not available<br/>';
         }
       }
       if(this.selectedDestinationCountry) {
-        if(this.selectedDestinationCountry.properties.gdp_md_est > 100) {
-          value = Math.round(this.selectedDestinationCountry.properties.gdp_md_est / this.selectedDestinationCountry.properties.pop_est * 1000000);
+        if(this.selectedDestinationCountry.gdp > 100) {
+          value = Math.round(this.selectedDestinationCountry.gdp / this.selectedDestinationCountry.population * 1000000);
           html += 'GDP per capita of ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedDestinationCountry ) + ': ' + formatNumber(value, 0) + ' USD<br/>';
         } else {
           html += 'Data for ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedDestinationCountry ) + ' not available<br/>';
@@ -1112,12 +1114,12 @@ WorldMap.prototype = {
     } else if(this.mode === 'population') {
       html = '';
       if(this.selectedCountry) {
-        value = this.selectedCountry.properties.pop_est;
+        value = this.selectedCountry.population;
         value = formatNumber(value, 0);
         html += 'Population of ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) + ': ' + value + '<br/>';
       }
       if(this.selectedDestinationCountry) {
-        value = this.selectedDestinationCountry.properties.pop_est;
+        value = this.selectedDestinationCountry.population;
         value = formatNumber(value, 0);
         html += 'Population of ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedDestinationCountry ) + ': ' + value + '<br/>';
       }
@@ -1212,16 +1214,16 @@ function init() {
         var found = false;
         for(var j = 0 ; j < worldMap.dataCountries.features.length ; j++) {
           var feature = worldMap.dataCountries.features[j];
-          if( feature.properties.sovereignt === feature2.properties.sovereignt ) {
+          if( feature.sovereignt === feature2.sovereignt ) {
             found = true;
             break;
           }
         }
         if(!found) {
           worldMap.dataCountries.features.push(feature2);
-          // log('Adding country: ' + feature2.properties.name_long);
+          // log('Adding country: ' + feature2.name);
         } else {
-          log('Duplicate country: ' + feature2.properties.name_long + ', sovereignty: ' + feature2.properties.sovereignt);
+          log('Duplicate country: ' + feature2.name + ', sovereignty: ' + feature2.sovereignt);
           count++;
         }
       }
@@ -1232,6 +1234,8 @@ function init() {
         $.when( $.getJSON(Config.mapDataFile2) ).then(function(dataCountries2) {
           worldMap.dataCountries2 = dataCountries2;
 
+          // console.log( dataCountries2.features.length );
+
           // merge countries from second higher-res map into first instead of loading full highres map:
           for(var i = 0; i < worldMap.dataCountries2.features.length; i++) {
             var feature2 = worldMap.dataCountries2.features[i];
@@ -1239,14 +1243,15 @@ function init() {
             var found = false;
             for(var j = 0; j < worldMap.dataCountries.features.length; j++) {
               var feature = worldMap.dataCountries.features[j];
-              if( feature.properties.name === feature2.properties.name ) {
+              if(feature.properties.NAME === feature2.properties.NAME) {
                 found = true;
                 break;
               }
             }
+
             if(!found) {
               worldMap.dataCountries.features.push(feature2);
-              log('Adding country: ' + feature2.properties.name);
+              log('Adding country: ' + feature2.properties.NAME);
             }
           }
 
@@ -1254,8 +1259,8 @@ function init() {
             var jsonPretty = JSON.stringify(worldMap.dataCountries, null, '');
             $.ajax({
               type: 'POST',
-              url: 'php/save_country_data.php',
-              data: {mergedCountriesFilename: Config.mergedCountriesFilename, json: jsonPretty},
+              url: 'http://test.local/save-to-file/index.php',
+              data: {filename: Config.mergedCountriesFilename, data: jsonPretty},
               success: function() {
                 log('JSON map data sent');
               }

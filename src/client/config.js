@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import Detector from './three/Detector';
 
-const mapVersion = '1.0';
+const mapVersion = '4.0.0';
 const cdnURL = 'https://cdn.markuslerner.com/travelscope/'; // 'http://cdn.markuslerner.com/travelscope/'
 
 
@@ -16,21 +16,19 @@ const config = {
 
   rendererContainer: '#container',
 
-  // mapDataFile: 'data/all_countries.json',
-  // 'all_countries.json', 'all_sovereignties.json'
-  // 'ne_50m_admin_0_sovereignty_simplified.json', 'ne_110m_admin_0_sovereignty_simplified.json'
-  // 'ne_50m_admin_0_countries_simplified.json', 'ne_110m_admin_0_countries_simplified'
-  mapDataFile: IS_DESKTOP && Detector.webgl
-    ? cdnURL + 'data/ne_50m_admin_0_countries_simplified.json?v=' + mapVersion
-    : cdnURL + 'data/all_countries.json?v=' + mapVersion,
+  mapDataFile: cdnURL + 'data/4.0.0/country_data.json?v=' + mapVersion,
 
-  // visaRequirementsFile: '/data/visa_requirements.json',
+  // mapDataFile: IS_DESKTOP && Detector.webgl
+  //   ? cdnURL + 'data/4.0.0/ne_50m_admin_0_countries_simplified.json?v=' + mapVersion
+  //   : cdnURL + 'data/4.0.0/all_countries.json?v=' + mapVersion,
+
   visaRequirementsFile: cdnURL + VISA_REQUIREMENTS_URL,
 
   mergeDataFromMapDataFile2: false,
-  mapDataFile2: '/data/ne_50m_admin_0_countries_simplified.json', // merge into: ne_110m_admin_0_countries_simplified
+  // mapDataFile: cdnURL + 'data/4.0.0/ne_50m_admin_0_countries_simplified.json?v=' + mapVersion,
+  mapDataFile2: cdnURL + 'data/4.0.0/ne_10m_admin_0_countries_simplified.json', // merge into: ne_50m_admin_0_countries_simplified
   saveMapData: false,
-  mergedCountriesFilename: '/data/all_countries.json',
+  mergedCountriesFilename: 'country_data.json',
 
   introRotateDuration: 4000, // 4000
   introWarpDelay: 2000, // 2000

@@ -5,6 +5,19 @@ import Config from '../config';
 
 
 
+export function isCountry(country) {
+  // return country.type === 'Sovereign country';
+
+  if(country.name === 'Taiwan') {
+    return false;
+  }
+
+  return country.type === 'Sovereign country' ||
+    (country.type === 'Country' && country.sovereignt === country.name);
+
+};
+
+
 export function matchDestinationToCountryName(destination, country) {
   if(destination === country) return true;
 
@@ -12,6 +25,8 @@ export function matchDestinationToCountryName(destination, country) {
     destination = 'Brunei Darussalam';
   } else if(destination === 'People\'s Republic of China') {
     destination = 'China';
+  } else if(destination === 'Czech Republic') {
+    destination = 'Czechia';
   } else if(destination === 'Republic of the Congo') {
     destination = 'Republic of Congo';
   } else if(destination === 'Ivory Coast') {
@@ -43,7 +58,7 @@ export function matchDestinationToCountryName(destination, country) {
 
 
 export function getCountryNameWithArticle(country) {
-  var name = country.properties.name_long;
+  var name = country.name;
   var nameFormatted = '<b>' + name + '</b>';
   if(name === 'Republic of the Congo') {
     return 'the ' + nameFormatted;
@@ -64,7 +79,7 @@ export function getCountryNameWithArticle(country) {
 
 export function getCountryByName(countries, name) {
   for(var c = 0; c < countries.length; c++) {
-    if(matchDestinationToCountryName(countries[c].properties.name_long, name) || matchDestinationToCountryName(name, countries[c].properties.name_long)) {
+    if(matchDestinationToCountryName(countries[c].name, name) || matchDestinationToCountryName(name, countries[c].name)) {
       return countries[c];
     }
   }
@@ -75,7 +90,7 @@ export function getCountryByName(countries, name) {
 export function getAllCountriesWithSameSovereignty(countries, sov) {
   var countriesMatched = [];
   for(var c = 0; c < countries.length; c++) {
-    if(countries[c].properties.sovereignt === sov) {
+    if(countries[c].sovereignt === sov) {
       countriesMatched.push(countries[c]);
     }
   }
@@ -84,40 +99,40 @@ export function getAllCountriesWithSameSovereignty(countries, sov) {
 
 
 export function correctCenter(country) {
-  if(country.properties.name === 'France') {
+  if(country.name === 'France') {
     country.center2D.x = -55;
     country.center2D.y = 89;
-  } else if(country.properties.name === 'Netherlands') {
+  } else if(country.name === 'Netherlands') {
     country.center2D.x = -47;
     country.center2D.y = 104;
-  } else if(country.properties.name === 'Norway') {
+  } else if(country.name === 'Norway') {
     country.center2D.x = -35;
     country.center2D.y = 140;
-  } else if(country.properties.name === 'United States') {
+  } else if(country.name === 'United States') {
     country.center2D.x = -300;
     country.center2D.y = 65;
-  } else if(country.properties.name === 'Canada') {
+  } else if(country.name === 'Canada') {
     country.center2D.x = -290;
     country.center2D.y = 130;
-  } else if(country.properties.name === 'Denmark') {
+  } else if(country.name === 'Denmark') {
     country.center2D.x = -38;
     country.center2D.y = 114;
-  } else if(country.properties.name === 'India') {
+  } else if(country.name === 'India') {
     country.center2D.x = 145;
     country.center2D.y = 20;
-  } else if(country.properties.name === 'Russia') {
+  } else if(country.name === 'Russia') {
     country.center2D.x = 135;
     country.center2D.y = 132;
-  } else if(country.properties.name === 'Brazil') {
+  } else if(country.name === 'Brazil') {
     country.center2D.x = -190;
     country.center2D.y = -78;
-  } else if(country.properties.name === 'United Kingdom') {
+  } else if(country.name === 'United Kingdom') {
     country.center2D.x = -64;
     country.center2D.y = 107;
-  } else if(country.properties.name === 'Spain') {
+  } else if(country.name === 'Spain') {
     country.center2D.x = -67;
     country.center2D.y = 70;
-  } else if(country.properties.name === 'Portugal') {
+  } else if(country.name === 'Portugal') {
     country.center2D.x = -79;
     country.center2D.y = 67;
   }
@@ -203,7 +218,7 @@ export function getCountryColorByFreeSources(numSources, maxNumSourcesFreeOrOnAr
 
 
 export function getCountryColorByGDP(country, maxGDP) {
-  var m = country.properties.gdp_md_est / maxGDP;
+  var m = country.gdp / maxGDP;
   m = TWEEN.Easing.Exponential.Out(m);
   var color = new THREE.Color(Config.colorZeroDestinations);
   color.lerp(Config.colorMaxDestinations, m);
@@ -212,7 +227,8 @@ export function getCountryColorByGDP(country, maxGDP) {
 
 
 export function getCountryColorByGDPPerCapita(country, maxGDPPerCapita) {
-  var m = (country.properties.gdp_md_est / country.properties.pop_est * 1000000) / maxGDPPerCapita;
+  // var m = (country.gdp / country.population * 1000000) / maxGDPPerCapita;
+  var m = country.gdpPerCapita / maxGDPPerCapita;
   m = TWEEN.Easing.Exponential.Out(m);
   var color = new THREE.Color(Config.colorZeroDestinations);
   color.lerp(Config.colorMaxDestinations, m);
@@ -221,7 +237,7 @@ export function getCountryColorByGDPPerCapita(country, maxGDPPerCapita) {
 
 
 export function getPopulationRatio(country, maxPopulation) {
-  return parseFloat(country.properties.pop_est) / maxPopulation;    // 1 166 079 220.0;
+  return parseFloat(country.population) / maxPopulation;    // 1 166 079 220.0;
 };
 
 
@@ -274,5 +290,3 @@ export function getCountryDetailsByVisaStatus(country) {
   }
   return details;
 };
-
-

@@ -167,20 +167,14 @@ export function createCountryList(worldMap) {
   var count = 0;
   for(var i = 0; i < worldMap.countries.length; i++) {
     var country = worldMap.countries[i];
-    var name = country.properties.name_long;
-    var type = country.properties.type;
+    var name = country.name;
 
-    // if(name === 'Serbia' || name === 'French Polynesia') {
-    // if(type !== 'Sovereign country') { // Disputed
-    // console.log(name, '| ' + type);
-    // }
+    // if(name === 'Isle of Man') {
+    //   console.log(country.properties);
     // }
 
-    // add only sovereignties:
-    // if(country.properties.sovereignt === country.properties.name_long) {
-    // if(country.properties.scalerank === 1) {
-    // if(country.properties.homepart === 1) {
-    if(type === 'Sovereign country') { //  || type === 'Disputed'
+    // add only proper countries:
+    if(CountryDataHelpers.isCountry(country)) {
       var li = $('<li><div class="container"><span class="box"></span><span class="number"></span><span class="text">' + name + '</span></div></li>');
       $('#country_list').append(li);
 
@@ -212,10 +206,10 @@ export function createCountryList(worldMap) {
       if(worldMap.selectedDestinationCountry !== selectedCountryNew) {
         if(event.ctrlKey || event.altKey || event.metaKey) {
           worldMap.setSelectedCountry(selectedCountryNew);
-          worldMap.trackEvent('sourceCountryListClick', selectedCountryNew.properties.name_long);
+          worldMap.trackEvent('sourceCountryListClick', selectedCountryNew.name);
         } else {
           worldMap.setSelectedDestinationCountry(selectedCountryNew);
-          worldMap.trackEvent('destinationCountryListClick', selectedCountryNew.properties.name_long);
+          worldMap.trackEvent('destinationCountryListClick', selectedCountryNew.name);
         }
       }
 
@@ -223,10 +217,10 @@ export function createCountryList(worldMap) {
       if(worldMap.selectedCountry !== selectedCountryNew) {
         if(event.ctrlKey || event.altKey || event.metaKey) {
           worldMap.setSelectedDestinationCountry(selectedCountryNew);
-          worldMap.trackEvent('destinationCountryListClick', selectedCountryNew.properties.name_long);
+          worldMap.trackEvent('destinationCountryListClick', selectedCountryNew.name);
         } else {
           worldMap.setSelectedCountry(selectedCountryNew);
-          worldMap.trackEvent('sourceCountryListClick', selectedCountryNew.properties.name_long);
+          worldMap.trackEvent('sourceCountryListClick', selectedCountryNew.name);
         }
       }
 
@@ -325,8 +319,8 @@ function sortCountryListByName() {
 
     var li = $('#country_list').children('li');
     li.sort(function(a, b) {
-      var aName = $(a).data('country').properties.name_long;
-      var bName = $(b).data('country').properties.name_long;
+      var aName = $(a).data('country').name;
+      var bName = $(b).data('country').name;
       return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
     });
     repositionCountryList(li);
@@ -362,7 +356,7 @@ function sortCountryListByFreeDestinations() {
       $(this).find('.box').css('background-color', '#' + country.colorByFreeDestinations.getHexString());
       $(this).find('.number').html(num);
 
-      $(this).find('.text').html( (index + 1) + '. ' + $(this).data('country').properties.name_long );
+      $(this).find('.text').html( (index + 1) + '. ' + $(this).data('country').name );
 
     });
 
@@ -381,21 +375,21 @@ function sortCountryListByCurrentFreeSourcesOrDestinations() {
     var aCountry = $(a).data('country');
     var bCountry = $(b).data('country');
 
-    var aName = 3 + aCountry.properties.name_long;
+    var aName = 3 + aCountry.name;
     if(aCountry.visa_required === 'no' || aCountry.visa_required === 'on-arrival') {
-      aName = 2 + aCountry.properties.name_long;
+      aName = 2 + aCountry.name;
     } else if(aCountry.visa_required === 'free-eu') {
-      aName = 1 + aCountry.properties.name_long;
+      aName = 1 + aCountry.name;
     } else if(aCountry === worldMap.selectedCountry) {
-      aName = 0 + aCountry.properties.name_long;
+      aName = 0 + aCountry.name;
     }
-    var bName = 3 + bCountry.properties.name_long;
+    var bName = 3 + bCountry.name;
     if(bCountry.visa_required === 'no' || bCountry.visa_required === 'on-arrival') {
-      bName = 2 + bCountry.properties.name_long;
+      bName = 2 + bCountry.name;
     } else if(bCountry.visa_required === 'free-eu') {
-      bName = 1 + bCountry.properties.name_long;
+      bName = 1 + bCountry.name;
     } else if(bCountry === worldMap.selectedCountry) {
-      bName = 0 + bCountry.properties.name_long;
+      bName = 0 + bCountry.name;
     }
 
     return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
@@ -406,7 +400,7 @@ function sortCountryListByCurrentFreeSourcesOrDestinations() {
   $('#country_list').removeClass('widenumbers');
 
   li.each(function(index, element) {
-    $(this).find('.text').html( $(this).data('country').properties.name_long );
+    $(this).find('.text').html( $(this).data('country').name );
   });
 
   /*
@@ -452,7 +446,7 @@ function sortCountryListByFreeSources() {
       $(this).find('.box').css('background-color', '#' + country.colorByFreeSources.getHexString());
       $(this).find('.number').html(num);
 
-      $(this).find('.text').html( (index + 1) + '. ' + $(this).data('country').properties.name_long );
+      $(this).find('.text').html( (index + 1) + '. ' + $(this).data('country').name );
 
     });
 
@@ -468,8 +462,8 @@ function sortCountryListByGDP() {
 
     var li = $('#country_list').children('li');
     li.sort(function(a, b) {
-      var aName = $(a).data('country').properties.gdp_md_est;
-      var bName = $(b).data('country').properties.gdp_md_est;
+      var aName = $(a).data('country').gdp;
+      var bName = $(b).data('country').gdp;
       return ((aName > bName) ? -1 : ((aName < bName) ? 1 : 0));
     });
 
@@ -479,7 +473,7 @@ function sortCountryListByGDP() {
 
     li.each(function(index) {
       var country = $(this).data('country');
-      var num = Math.round(country.properties.gdp_md_est);
+      var num = Math.round(country.gdp);
       if(num > 1000) {
         num /= 1000;
         num = formatNumber(num, 0) + ' b USD';
@@ -488,7 +482,7 @@ function sortCountryListByGDP() {
       }
       $(this).find('.number').html(num);
 
-      $(this).find('.text').html( (index + 1) + '. ' + $(this).data('country').properties.name_long );
+      $(this).find('.text').html( (index + 1) + '. ' + $(this).data('country').name );
 
     });
 
@@ -504,8 +498,8 @@ function sortCountryListByGDPPerCapita() {
 
     var li = $('#country_list').children('li');
     li.sort(function(a, b) {
-      var aName = $(a).data('country').properties.gdp_per_capita;
-      var bName = $(b).data('country').properties.gdp_per_capita;
+      var aName = $(a).data('country').gdpPerCapita;
+      var bName = $(b).data('country').gdpPerCapita;
       return ((aName > bName) ? -1 : ((aName < bName) ? 1 : 0));
     });
 
@@ -515,11 +509,11 @@ function sortCountryListByGDPPerCapita() {
 
     li.each(function(index) {
       var country = $(this).data('country');
-      var num = Math.round(country.properties.gdp_per_capita);
+      var num = Math.round(country.gdpPerCapita);
       num = formatNumber(num, 0) + ' USD';
       $(this).find('.number').html(num);
 
-      $(this).find('.text').html( (index + 1) + '. ' + $(this).data('country').properties.name_long );
+      $(this).find('.text').html( (index + 1) + '. ' + $(this).data('country').name );
 
     });
 
@@ -535,8 +529,8 @@ function sortCountryListByPopulation() {
 
     var li = $('#country_list').children('li');
     li.sort(function(a, b) {
-      var aName = $(a).data('country').properties.pop_est;
-      var bName = $(b).data('country').properties.pop_est;
+      var aName = $(a).data('country').population;
+      var bName = $(b).data('country').population;
       return ((aName > bName) ? -1 : ((aName < bName) ? 1 : 0));
     });
 
@@ -546,7 +540,7 @@ function sortCountryListByPopulation() {
 
     li.each(function(index) {
       var country = $(this).data('country');
-      var num = country.properties.pop_est;
+      var num = country.population;
       if(num > 1000000) {
         num = Math.round(num / 1000000) + ' m';
       } else {
@@ -554,7 +548,7 @@ function sortCountryListByPopulation() {
       }
       $(this).find('.number').html(num);
 
-      $(this).find('.text').html( (index + 1) + '. ' + $(this).data('country').properties.name_long );
+      $(this).find('.text').html( (index + 1) + '. ' + $(this).data('country').name );
 
     });
 
@@ -760,7 +754,7 @@ export function initSourceCountryDropDown(worldMap) {
       var selectedCountryNew = null;
 
       for(var i = 0; i < worldMap.countries.length; i++) {
-        if(worldMap.countries[i].properties.name_long === value) {
+        if(worldMap.countries[i].name === value) {
           selectedCountryNew = worldMap.countries[i];
           break;
         }
@@ -779,7 +773,7 @@ export function initSourceCountryDropDown(worldMap) {
 
         if(worldMap.selectedCountry !== selectedCountryNew) {
           worldMap.setSelectedCountry(selectedCountryNew);
-          worldMap.trackEvent('sourceCountryDropdownSelect', selectedCountryNew.properties.name_long);
+          worldMap.trackEvent('sourceCountryDropdownSelect', selectedCountryNew.name);
           worldMap.updateCountryHover(selectedCountryNew);
         }
 
@@ -860,7 +854,7 @@ export function initDestinationCountryDropDown(worldMap) {
       var selectedDestinationCountryNew = null;
 
       for(var i = 0; i < worldMap.countries.length; i++) {
-        if(worldMap.countries[i].properties.name_long === value) {
+        if(worldMap.countries[i].name === value) {
           selectedDestinationCountryNew = worldMap.countries[i];
           break;
         }
@@ -879,7 +873,7 @@ export function initDestinationCountryDropDown(worldMap) {
 
         if(worldMap.selectedCountry !== selectedDestinationCountryNew && worldMap.selectedDestinationCountry !== selectedDestinationCountryNew) {
           worldMap.setSelectedDestinationCountry(selectedDestinationCountryNew);
-          worldMap.trackEvent('destinationCountryDropdownSelect', selectedDestinationCountryNew.properties.name_long);
+          worldMap.trackEvent('destinationCountryDropdownSelect', selectedDestinationCountryNew.name);
           worldMap.updateCountryHover(selectedDestinationCountryNew);
         }
 
@@ -917,11 +911,11 @@ export function collapseNavBar() {
 export function updateCountryTooltip(worldMap, country) {
   // log('updateCountryTooltip()');
 
-  // if(country.properties.name_long === country.properties.sovereignt) {
-  if(country.properties.type === 'Sovereign country') {
-    $('#country-tooltip .title').html( country.properties.name_long );
+  // if(country.name === country.sovereignt) {
+  if(country.type === 'Sovereign country') {
+    $('#country-tooltip .title').html( country.name );
   } else {
-    $('#country-tooltip .title').html( country.properties.name_long + ' (' + country.properties.sovereignt + ')' );
+    $('#country-tooltip .title').html( country.name + ' (' + country.sovereignt + ')' );
   }
 
   $('#country-tooltip .details').html('');
@@ -979,7 +973,7 @@ export function updateCountryTooltip(worldMap, country) {
           $('#country-tooltip .details').html(
             '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(worldMap.selectedDestinationCountry) + '</span> ' +
             // CountryDataHelpers.getCountryDetailsByVisaStatus(worldMap.selectedDestinationCountry) +
-            ' in ' + worldMap.selectedDestinationCountry.properties.name_long +
+            ' in ' + worldMap.selectedDestinationCountry.name +
             ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle(worldMap.selectedCountry) +
             '.<br/><div class="notes">' + worldMap.selectedDestinationCountry.notes + '</div>');
         } else {
@@ -999,7 +993,7 @@ export function updateCountryTooltip(worldMap, country) {
           $('#country-tooltip .details').html(
             // CountryDataHelpers.getCountryDetailsByVisaStatus(country) +
             '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(country) + '</span> ' +
-            ' in ' + worldMap.selectedDestinationCountry.properties.name_long +
+            ' in ' + worldMap.selectedDestinationCountry.name +
             ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle(country) +
             '.<br/><div class="notes">' + country.notes + '</div>');
         } else {
@@ -1044,14 +1038,14 @@ export function showCountryHoverInfoVisaFreeDestinations(country) {
 
 
 export function showCountryHoverInfoVisaFreeSources(country) {
-  $('#country-tooltip .details').html( 'Nationals from ' + country.numSourcesFreeOrOnArrival + ' countries are granted access visa-free or with visa on arrival to ' + country.properties.name_long );
+  $('#country-tooltip .details').html( 'Nationals from ' + country.numSourcesFreeOrOnArrival + ' countries are granted access visa-free or with visa on arrival to ' + country.name );
   $('#country-tooltip .details').show();
 };
 
 
 export function showCountryHoverInfoGDP(country) {
-  if(country.properties.gdp_md_est > 100) {
-    var value = country.properties.gdp_md_est / 1000;
+  if(country.gdp > 100) {
+    var value = country.gdp / 1000;
     $('#country-tooltip .details').html( 'GDP: ' + formatNumber(value, 1) + ' Billion USD' );
   } else {
     $('#country-tooltip .details').html( 'Data not available' );
@@ -1061,8 +1055,8 @@ export function showCountryHoverInfoGDP(country) {
 
 
 export function showCountryHoverInfoGDPPerCapita(country) {
-  if(country.properties.gdp_md_est > 100) {
-    var value = Math.round(country.properties.gdp_md_est / country.properties.pop_est * 1000000);
+  if(country.gdp > 100) {
+    var value = Math.round(country.gdp / country.population * 1000000);
     $('#country-tooltip .details').html( 'GDP per capita: ' + formatNumber(value, 0) + ' USD' );
   } else {
     $('#country-tooltip .details').html( 'Data not available' );
@@ -1072,7 +1066,7 @@ export function showCountryHoverInfoGDPPerCapita(country) {
 
 
 export function showCountryHoverInfoPopulation(country) {
-  var value = country.properties.pop_est;
+  var value = country.population;
   $('#country-tooltip .details').html( 'Population: ' + formatNumber(value, 0) );
   $('#country-tooltip .details').show();
 };
