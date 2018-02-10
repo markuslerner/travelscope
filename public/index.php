@@ -4,7 +4,7 @@
 	$description = "A visual exploration of the travel freedom attached to passports";
 
 	define('CDN_URL', '//cdn.markuslerner.com/travelscope/'); // http://cdn.markuslerner.com/travelscope/
-	define('VERSION', '1.3.3');
+	define('VERSION', '2.0');
 
 	$visa_requirements_folder = "data/visa_requirements";
 
@@ -364,7 +364,7 @@ var rsypgei = ['m','=','p','r','e','c','l','t','a','"','s','s','e','c','t','s','
 	?></div>
 
 
-	<div id="last_update_naturalearthdata" class="last_update">Source: <a href="http://www.naturalearthdata.com/" target="_blank">Natural Earth Data</a></div>
+	<div id="last_update_naturalearthdata" class="last_update">Source: <a href="http://www.naturalearthdata.com/" target="_blank">Natural Earth Data</a>, last update: 15/10/2017</div>
 
 
 	<div id="loading">
