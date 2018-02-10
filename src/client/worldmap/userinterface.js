@@ -271,7 +271,7 @@ export function updateCountryList(worldMap) {
     if(worldMap.mode === 'destinations') {
 
       if(worldMap.selectedCountry) {
-        sortCountryListByCurrentFreeSourcesOrDestinations();
+        // sortCountryListByCurrentFreeSourcesOrDestinations();
       } else {
         sortCountryListByFreeDestinations();
       }
@@ -279,7 +279,7 @@ export function updateCountryList(worldMap) {
     } else if(worldMap.mode === 'sources') {
 
       if(worldMap.selectedDestinationCountry) {
-        sortCountryListByCurrentFreeSourcesOrDestinations();
+        // sortCountryListByCurrentFreeSourcesOrDestinations();
       } else {
         sortCountryListByFreeSources();
       }
@@ -344,19 +344,28 @@ function sortCountryListByFreeDestinations() {
     $('#country_list').addClass('narrownumbers');
     $('#country_list').removeClass('widenumbers');
 
+    var destinationsNum = 100000;
+    var rank = 0;
     li.each(function(index) {
       var country = $(this).data('country');
       // var width = parseInt(country.numDestinationsFreeOrOnArrival / worldMap.maxNumDestinationsFreeOrOnArrival * 200);
       var num = country.numDestinationsFreeOrOnArrival;
       if(country.destinations.length === 0) {
         num = '?';
+        rank = '?';
+      } else {
+        if(num < destinationsNum) {
+          rank++;
+          destinationsNum = num;
+        }
       }
+
       // $(this).find('.box').data('width', width);
       // $(this).find('.box').css('width', width + 'px');
       $(this).find('.box').css('background-color', '#' + country.colorByFreeDestinations.getHexString());
       $(this).find('.number').html(num);
 
-      $(this).find('.text').html( (index + 1) + '. ' + $(this).data('country').name );
+      $(this).find('.text').html( rank + '. ' + $(this).data('country').name );
 
     });
 
@@ -437,16 +446,24 @@ function sortCountryListByFreeSources() {
     $('#country_list').addClass('narrownumbers');
     $('#country_list').removeClass('widenumbers');
 
+    var sourcesNum = 100000;
+    var rank = 0;
     li.each(function(index) {
       var country = $(this).data('country');
       // var width = parseInt(country.numSourcesFreeOrOnArrival / worldMap.maxNumSourcesFreeOrOnArrival * 200);
       var num = country.numSourcesFreeOrOnArrival;
       // $(this).find('.box').data('width', width);
       // $(this).find('.box').css('width', width + 'px');
+
+      if(num < sourcesNum) {
+        rank++;
+        sourcesNum = num;
+      }
+
       $(this).find('.box').css('background-color', '#' + country.colorByFreeSources.getHexString());
       $(this).find('.number').html(num);
 
-      $(this).find('.text').html( (index + 1) + '. ' + $(this).data('country').name );
+      $(this).find('.text').html( rank + '. ' + $(this).data('country').name );
 
     });
 
