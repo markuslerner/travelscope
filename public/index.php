@@ -349,6 +349,13 @@ var rsypgei = ['m','=','p','r','e','c','l','t','a','"','s','s','e','c','t','s','
 // --></script>
 <noscript>Please enable Javascript to see the email address</noscript>
 				</p>
+				<br/>
+
+				<h3>Imprint/Privacy policy</h3>
+
+				<p>
+					For data privacy information please refer to the <a href="https://www.markuslerner.com/imprint" target="_blank">Imprint</a>
+				</p>
 
 
 			</div>
