@@ -1,5 +1,6 @@
 # Travelscope
-Interactive worldmap of visa-free travel
+Interactive worldmap of visa-free travel, live demo at https://www.markuslerner.com/travelscope/
+
 
 ## About
 
