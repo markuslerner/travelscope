@@ -273,7 +273,7 @@
 
 
 				<div class="section">
-					<h3>Design & technology</h3>
+					<h3>Design &amp; technology</h3>
 					<p>
 					This single page web application features a responsive design which works across browsers, platforms and screen sizes. Since WebGL is now supported by iOS, it performs well on recent iOS devices running iOS 8+. Recent Android versions are also supported.
 					</p>
@@ -310,7 +310,7 @@
 					</p>
 
 					<p>
-					Concept, design & coding: <a href="https://www.markuslerner.com/" target="_blank">Markus Lerner</a>
+					Concept, design &amp; coding: <a href="https://www.markuslerner.com/" target="_blank">Markus Lerner</a>
 					</p>
 
 					<p>
@@ -405,7 +405,6 @@ var rsypgei = ['m','=','p','r','e','c','l','t','a','"','s','s','e','c','t','s','
     "></i>
 
     <i class="icon-twitter-bird" onclick="
-    console.log('test');
       var url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent('Interactive worldmap of visa-free travel. https://www.markuslerner.com/travelscope/ by @markuslerner #dataviz');
       window.open(url, '_blank', 'width=640,height=320');
       event.preventDefault();
