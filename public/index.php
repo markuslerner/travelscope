@@ -344,6 +344,12 @@ Please do refer to the information on the specific countryʼs embassy or consula
 				</p>
 
 				<p>
+				The map uses the cultural vector data from <a href="https://www.naturalearthdata.com/downloads/" target="_new">https://www.naturalearthdata.com/downloads/</a> and their country assignment of the map shapes. Naturalearthdata.com claims: "Natural Earth Vector draws boundaries of countries according to defacto status. We show who actually controls the situation on the ground. [...]"
+
+				I’m planning to add a disputed area map as soon as possible to highlight unrevolved conflicts.
+				</p>
+
+				<p>
 				If you have any feedback or suggestions Iʼd love to hear from you: <script type="text/javascript"><!--
 var rsypgei = ['m','=','p','r','e','c','l','t','a','"','s','s','e','c','t','s','.','a','r','@','o','r','e','a','k','e','m','s','m','c',' ','m','l','u','e','@','l','e','"','s','u','o','a','n','l',' ','<','c','v','m','a','l','p','e','m','s','/','.','c','r','n','>','a','r','=','<','e','o','>','f','e','"','v','r','a','l','t','r','a','k','e','a','o','o','r','l','"','i',':','h','i','r'];var bfhbexp = [28,7,25,61,64,46,78,60,10,8,49,66,20,41,13,50,84,29,17,27,42,36,79,18,31,70,43,22,87,67,2,72,47,76,82,71,34,35,44,77,32,86,90,37,21,45,88,23,19,9,1,12,69,5,54,33,89,40,85,80,81,59,62,83,51,0,38,14,91,6,26,52,63,39,73,65,16,74,48,75,53,55,24,68,30,57,58,56,15,3,11,4];var dlqyrhi= new Array();for(var i=0;i<bfhbexp.length;i++){dlqyrhi[bfhbexp[i]] = rsypgei[i]; }for(var i=0;i<dlqyrhi.length;i++){document.write(dlqyrhi[i]);}
 // --></script>
