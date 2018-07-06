@@ -13,7 +13,7 @@ export function isCountry(country) {
   }
 
   return country.type === 'Sovereign country' ||
-    (country.type === 'Country' && country.sovereignt === country.name);
+    (country.type === 'Country' && (country.sovereignt === country.name || country.sovereignt === country.nameSort));
 
 };
 

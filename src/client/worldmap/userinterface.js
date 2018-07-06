@@ -169,8 +169,9 @@ export function createCountryList(worldMap) {
     var country = worldMap.countries[i];
     var name = country.name;
 
-    // if(name === 'Isle of Man') {
-    //   console.log(country.properties);
+    // if(name === 'United States') {
+      // console.log(country.properties, CountryDataHelpers.isCountry(country), country.type === 'Country', country.sovereignt);
+      // console.log(country.type);
     // }
 
     // add only proper countries:

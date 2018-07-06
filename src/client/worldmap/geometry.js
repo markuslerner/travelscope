@@ -41,6 +41,7 @@ export function createCountriesGeometry(worldMap) {
 
         var country = {
           name: feature.properties.NAME_LONG,
+          nameSort: feature.properties.NAME_SORT,
           sovereignt: feature.properties.SOVEREIGNT,
           gdp: feature.properties.GDP_MD_EST,
           gdpPerCapita: feature.properties.GDP_PER_CAPITA,
