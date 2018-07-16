@@ -1232,13 +1232,11 @@ function init() {
 
       if(Config.mergeDataFromMapDataFile2) {
         $.when( $.getJSON(Config.mapDataFile2) ).then(function(dataCountries2) {
-          worldMap.dataCountries2 = dataCountries2;
-
           // console.log( dataCountries2.features.length );
 
           // merge countries from second higher-res map into first instead of loading full highres map:
-          for(var i = 0; i < worldMap.dataCountries2.features.length; i++) {
-            var feature2 = worldMap.dataCountries2.features[i];
+          for(var i = 0; i < dataCountries2.features.length; i++) {
+            var feature2 = dataCountries2.features[i];
 
             var found = false;
             for(var j = 0; j < worldMap.dataCountries.features.length; j++) {
@@ -1251,25 +1249,26 @@ function init() {
 
             if(!found) {
               worldMap.dataCountries.features.push(feature2);
-              log('Adding country: ' + feature2.properties.NAME);
+              log('Adding country: ' + feature2.properties.NAME + ', type: ' + feature2.properties.TYPE);
             }
           }
 
-          if(Config.saveMapData) {
-            var jsonPretty = JSON.stringify(worldMap.dataCountries, null, '');
-            $.ajax({
-              type: 'POST',
-              url: 'http://test.local/save-to-file/index.php',
-              data: {filename: Config.mergedCountriesFilename, data: jsonPretty},
-              success: function() {
-                log('JSON map data sent');
+          if(Config.mergeDataFromDisputedAreasFile) {
+            $.when( $.getJSON(Config.disputedAreasFile) ).then(function(disputedAreas) {
+              // merge disputed areas:
+              for(var i = 0; i < disputedAreas.features.length; i++) {
+                var disputedArea = disputedAreas.features[i];
+                worldMap.dataCountries.features.push(disputedArea);
               }
-            }).done(function( msg ) {
-              log( 'Response: ' + msg );
-            });
-          }
 
-          completeInit();
+              console.log(disputedAreas.features.length + ' disputed areas loaded');
+
+              completeInit();
+            });
+          } else {
+            completeInit();
+
+          }
 
         });
 
@@ -1297,6 +1296,20 @@ function init() {
 
 
 function completeInit() {
+  if(Config.saveMapData) {
+    var jsonPretty = JSON.stringify(worldMap.dataCountries, null, '');
+    $.ajax({
+      type: 'POST',
+      url: 'http://test.local/save-to-file/index.php',
+      data: {filename: Config.mergedCountriesFilename, data: jsonPretty},
+      success: function() {
+        log('JSON map data sent');
+      }
+    }).done(function( msg ) {
+      log( 'Response: ' + msg );
+    });
+  }
+
   worldMap.createCountries();
   worldMap.initControls();
 
