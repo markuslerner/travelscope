@@ -4,7 +4,7 @@
 	$description = "A visual exploration of the travel freedom attached to passports";
 
 	define('CDN_URL', '//cdn.markuslerner.com/travelscope/'); // http://cdn.markuslerner.com/travelscope/
-	define('VERSION', '2.1.1');
+	define('VERSION', '2.1.2');
 
 	$visa_requirements_folder = "data/visa_requirements";
 
@@ -246,6 +246,10 @@
 				<div class="section">
 					<h3>News</h3>
 					<p>
+						<small>16 July 2018</small><br/>
+						Disputed areas from <a href="http://www.naturalearthdata.com/" target="_blank">Natural Earth Data</a> are now integrated to highlight unrevolved conflicts.
+					</p>
+					<p>
 						<small>29 August 2016</small><br/>
 						Upon many requests, I decided to publish the source code if this project on GitHub: <a href="https://github.com/markuslerner/travelscope" target="_blank">https://github.com/markuslerner/travelscope</a>
 					</p>
@@ -345,8 +349,6 @@ Please do refer to the information on the specific countryʼs embassy or consula
 
 				<p>
 				The map uses the cultural vector data from <a href="https://www.naturalearthdata.com/downloads/" target="_new">https://www.naturalearthdata.com/downloads/</a> and their country assignment of the map shapes. Naturalearthdata.com claims: "Natural Earth Vector draws boundaries of countries according to defacto status. We show who actually controls the situation on the ground. [...]"
-
-				I’m planning to add a disputed area map as soon as possible to highlight unrevolved conflicts.
 				</p>
 
 				<p>
