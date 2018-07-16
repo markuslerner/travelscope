@@ -49,6 +49,7 @@ export function createCountriesGeometry(worldMap) {
           gdpPerCapita: feature.properties.GDP_PER_CAPITA,
           population: feature.properties.POP_EST,
           type: feature.properties.TYPE,
+          disputed: feature.disputed === true,
 
           properties: feature.properties,
           shapes,
@@ -59,7 +60,13 @@ export function createCountriesGeometry(worldMap) {
           colorLast: new THREE.Color(Config.colorCountryDefault)
         };
 
-        if(country.type !== 'Disputed') {
+        if(country.disputed) {
+          country.name = country.brkName === country.name
+            ? country.name + ' (' + country.type + ')'
+            : country.name + '/' + country.brkName + ' (' + country.type + ')';
+        }
+
+        if(!country.disputed) {
           for(var r = 0; r < worldMap.visaRequirements.countries.length; r++) {
             // 199 nationalities travelling to 243 (?) countries, assuming nationals from a country don't need a visa to the sovereignty's main country:
             // if(CountryDataHelpers.matchDestinationToCountryName(country.name_long, worldMap.visaRequirements.countries[r].name) || CountryDataHelpers.matchDestinationToCountryName(worldMap.visaRequirements.countries[r].name, country.name)) {
@@ -77,7 +84,7 @@ export function createCountriesGeometry(worldMap) {
         //   console.error('Geometry: No visa requirements found for: ' + country.name);
         // }
 
-        if(country.type !== 'Disputed') {
+        if(!country.disputed) {
           if(CountryDataHelpers.isCountry(country)) {
             worldMap.countryDropdownChoices.push({text: country.name, value: country.name});
           } else {
@@ -129,7 +136,7 @@ export function createCountriesGeometry(worldMap) {
   }
   // console.log(countriesString);
 
-  if(country.type !== 'Disputed') {
+  if(!country.disputed) {
     // count visa-free destinations:
     for(i = 0; i < worldMap.countries.length; i++) {
       destinations = worldMap.countries[i].destinations;
@@ -255,7 +262,7 @@ export function createCountriesGeometry(worldMap) {
     for(k = 0; k < worldMap.countries[i].geometry2D.vertices.length; k++) {
       worldMap.countries[i].geometry2D.vertices[k].x += Config.mapOffsetX;
       worldMap.countries[i].geometry2D.vertices[k].y = -worldMap.countries[i].geometry2D.vertices[k].y + Config.mapOffsetY;
-      if(worldMap.countries[i].type === 'Disputed') {
+      if(worldMap.countries[i].disputed) {
         // draw disputed areas on top:
         worldMap.countries[i].geometry2D.vertices[k].z += 0.1;
       }
@@ -286,7 +293,7 @@ export function createCountriesGeometry(worldMap) {
 
 
     // 2D points meshes (for disputed country border, always visible):
-    if(worldMap.countries[i].type === 'Disputed') {
+    if(worldMap.countries[i].disputed) {
       worldMap.countries[i].borderDisputed2D = new THREE.Object3D();
       for(s = 0; s < worldMap.countries[i].shapes.length; s++) {
         pointsGeometry = worldMap.countries[i].shapes[s].createPointsGeometry();
@@ -316,7 +323,7 @@ export function createCountriesGeometry(worldMap) {
       if(worldMap.countries[i].geometry.vertices[k].z < Config.extrudeDepth) {
         worldMap.countries[i].geometry3D.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
         // worldMap.countries[i].geometry3D.vertices[k].multiplyScalar(0.5);
-        if(worldMap.countries[i].type === 'Disputed') {
+        if(worldMap.countries[i].disputed) {
           // draw disputed areas on top:
           worldMap.countries[i].geometry3D.vertices[k].multiplyScalar(1.0005);
         }
@@ -372,7 +379,7 @@ export function createCountriesGeometry(worldMap) {
 
 
     // 3D points meshes (for disputed country border, always visible):
-    if(worldMap.countries[i].type === 'Disputed') {
+    if(worldMap.countries[i].disputed) {
       worldMap.countries[i].borderDisputed3D = new THREE.Object3D();
       for(s = 0; s < worldMap.countries[i].shapes.length; s++) {
         pointsGeometry = worldMap.countries[i].shapes[s].createPointsGeometry();

@@ -442,7 +442,11 @@ WorldMap.prototype = {
         } else if(this.selectedCountry && !this.selectedDestinationCountry) {
 
           // like nothing selected:
-          c.set(country.colorByFreeSources);
+          if(country.disputed) {
+            c.set(Config.colorVisaDataNotAvailable);
+          } else {
+            c.set(country.colorByFreeSources);
+          }
 
         } else if(!this.selectedCountry && this.selectedDestinationCountry) {
 
@@ -462,7 +466,11 @@ WorldMap.prototype = {
         } else {
 
           // nothing selected:
-          c.set(country.colorByFreeSources);
+          if(country.disputed) {
+            c.set(Config.colorVisaDataNotAvailable);
+          } else {
+            c.set(country.colorByFreeSources);
+          }
 
         }
 
@@ -512,7 +520,7 @@ WorldMap.prototype = {
   showDisputedAreasBorders: function() {
     for(var i = 0; i < this.countries.length; i++) {
       var country = this.countries[i];
-      if(country.type === 'Disputed') {
+      if(country.disputed) {
         if(this.viewMode === '2d') {
           this.scene.add(country.borderDisputed2D);
         } else {
@@ -525,7 +533,7 @@ WorldMap.prototype = {
   hideDisputedAreasBorders: function() {
     for(var i = 0; i < this.countries.length; i++) {
       var country = this.countries[i];
-      if(country.type === 'Disputed') {
+      if(country.disputed) {
         this.scene.remove(country.borderDisputed2D);
         this.scene.remove(country.borderDisputed3D);
       }
@@ -631,22 +639,42 @@ WorldMap.prototype = {
     if( intersects.length > 0 ) {
       if(intersects[ 0 ].object.countryObject && this.selectedCountry !== intersects[ 0 ].object.countryObject ) {
 
-        if(intersects[ 0 ].object.name !== 'sphere' && intersects[ 0 ].object.countryObject.type !== 'Disputed') {
+        // if(intersects[ 0 ].object.name !== 'sphere' && !intersects[ 0 ].object.countryObject.disputed) {
+        if(intersects[ 0 ].object.name !== 'sphere') {
           if(this.mode === 'destinations') {
-            if(event.ctrlKey || event.altKey || event.metaKey) {
-              this.setSelectedDestinationCountry(intersects[ 0 ].object.countryObject);
-              this.trackEvent('destinationCountryMapClick', intersects[ 0 ].object.countryObject.name);
+            if(intersects[ 0 ].object.countryObject.disputed) {
+              if(event.ctrlKey || event.altKey || event.metaKey) {
+              } else {
+                this.setSelectedDisputedCountry(intersects[ 0 ].object.countryObject);
+              }
             } else {
-              this.setSelectedCountry(intersects[ 0 ].object.countryObject);
-              this.trackEvent('sourceCountryMapClick', intersects[ 0 ].object.countryObject.name);
+              if(event.ctrlKey || event.altKey || event.metaKey) {
+                if(this.selectedCountry && this.selectedCountry.disputed) {
+                  this.selectedCountry = null;
+                } else {
+                  this.setSelectedDestinationCountry(intersects[ 0 ].object.countryObject);
+                  this.trackEvent('destinationCountryMapClick', intersects[ 0 ].object.countryObject.name);
+                }
+              } else {
+                this.setSelectedCountry(intersects[ 0 ].object.countryObject);
+                this.trackEvent('sourceCountryMapClick', intersects[ 0 ].object.countryObject.name);
+              }
             }
+
           } else if(this.mode === 'sources') {
-            if(event.ctrlKey || event.altKey || event.metaKey) {
-              this.setSelectedCountry(intersects[ 0 ].object.countryObject);
-              this.trackEvent('sourceCountryMapClick', intersects[ 0 ].object.countryObject.name);
+            if(intersects[ 0 ].object.countryObject.disputed) {
+              if(event.ctrlKey || event.altKey || event.metaKey) {
+              } else {
+                this.setSelectedDisputedDestinationCountry(intersects[ 0 ].object.countryObject);
+              }
             } else {
-              this.setSelectedDestinationCountry(intersects[ 0 ].object.countryObject);
-              this.trackEvent('destinationCountryMapClick', intersects[ 0 ].object.countryObject.name);
+              if(event.ctrlKey || event.altKey || event.metaKey) {
+                this.setSelectedCountry(intersects[ 0 ].object.countryObject);
+                this.trackEvent('sourceCountryMapClick', intersects[ 0 ].object.countryObject.name);
+              } else {
+                this.setSelectedDestinationCountry(intersects[ 0 ].object.countryObject);
+                this.trackEvent('destinationCountryMapClick', intersects[ 0 ].object.countryObject.name);
+              }
             }
 
           } else {
@@ -815,6 +843,20 @@ WorldMap.prototype = {
       }
 
       this.updateCountrySelection();
+    }
+  },
+
+  setSelectedDisputedCountry: function(country) {
+    if(!this.introRunning) {
+      this.selectedCountry = country;
+      UI.setHeadline( country.name );
+    }
+  },
+
+  setSelectedDisputedDestinationCountry: function(country) {
+    if(!this.introRunning) {
+      this.selectedDestinationCountry = country;
+      UI.setHeadline( country.name );
     }
   },
 
@@ -1283,7 +1325,8 @@ function init() {
               // merge disputed areas:
               for(var i = 0; i < disputedAreas.features.length; i++) {
                 var disputedArea = disputedAreas.features[i];
-                if(disputedArea.properties.NAME === 'Morocco') console.log(disputedArea.properties);
+                disputedArea.disputed = true;
+                // if(disputedArea.properties.TYPE !== 'Disputed') console.log(disputedArea.properties.TYPE, disputedArea.properties.NAME, disputedArea.properties);
                 worldMap.dataCountries.features.push(disputedArea);
               }
 

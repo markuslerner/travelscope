@@ -54,7 +54,7 @@ export function createLegend(worldMap) {
   $('#legend_main .range .box').css('background', 'linear-gradient(to right,  #' + Config.colorZeroDestinations.getHexString() + ' 0%,#' + Config.colorMaxDestinations.getHexString() + ' 100%)'); /* W3C */
   $('#legend_main .range .box').css('filter', 'progid:DXImageTransform.Microsoft.gradient( startColorstr=\'#' + Config.colorZeroDestinations.getHexString() + '\', endColorstr=\'#' + Config.colorMaxDestinations.getHexString() + '\',GradientType=1 )'); /* IE6-9 */
 
-  $('#legend_main .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaDataNotAvailable.getHexString() + '"></div><div class="text">Data not available</div></div>');
+  $('#legend_main .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaDataNotAvailable.getHexString() + '"></div><div class="text">Special status/data not available</div></div>');
 
   $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorCountrySelected.getHexString() + '"></div><div class="text">Selected country/nationality</div></div>');
   $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaNotRequired.getHexString() + '"></div><div class="text">Visa not required</div></div>');
@@ -936,11 +936,8 @@ export function updateCountryTooltip(worldMap, country) {
   $('#country-tooltip .details').html('');
 
   // if(country.name === country.sovereignt) {
-  if(country.type === 'Disputed') {
-    var title = country.brkName === country.name
-      ? country.name + ' (disputed)'
-      : country.name + '/' + country.brkName + ' (disputed)';
-    $('#country-tooltip .title').html( title );
+  if(country.disputed) {
+    $('#country-tooltip .title').html( country.name );
     // $('#country-tooltip .details').html(country.noteBrk);
 
   } else if(country.type === 'Sovereign country') {
@@ -951,7 +948,7 @@ export function updateCountryTooltip(worldMap, country) {
 
   }
 
-  if(country.type !== 'Disputed') {
+  if(!country.disputed) {
     if(worldMap.mode === 'destinations') {
       if(worldMap.selectedCountry && worldMap.selectedDestinationCountry) {
         if(country === worldMap.selectedCountry) {
@@ -975,15 +972,20 @@ export function updateCountryTooltip(worldMap, country) {
           showCountryHoverInfoVisaFreeDestinations(country);
 
         } else {
-          if(worldMap.visaInformationFound) {
-            $('#country-tooltip .details').html(
-              // CountryDataHelpers.getCountryDetailsByVisaStatus(country) +
-              '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(country) + '</span> ' +
-              ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle(worldMap.selectedCountry) +
-              '.<br/>' +
-              '<div class="notes">' + country.notes + '</div>');
+          if(worldMap.selectedCountry.disputed) {
+            $('#country-tooltip .details').html('');
+
           } else {
-            $('#country-tooltip .details').html( 'Data not available.' );
+            if(worldMap.visaInformationFound) {
+              $('#country-tooltip .details').html(
+                // CountryDataHelpers.getCountryDetailsByVisaStatus(country) +
+                '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(country) + '</span> ' +
+                ' for nationals from ' + CountryDataHelpers.getCountryNameWithArticle(worldMap.selectedCountry) +
+                '.<br/>' +
+                '<div class="notes">' + country.notes + '</div>');
+            } else {
+              $('#country-tooltip .details').html( 'Data not available.' );
+            }
           }
         }
 
