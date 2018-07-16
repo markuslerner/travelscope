@@ -294,6 +294,7 @@ WorldMap.prototype = {
           worldMap.geometryNeedsUpdate = true;
           worldMap.introRunning = false;
           worldMap.controls.enabled = true;
+          worldMap.showDisputedAreasBorders();
 
           UI.initSourceCountryDropDown(worldMap);
           UI.initDestinationCountryDropDown(worldMap);
@@ -508,6 +509,29 @@ WorldMap.prototype = {
     }
   },
 
+  showDisputedAreasBorders: function() {
+    for(var i = 0; i < this.countries.length; i++) {
+      var country = this.countries[i];
+      if(country.type === 'Disputed') {
+        if(this.viewMode === '2d') {
+          this.scene.add(country.borderDisputed2D);
+        } else {
+          this.scene.add(country.borderDisputed3D);
+        }
+      }
+    }
+  },
+
+  hideDisputedAreasBorders: function() {
+    for(var i = 0; i < this.countries.length; i++) {
+      var country = this.countries[i];
+      if(country.type === 'Disputed') {
+        this.scene.remove(country.borderDisputed2D);
+        this.scene.remove(country.borderDisputed3D);
+      }
+    }
+  },
+
   updateCountryHover: function(country) {
     // log('updateCountryHover()');
     if(!Config.isTouchDevice) {
@@ -516,10 +540,11 @@ WorldMap.prototype = {
       if(this.countryBorder) {
         this.scene.remove(this.countryBorder);
       }
+
       if(this.viewMode === '3d') {
-        this.countryBorder = country.pointsMesh3D;
+        this.countryBorder = country.border3D;
       } else {
-        this.countryBorder = country.pointsMesh2D;
+        this.countryBorder = country.border2D;
       }
       this.scene.add(this.countryBorder);
 
@@ -606,7 +631,7 @@ WorldMap.prototype = {
     if( intersects.length > 0 ) {
       if(intersects[ 0 ].object.countryObject && this.selectedCountry !== intersects[ 0 ].object.countryObject ) {
 
-        if(intersects[ 0 ].object.name !== 'sphere') {
+        if(intersects[ 0 ].object.name !== 'sphere' && intersects[ 0 ].object.countryObject.type !== 'Disputed') {
           if(this.mode === 'destinations') {
             if(event.ctrlKey || event.altKey || event.metaKey) {
               this.setSelectedDestinationCountry(intersects[ 0 ].object.countryObject);
@@ -1258,6 +1283,7 @@ function init() {
               // merge disputed areas:
               for(var i = 0; i < disputedAreas.features.length; i++) {
                 var disputedArea = disputedAreas.features[i];
+                if(disputedArea.properties.NAME === 'Morocco') console.log(disputedArea.properties);
                 worldMap.dataCountries.features.push(disputedArea);
               }
 

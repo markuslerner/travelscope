@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import Detector from './three/Detector';
 
-const mapVersion = '4.0.0.1';
+const mapVersion = '4.1.0';
 const cdnURL = 'https://cdn.markuslerner.com/travelscope/'; // 'http://cdn.markuslerner.com/travelscope/'
 
 
@@ -16,21 +16,17 @@ const config = {
 
   rendererContainer: '#container',
 
-  // mapDataFile: cdnURL + 'data/4.1.0/country_data.json?v=' + mapVersion,
-
-  // mapDataFile: IS_DESKTOP && Detector.webgl
-  //   ? cdnURL + 'data/4.0.0/ne_50m_admin_0_countries_simplified.json?v=' + mapVersion
-  //   : cdnURL + 'data/4.0.0/all_countries.json?v=' + mapVersion,
+  mapDataFile: cdnURL + 'data/4.1.0/country_data.json?v=' + mapVersion,
 
   visaRequirementsFile: cdnURL + VISA_REQUIREMENTS_URL,
 
-  mergeDataFromMapDataFile2: true,
-  mergeDataFromDisputedAreasFile: true,
-  mapDataFile: cdnURL + 'data/4.1.0/ne_50m_admin_0_countries_simplified.json?v=' + mapVersion,
+  mergeDataFromMapDataFile2: false,
+  mergeDataFromDisputedAreasFile: false,
+  // mapDataFile: cdnURL + 'data/4.1.0/ne_50m_admin_0_countries_simplified.json?v=' + mapVersion,
   mapDataFile2: cdnURL + 'data/4.1.0/ne_10m_admin_0_countries_simplified.json', // merge into: ne_50m_admin_0_countries_simplified
   disputedAreasFile: cdnURL + 'data/4.1.0/ne_10m_admin_0_disputed_areas_simplified.json?v=' + mapVersion,
 
-  saveMapData: true,
+  saveMapData: false,
   mergedCountriesFilename: 'country_data.json',
 
   introRotateDuration: 4000, // 4000
@@ -97,7 +93,9 @@ const config = {
 // only for non-BufferedGeometries:
 config.materialCountryDefault = new THREE.MeshPhongMaterial({ color: config.colorCountryDefault, transparent: false, wireframe: false, shading: THREE.SmoothShading, side: THREE.DoubleSide });
 
+// Chrome and Firefox seem to ignore linewidth when using WebGLRenderer:
 config.materialCountryBorder = new THREE.LineBasicMaterial( { color: 0xFFFFFF, linewidth: 1.5 } );
+config.materialCountryBorderDisputed = new THREE.LineBasicMaterial( { color: 0x444444, linewidth: 2.0 } );
 config.materialLineDefault = new THREE.LineDashedMaterial( { color: config.colorCountryDefault, linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
 config.materialLineVisaNotRequired = new THREE.LineDashedMaterial( { color: config.colorVisaNotRequired, linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
 config.materialLineVisaOnArrival = new THREE.LineDashedMaterial( { color: config.colorVisaOnArrival, linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
