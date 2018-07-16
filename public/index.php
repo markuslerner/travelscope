@@ -4,7 +4,7 @@
 	$description = "A visual exploration of the travel freedom attached to passports";
 
 	define('CDN_URL', '//cdn.markuslerner.com/travelscope/'); // http://cdn.markuslerner.com/travelscope/
-	define('VERSION', '2.1.0');
+	define('VERSION', '2.1.1');
 
 	$visa_requirements_folder = "data/visa_requirements";
 
