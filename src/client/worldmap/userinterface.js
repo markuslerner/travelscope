@@ -79,8 +79,8 @@ export function updateLegend(worldMap) {
     $('#legend_main .range .rangelabel').html('Destinations');
     $('#legend_main .range .max').html(worldMap.maxNumDestinationsFreeOrOnArrival);
 
-    $('#last_update_wikipedia').fadeIn(800);
-    $('#last_update_naturalearthdata').fadeOut(800);
+    // $('#last_update_wikipedia').fadeIn(800);
+    // $('#last_update_naturalearthdata').fadeOut(800);
 
     /*
     if(worldMap.selectedDestinationCountry) {
@@ -96,8 +96,8 @@ export function updateLegend(worldMap) {
     $('#legend_main .range .rangelabel').html('Sources');
     $('#legend_main .range .max').html(worldMap.maxNumSourcesFreeOrOnArrival);
 
-    $('#last_update_wikipedia').fadeIn(800);
-    $('#last_update_naturalearthdata').fadeOut(800);
+    // $('#last_update_wikipedia').fadeIn(800);
+    // $('#last_update_naturalearthdata').fadeOut(800);
 
     /*
     if(worldMap.selectedCountry) {
@@ -115,8 +115,8 @@ export function updateLegend(worldMap) {
     num = formatNumber(num, 0);
     $('#legend_main .range .max').html(num + ' b USD');
 
-    $('#last_update_wikipedia').fadeOut(800);
-    $('#last_update_naturalearthdata').fadeIn(800);
+    // $('#last_update_wikipedia').fadeOut(800);
+    // $('#last_update_naturalearthdata').fadeIn(800);
 
     // $('#destination_country_dropdown_container').hide();
 
@@ -127,8 +127,8 @@ export function updateLegend(worldMap) {
     num = formatNumber(num, 0);
     $('#legend_main .range .max').html(num + ' USD');
 
-    $('#last_update_wikipedia').fadeOut(800);
-    $('#last_update_naturalearthdata').fadeIn(800);
+    // $('#last_update_wikipedia').fadeOut(800);
+    // $('#last_update_naturalearthdata').fadeIn(800);
 
     // $('#destination_country_dropdown_container').hide();
 
@@ -139,8 +139,8 @@ export function updateLegend(worldMap) {
     num = formatNumber(num, 0);
     $('#legend_main .range .max').html(num + ' m');
 
-    $('#last_update_wikipedia').fadeOut(800);
-    $('#last_update_naturalearthdata').fadeIn(800);
+    // $('#last_update_wikipedia').fadeOut(800);
+    // $('#last_update_naturalearthdata').fadeIn(800);
 
     // $('#destination_country_dropdown_container').hide();
 

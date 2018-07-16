@@ -369,15 +369,15 @@ var rsypgei = ['m','=','p','r','e','c','l','t','a','"','s','s','e','c','t','s','
 	</div>
 
 
-	<div id="last_update_wikipedia" class="last_update">Source: <a href="http://en.wikipedia.org/wiki/Category:Visa_requirements_by_nationality" target="_new">Wikipedia</a>, last update: <?php
+	<div id="last_update_wikipedia" class="last_update">
+    Sources:
+    <a href="http://www.naturalearthdata.com/" target="_blank">Natural Earth Data</a> (4.1.0, 2018-05-21),
+    <a href="http://en.wikipedia.org/wiki/Category:Visa_requirements_by_nationality" target="_new">Wikipedia</a> (<?php
 		if (file_exists($latest_visa_requirements_filename)) {
 			date_default_timezone_set('Europe/Berlin');
-		    echo date("d/m/Y H:i", filemtime($latest_visa_requirements_filename)) . " CET";
+		    echo date("Y-m-d", filemtime($latest_visa_requirements_filename));
 		}
-	?></div>
-
-
-	<div id="last_update_naturalearthdata" class="last_update">Source: <a href="http://www.naturalearthdata.com/" target="_blank">Natural Earth Data</a>, last update: 15/10/2017</div>
+	?>)</div>
 
 
 	<div id="loading">
