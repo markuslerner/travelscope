@@ -48,7 +48,7 @@
     "gulp-sass": "^2.1.0",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-streamify": "^1.0.2",
-    "gulp-uglify": "^2.0.0",
+    "gulp-uglify": "^3.0.1",
     "gulp-util": "^3.0.7",
     "loose-envify": "^1.2.0",
     "run-sequence": "^1.2.2",
@@ -70,7 +70,6 @@
     "jquery-mousewheel": "^3.1.13",
     "jquery-ui": "^1.12.0",
     "lodash": "^4.17.5",
-    "query-string": "^6.1.0",
     "three": "^0.80.0",
     "tween.js": "^16.3.5"
   }

@@ -3,7 +3,6 @@ import 'jquery-mousewheel';
 import * as THREE from 'three';
 import * as TWEEN from 'tween.js';
 import * as d3 from 'd3';
-import queryString from 'query-string';
 
 import '../thirdparty/RequestAnimationFrame';
 import Stats from '../thirdparty/Stats';
@@ -543,7 +542,9 @@ WorldMap.prototype = {
   },
 
   setParamsFromSearch: function() {
-    const params = queryString.parse(location.search);
+    var search = location.search.substring(1);
+    const params = search === '' ? {} : JSON.parse('{"' + search.replace(/&/g, '","').replace(/=/g,'":"') + '"}', function (key, value) { return key === "" ? value: decodeURIComponent(value) });
+
     const { mode, source, destination } = params;
 
     if(mode !== undefined && mode !== '') {
