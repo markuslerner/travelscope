@@ -3,6 +3,7 @@ import 'jquery-mousewheel';
 import * as THREE from 'three';
 import * as TWEEN from 'tween.js';
 import * as d3 from 'd3';
+import queryString from 'query-string';
 
 import '../thirdparty/RequestAnimationFrame';
 import Stats from '../thirdparty/Stats';
@@ -291,16 +292,17 @@ WorldMap.prototype = {
           worldMap.geometryNeedsUpdate = true;
         })
         .onComplete(function() {
-          worldMap.geometryNeedsUpdate = true;
-          worldMap.introRunning = false;
-          worldMap.controls.enabled = true;
-          worldMap.showDisputedAreasBorders();
-
           UI.initSourceCountryDropDown(worldMap);
           UI.initDestinationCountryDropDown(worldMap);
           UI.showCountryList(worldMap);
           UI.updateModeStatement(worldMap);
           UI.completeInit();
+
+          worldMap.geometryNeedsUpdate = true;
+          worldMap.introRunning = false;
+          worldMap.controls.enabled = true;
+          worldMap.showDisputedAreasBorders();
+          worldMap.setParamsFromSearch();
 
         });
 
@@ -538,6 +540,41 @@ WorldMap.prototype = {
         this.scene.remove(country.borderDisputed3D);
       }
     }
+  },
+
+  setParamsFromSearch: function() {
+    const params = queryString.parse(location.search);
+    const { mode, source, destination } = params;
+
+    if(mode !== undefined && mode !== '') {
+      this.setMode(mode.toLowerCase());
+      UI.setModeDropdownValue(mode.toLowerCase());
+    }
+
+    if(source !== undefined && source !== '') {
+      for(var i = 0; i < this.countries.length; i++) {
+        var country = this.countries[i];
+        var name = country.name.toLowerCase();
+
+        if(name === source.toLowerCase() && CountryDataHelpers.isCountry(country)) {
+          this.setSelectedCountry(country);
+          break;
+        }
+      }
+    }
+
+    if(destination !== undefined && destination !== '') {
+      for(i = 0; i < this.countries.length; i++) {
+        country = this.countries[i];
+        name = country.name.toLowerCase();
+
+        if(name === destination.toLowerCase() && CountryDataHelpers.isCountry(country)) {
+          this.setSelectedDestinationCountry(country);
+          break;
+        }
+      }
+    }
+
   },
 
   updateCountryHover: function(country) {

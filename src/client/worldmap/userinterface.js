@@ -7,7 +7,7 @@ import { formatNumber } from '../utils';
 import * as CountryDataHelpers from '../utils/countryDataHelpers';
 import { worldMap } from './index.js';
 import * as Panels from './panel';
-import { log } from '../LogTerminal';
+// import { log } from '../LogTerminal';
 
 
 
@@ -918,6 +918,12 @@ export function clearDestinationCountryDropDown() {
   $('#destination_country_dropdown').val(Config.destinationCountryDefaultText);
   $('#destination_country_dropdown').removeClass('filled');
   $('#destination_country_dropdown_container .cancel').fadeOut();
+};
+
+
+export function setModeDropdownValue(value) {
+  $('#map_mode .dropdown-menu li a').filter('[data-mode=' + value + ']').trigger('click');
+  $('#map_mode.open .dropdown-toggle').dropdown('toggle');
 };
 
 
