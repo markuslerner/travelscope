@@ -20,6 +20,8 @@ export function createCountriesGeometry(worldMap) {
   worldMap.trianglesNumTotal = 0;
   worldMap.countryDropdownChoices = [];
 
+  const countriesUsed = [];
+
   // features = countries
   var i;
   var destinations;
@@ -85,6 +87,8 @@ export function createCountriesGeometry(worldMap) {
         // }
 
         if(!country.disputed) {
+          countriesUsed.push(country.name);
+
           if(CountryDataHelpers.isCountry(country)) {
             worldMap.countryDropdownChoices.push({text: country.name, value: country.name});
           } else {
@@ -97,6 +101,8 @@ export function createCountriesGeometry(worldMap) {
       }
     }
   }
+
+  // console.log(JSON.stringify(countriesUsed.sort()));
 
   // console.log(worldMap.countries);
 
