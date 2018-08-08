@@ -25,7 +25,7 @@ import '../jquery-ui/jquery-ui-1.12.0.custom/jquery-ui';
 import '../jquery-ui/jquery-ui.custom.combobox';
 
 import Config from '../config';
-import { formatNumber, toSentenceStart } from '../utils';
+import { formatNumber, toSentenceStart, cleanURLString } from '../utils';
 import * as CountryDataHelpers from '../utils/countryDataHelpers';
 import * as Geometry from './geometry';
 import * as Panels from './panel';
@@ -557,7 +557,7 @@ WorldMap.prototype = {
         var country = this.countries[i];
         var name = country.name.toLowerCase();
 
-        if(name === source.toLowerCase() && CountryDataHelpers.isCountry(country)) {
+        if(cleanURLString(name) === cleanURLString(source.toLowerCase()) && CountryDataHelpers.isCountry(country)) {
           this.setSelectedCountry(country);
           break;
         }
@@ -569,7 +569,7 @@ WorldMap.prototype = {
         country = this.countries[i];
         name = country.name.toLowerCase();
 
-        if(name === destination.toLowerCase() && CountryDataHelpers.isCountry(country)) {
+        if(cleanURLString(name) === cleanURLString(destination.toLowerCase()) && CountryDataHelpers.isCountry(country)) {
           this.setSelectedDestinationCountry(country);
           break;
         }

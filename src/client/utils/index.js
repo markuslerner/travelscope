@@ -13,3 +13,29 @@ export function toSentenceStart(s) {
     return txt.charAt(0).toUpperCase() + txt.substr(1);
   });
 };
+
+export const cleanURLString = (string) => {
+  return string
+    .toLowerCase()
+    .replace(/[àáâãåæāăą]/g, 'a')
+    .replace(/[äæ]/g, 'ae')
+    .replace(/[çćĉċč]/g, 'c')
+    .replace(/[èéêëēĕėęě]/g, 'e')
+    .replace(/[ĝğġģ]/g, 'g')
+    .replace(/[ĥħ]/g, 'h')
+    .replace(/[ìíîïĩīĭįıĳ]/g, 'i')
+    .replace(/[ĵĵ]/g, 'j')
+    .replace(/[ĺļľŀł]/g, 'l')
+    .replace(/[ñńņňŉŋ]/g, 'n')
+    .replace(/[òóôõōŏ]/g, 'o')
+    .replace(/[öøőœ]/g, 'oe')
+    .replace(/[ŕŗř]/g, 'r')
+    .replace(/[śŝşš]/g, 's')
+    .replace(/[ţťŧ]/g, 't')
+    .replace(/[ùúûũūŭůų]/g, 'u')
+    .replace(/[üű]/g, 'ue')
+    .replace(/[ŵ]/g, 'w')
+    .replace(/[ýÿŷ]/g, 'y')
+    .replace(/[źżž]/g, 'z')
+    .replace(/[^a-z0-9]+/g, '-');
+};
