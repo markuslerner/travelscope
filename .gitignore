@@ -61,9 +61,10 @@ dev
 # Production folder
 public/assets
 public/css
+public/data
 public/js
-public/src
 public/images
+public/src
 public/index.html
 
 .env
@@ -72,4 +73,3 @@ public/index.html
 # composer
 composer.phar
 /vendor/
-

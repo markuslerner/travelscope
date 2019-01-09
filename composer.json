@@ -1,0 +1,16 @@
+{
+    "name": "travelscope",
+    "type": "project",
+    "license": "proprietary",
+    "description": "Travelscope",
+    "authors": [
+      {
+        "name": "Markus Lerner",
+        "email": "m@markuslerner.com"
+      }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^2.4",
+        "mobiledetect/mobiledetectlib": "^2.8"
+    }
+}
