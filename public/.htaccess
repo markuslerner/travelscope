@@ -3,10 +3,14 @@ php_flag allow_url_fopen on
 RewriteEngine On
 
 # force https
+# not on *.local domains:
+RewriteCond %{HTTP_HOST} !.local$
 RewriteCond %{HTTPS} off
 RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
 # force www
+# not on *.local domains:
+RewriteCond %{HTTP_HOST} !.local$
 RewriteCond %{HTTP_HOST} !^$
 RewriteCond %{HTTP_HOST} !^www\. [NC]
 RewriteCond %{HTTPS}s ^on(s)|
