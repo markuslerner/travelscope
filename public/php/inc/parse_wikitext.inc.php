@@ -175,7 +175,11 @@ function parseWikiText($text, $debug, $country_name) {
 						$data['notes'] = $col;
 						$data['notes'] = str_replace("[[", "", $data['notes']);
 						$data['notes'] = str_replace("]]", "", $data['notes']);
-						$data['notes'] = str_replace("\n", "", (htmlspecialchars(trim(cleanURLs($data['notes'])))));
+            $data['notes'] = trim($data['notes']);
+            if($data['notes'] == '|') $data['notes'] = '';
+            // $data['notes'] = str_replace("|", ", ", $data['notes']);
+            $data['notes'] = join(', ', array_filter(explode('|', $data['notes'])));
+						$data['notes'] = str_replace("\n", "", (htmlspecialchars(cleanURLs($data['notes']))));
 
 						if($debug) {
 							echo "notes: " . $data['notes'] . "<br>";

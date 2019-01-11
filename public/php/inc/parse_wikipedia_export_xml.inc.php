@@ -17,8 +17,8 @@ foreach ($pages as $page) {
 
 				$country = getCountryByTitle($countries, $title);
 
-				if($country[0] != "COUNTRY_NAME") {
-				// if($country[0] == "Germany") {
+				// if($country[0] != "COUNTRY_NAME") {
+				if($country[0] == "India") {
 					// echo "Country:" . $country[0] . "\n<br>";
 
 					$destinations = parseWikiText($text, $debug, $country[0]);
