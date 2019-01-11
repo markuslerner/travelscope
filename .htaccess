@@ -1,0 +1,5 @@
+RewriteEngine On
+
+# rewrite to public folder
+RewriteBase /travelscope
+RewriteRule (.*) public/$1 [L]

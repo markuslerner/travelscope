@@ -1,5 +1,7 @@
 php_flag allow_url_fopen on
 
+Options -Indexes
+
 DirectoryIndex index.php
 
 RewriteEngine On
@@ -17,5 +19,3 @@ RewriteCond %{HTTP_HOST} !^$
 RewriteCond %{HTTP_HOST} !^www\. [NC]
 RewriteCond %{HTTPS}s ^on(s)|
 RewriteRule ^ http%1://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
-
-Options -Indexes
