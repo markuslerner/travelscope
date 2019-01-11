@@ -4,7 +4,7 @@
 	$description = "A visual exploration of the travel freedom attached to passports";
 
 	define('CDN_URL', '//cdn.markuslerner.com/travelscope/'); // http://cdn.markuslerner.com/travelscope/
-	define('VERSION', '2.2.1');
+	define('VERSION', '2.3');
 
 	$visa_requirements_folder = "data/visa_requirements";
 
@@ -342,8 +342,17 @@
 		<div class="inside">
 			<div class="details">
 				<p>
-				This website is an experimental visualization of visa regulation data pulled from <a href="http://en.wikipedia.org/wiki/Category:Visa_requirements_by_nationality" target="_new">Wikipedia</a> in regular intervals and matched to the countries/territories via the sovereignty of the respective country/territory. It is possible that there are glitches in the way the data are read from Wikipedia besides the fact that the information on Wikipedia might not have been correct at the time of the last update.
+				This website is an experimental visualization of visa regulation data pulled from <a href="http://en.wikipedia.org/wiki/Category:Visa_requirements_by_nationality" target="_new">Wikipedia</a> in regular intervals and matched to the countries via the sovereignty of the respective country.
 				</p>
+
+				<p>
+				The data for territories, disputed areas, partially recognized countries and restricted zones cannot be imported from Wikipedia, because the data for those is not entered in a consistent form for all countries yet. For that reason, the number of visa-free destinations might differ from other indexes.
+				</p>
+
+				<p>
+				It is also possible that there are glitches in the way the data are read from Wikipedia besides the fact that the information on Wikipedia might not have been correct at the time of the last update.
+				</p>
+
 				<p>
 Please do refer to the information on the specific countryʼs embassy or consulate website to get the most up-to-date information pertaining to your travel. I do not take any responsibility for the accuracy of the data displayed on this website.
 				</p>

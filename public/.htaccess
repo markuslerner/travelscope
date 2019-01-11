@@ -1,5 +1,7 @@
 php_flag allow_url_fopen on
 
+DirectoryIndex index.php
+
 RewriteEngine On
 
 # force https
