@@ -119,8 +119,6 @@ $json_contents = "{\n\t\"created\": \"" . date("c", $time) . "\",\n\t\"type\": \
 
 $parser->loadXML($export_xml_string);
 
-echo $parser;
-
 $countries_json = array();
 
 require_once('inc/parse_wikipedia_export_xml.inc.php');
@@ -149,11 +147,6 @@ if($debug_print_json) {
 	header('Content-Type: application/json');
 	echo $json_contents;
 }
-if($debug) {
-	echo "<br><b>" . sizeof($destinations) . " destinations loaded.</b><br/>";
-}
-
-
 
 
 function getSubString($str, $start_string, $end_string) {
@@ -161,10 +154,12 @@ function getSubString($str, $start_string, $end_string) {
 	return substr($str, $start, stripos($str, $end_string) - $start);
 }
 
+
 function getSubStringAfter($str, $start_string) {
 	$start = stripos($str, $start_string) + strlen($start_string);
 	return substr($str, $start);
 }
+
 
 function cleanURLs($url) {
   $U = explode(' ',$url);
@@ -178,6 +173,7 @@ function cleanURLs($url) {
   }
   return implode(' ',$U);
 }
+
 
 function getCountryByTitle($countries, $title) {
 	foreach ($countries as $country) {

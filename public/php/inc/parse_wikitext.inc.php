@@ -11,8 +11,9 @@ function getAllRows($text, $start_string) {
 			$end = stripos($table, "|}");
 			$table = substr($text, $start, $end);
 			// echo $table;
+
 			$table = strip_tags($table);
-			$rows = spliti("\\|\-", $table);
+			$rows = explode("|-", $table);
 
 			$all_rows = array_merge($all_rows, $rows);
 			$text = substr($text, $start_index);
@@ -31,7 +32,7 @@ function getRows($text, $start_index, $start_string) {
 		$table = substr($text, $start, $end);
 		// echo $table;
 		$table = strip_tags($table);
-		$rows = spliti("\\|\-", $table);
+		$rows = explode("|-", $table);
 		return $rows;
 	} else {
 		return null;
@@ -56,7 +57,10 @@ function parseWikiText($text, $debug, $country_name) {
 	$text = str_replace("|}}", "}}", $text);
 
 	$start_string = "{| class=\"sortable wikitable\"";
+
 	$rows = getAllRows($text, $start_string);
+
+  // print_r($rows);
 
 	// if($country_name == "Germany") {
 	// 	$start_string = "{| class=\"wikitable\"";
@@ -72,7 +76,8 @@ function parseWikiText($text, $debug, $country_name) {
 			if($debug) echo "<br/><br/>ROW " . $rowID . ": " . $row . "\n<br><br>";
 
 			if($rowID > 0) {
-				$cols = spliti("\n\\| ", $row);
+        // $cols = spliti("\n\\| ", $row);
+				$cols = explode("\n| ", $row);
 				// $cols = explode(" |", $row);
 				// $cols = preg_split('/\|+/', $row);
 
@@ -86,7 +91,8 @@ function parseWikiText($text, $debug, $country_name) {
 						$data['d_name'] = trim(getSubString($col, "{{flag|", "}}"));
 
 						if(stripos($data['d_name'], "|") > -1) {
-							$split = spliti("\\|", $data['d_name']);
+							// $split = spliti("\\|", $data['d_name']);
+              $split = explode("|", $data['d_name']);
 							$data['d_name'] = $split[0];
 						}
 
@@ -101,7 +107,8 @@ function parseWikiText($text, $debug, $country_name) {
 							$data['visa_title'] = str_replace(array("[[", "]]"), "", $data['visa_title']);
 							$data['visa_title'] = preg_replace( "/\r|\n/", "", $data['visa_title']); // remove line breaks
 							if(stripos($data['visa_title'], '|') > -1) {
-								$parts = spliti("\\|", $data['visa_title']);
+								// $parts = spliti("\\|", $data['visa_title']);
+                $parts = explode("|", $data['visa_title']);
 								if(sizeof($parts) > 0) {
 									$data['visa_title'] = $parts[sizeof($parts) - 1];
 								}
