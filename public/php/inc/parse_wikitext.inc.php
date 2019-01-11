@@ -57,16 +57,14 @@ function parseWikiText($text, $debug, $country_name) {
 	$text = str_replace("|}}", "}}", $text);
 
 	$start_string = "{| class=\"sortable wikitable\"";
-
 	$rows = getAllRows($text, $start_string);
 
-  // print_r($rows);
+	// load info for territories (not used yet, because many pages still don't have this info in tabular form):
+	// $start_string = "{| class=\"wikitable\"";
+	// $rows2 = getAllRows($text, $start_string);
+	// $rows = array_merge($rows, $rows2);
 
-	// if($country_name == "Germany") {
-	// 	$start_string = "{| class=\"wikitable\"";
-	// 	$rows2 = getAllRows($text, $start_string);
-	// 	$rows = array_merge($rows, $rows2);
-	// }
+  // print_r($rows);
 
 	if(sizeof($rows) > 0) {
 		$destinations = array();
@@ -190,7 +188,7 @@ function parseWikiText($text, $debug, $country_name) {
 					$colID++;
 				} // end foreach cols
 
-				if($data['d_name'] != "") {
+				if($data['d_name'] != "" && strpos($data['d_name'], 'text-align') === false) {
 					$found = false;
 					foreach($destinations as $d) {
 						if($d['d_name'] == $data['d_name']) {

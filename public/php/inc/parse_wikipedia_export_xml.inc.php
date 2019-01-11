@@ -17,8 +17,8 @@ foreach ($pages as $page) {
 
 				$country = getCountryByTitle($countries, $title);
 
-				// if($country[0] != "COUNTRY_NAME") {
-				if($country[0] == "India") {
+				if($country[0] != "COUNTRY_NAME") {
+				// if($country[0] == "Mauritius") {
 					// echo "Country:" . $country[0] . "\n<br>";
 
 					$destinations = parseWikiText($text, $debug, $country[0]);
@@ -29,10 +29,10 @@ foreach ($pages as $page) {
 						$string = "\t{ \"name\": \"" . $country[0] . "\", \"code\": \"" . $country[1] . "\", \"destinations\": [";
 
 						foreach($destinations as $key => $destination) {
-							$d = "\t{ \"d_name\": \"" . $destination['d_name'] . "\",
-								\"visa_required\": \"" . $destination['visa_required'] . "\",
-								\"visa_title\": \"" . $destination['visa_title'] . "\",
-								\"notes\": \"" . $destination['notes'] . "\" }";
+							$d = "\t{ \"d_name\": " . json_encode($destination['d_name']) . ",
+								\"visa_required\": " . json_encode($destination['visa_required']) . ",
+								\"visa_title\": " . json_encode($destination['visa_title']) . ",
+								\"notes\": " . json_encode($destination['notes']) . " }";
 							// echo $d . "<br/>";
 							$string .= $d;
 							if($key < sizeof($destinations) - 1) {
@@ -49,7 +49,8 @@ foreach ($pages as $page) {
 						// 	break;
 						// }
 
-            if($debug) echo sizeof($destinations) . ' destinations found for citizens from ' . $country[0] . '<br>';
+            // if($debug)
+            echo sizeof($destinations) . ' destinations found for citizens from ' . $country[0] . '<br>';
 
 					} else {
 						echo "No destinations found in: <a href=\"" . $wikipedia_url . $country[2] . "\" target=\"_blank\">" . $title . "</a><br/>\n";
