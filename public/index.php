@@ -94,6 +94,7 @@
 
     <script language="JavaScript" type="text/javascript">
       var IS_DESKTOP = <? echo $isDesktop ? 'true' : 'false'; ?>;
+			var CDN_URL = '<?=CDN_URL?>';
       var VISA_REQUIREMENTS_URL = '<?=$latest_visa_requirements_filename;?>';
     </script>
 

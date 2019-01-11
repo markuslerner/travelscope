@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import Detector from './three/Detector';
 
 const mapVersion = '4.1.0.1';
-const cdnURL = 'https://cdn.markuslerner.com/travelscope/'; // 'http://cdn.markuslerner.com/travelscope/'
 
 
 
@@ -16,15 +15,15 @@ const config = {
 
   rendererContainer: '#container',
 
-  mapDataFile: cdnURL + 'data/4.1.0/country_data.json?v=' + mapVersion,
+  mapDataFile: CDN_URL + 'data/map/4.1.0/country_data.json?v=' + mapVersion,
 
-  visaRequirementsFile: cdnURL + VISA_REQUIREMENTS_URL,
+  visaRequirementsFile: CDN_URL + VISA_REQUIREMENTS_URL,
 
   mergeDataFromMapDataFile2: false,
   mergeDataFromDisputedAreasFile: false,
-  // mapDataFile: cdnURL + 'data/4.1.0/ne_50m_admin_0_countries_simplified.json?v=' + mapVersion,
-  mapDataFile2: cdnURL + 'data/4.1.0/ne_10m_admin_0_countries_simplified.json?v=' + mapVersion, // merge into: ne_50m_admin_0_countries_simplified
-  disputedAreasFile: cdnURL + 'data/4.1.0/ne_10m_admin_0_disputed_areas_simplified.json?v=' + mapVersion,
+  // mapDataFile: CDN_URL + 'data/map/4.1.0/ne_50m_admin_0_countries_simplified.json?v=' + mapVersion,
+  mapDataFile2: CDN_URL + 'data/map/4.1.0/ne_10m_admin_0_countries_simplified.json?v=' + mapVersion, // merge into: ne_50m_admin_0_countries_simplified
+  disputedAreasFile: CDN_URL + 'data/map/4.1.0/ne_10m_admin_0_disputed_areas_simplified.json?v=' + mapVersion,
 
   saveMapData: false,
   mergedCountriesFilename: 'country_data.json',
