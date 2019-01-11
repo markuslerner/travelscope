@@ -23,30 +23,30 @@ var merge = require('utils-merge');
 var buffer = require('vinyl-buffer');
 var source = require('vinyl-source-stream');
 var watchify = require('watchify');
-var del = require('del');
+// var del = require('del');
 var runSequence = require('run-sequence');
 
 const options = {
   dev: true,
   src: 'src',
-  dest: 'dev',
+  dest: 'public', // dev
 };
 
 
 // Set deployment variables and path (force production)
 gulp.task('prepare-production', function() {
   options.dev = false;
-  options.dest = 'public';
+  // options.dest = 'public';
 });
 
 
 // Clean dev directory
-gulp.task('clean', () => {
-  if(options.dev) {
-    return del([options.dest + '/*'], {dot: false});
-  }
-  return true;
-});
+// gulp.task('clean', () => {
+//   if(options.dev) {
+//     return del([options.dest + '/*'], {dot: false});
+//   }
+//   return true;
+// });
 
 
 // Es lint javascript (development and production)
@@ -215,7 +215,7 @@ gulp.task('watch', function() {
 
 gulp.task('default', callback =>
   runSequence(
-    'clean',
+    // 'clean',
     ['sass', 'lint', 'copy', 'watchify'],
     'browser-sync',
     'watch',
