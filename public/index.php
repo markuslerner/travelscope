@@ -342,7 +342,7 @@
 		<div class="inside">
 			<div class="details">
 				<p>
-				This website is an experimental visualization of visa regulation data pulled from <a href="http://en.wikipedia.org/wiki/Category:Visa_requirements_by_nationality" target="_new">Wikipedia</a> in regular intervals and matched to the countries via the sovereignty of the respective country.
+				This website is a non-profit experimental visualization of visa regulation data pulled from <a href="http://en.wikipedia.org/wiki/Category:Visa_requirements_by_nationality" target="_new">Wikipedia</a> in regular intervals and matched to the countries via the sovereignty of the respective country.
 				</p>
 
 				<p>
