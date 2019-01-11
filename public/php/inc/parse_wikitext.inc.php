@@ -125,6 +125,9 @@ function parseWikiText($text, $debug, $country_name) {
 						} else if ( containsString("{{free|{{sort|EU|Visa not required", $col) ) {
 							$data['visa_required'] = "free-eu";
 
+						} else if ( containsString("{{free|{{sort|EU|Freedom of movement", $col) ) {
+							$data['visa_required'] = "free-eu";
+
 						} else if ( containsString("{{yes2|", $col) ) {
 							$data['visa_required'] = "eta";
 
@@ -177,6 +180,7 @@ function parseWikiText($text, $debug, $country_name) {
             if($data['notes'] == '|') $data['notes'] = '';
             // $data['notes'] = str_replace("|", ", ", $data['notes']);
             $data['notes'] = join(', ', array_filter(explode('|', $data['notes'])));
+						$data['notes'] = str_replace("colspan=2 , ", "", $data['notes']);
 						$data['notes'] = str_replace("\n", "", (htmlspecialchars(cleanURLs($data['notes']))));
 
 						if($debug) {
