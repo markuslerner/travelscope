@@ -936,7 +936,11 @@ WorldMap.prototype = {
           }
 
           for(d = 0; d < destinations.length; d++) {
-            if( (CountryDataHelpers.matchDestinationToCountryName(destinations[d].d_name, this.selectedDestinationCountry.name) || CountryDataHelpers.matchDestinationToCountryName(this.selectedDestinationCountry.name, destinations[d].d_name)) && this.selectedDestinationCountry.name !== this.selectedCountry.name) {
+            if( (CountryDataHelpers.matchDestinationToCountryName(destinations[d].d_name, this.selectedDestinationCountry.name) ||
+              CountryDataHelpers.matchDestinationToCountryName(this.selectedDestinationCountry.name, destinations[d].d_name)) &&
+              this.selectedDestinationCountry.name !== this.selectedCountry.name &&
+              destinations[d].visa_required !== ''
+            ) {
               this.selectedDestinationCountry.visa_required = destinations[d].visa_required;
               this.selectedDestinationCountry.visa_title = destinations[d].visa_title;
               this.selectedDestinationCountry.notes = destinations[d].notes;
@@ -960,7 +964,7 @@ WorldMap.prototype = {
 
           // add main sovereignty, if exists:
           mainCountry = CountryDataHelpers.getCountryByName(this.countries, this.selectedCountry.sovereignt);
-          if(mainCountry && mainCountry.visa_required === '') {
+          if(mainCountry && mainCountry.visa_required !== '') {
             mainCountry.visa_required = 'no';
             mainCountry.notes = 'National of same sovereignty (exceptions may exist)';
             this.visaInformationFound = true;
@@ -977,8 +981,14 @@ WorldMap.prototype = {
 
         } else {
           this.visaInformationFound = false;
-          UI.setHeadline( 'Data not available for nationals from ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) + '. <div class="notes">Please select a different country or click/tap the background to clear selection.</div>' );
 
+        }
+
+        if(!this.visaInformationFound) {
+          UI.setHeadline( 'Data not available for nationals from ' +
+          CountryDataHelpers.getCountryNameWithArticle( this.selectedCountry ) +
+          ' travelling to ' + CountryDataHelpers.getCountryNameWithArticle( this.selectedDestinationCountry ) +
+          '. <div class="notes">Please select a different country or click/tap the background to clear selection.</div>' );
         }
 
       } else if(this.selectedCountry && !this.selectedDestinationCountry) {
@@ -996,7 +1006,8 @@ WorldMap.prototype = {
                    CountryDataHelpers.matchDestinationToCountryName(destinations[d].d_name, this.countries[c].name) ||
                    CountryDataHelpers.matchDestinationToCountryName(this.countries[c].name, destinations[d].d_name)
                 ) &&
-                  this.countries[c].name !== this.selectedCountry.name
+                  this.countries[c].name !== this.selectedCountry.name &&
+                  destinations[d].visa_required !== ''
 
                 ) {
                 this.countries[c].visa_required = destinations[d].visa_required;

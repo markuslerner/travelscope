@@ -937,7 +937,7 @@ export function collapseNavBar() {
 
 
 export function updateCountryTooltip(worldMap, country) {
-  // log('updateCountryTooltip()');
+  // console.log('updateCountryTooltip()');
 
   $('#country-tooltip .details').html('');
 
@@ -961,7 +961,7 @@ export function updateCountryTooltip(worldMap, country) {
           showCountryHoverInfoVisaFreeDestinations(country);
 
         } else if(country === worldMap.selectedDestinationCountry) {
-          if(worldMap.visaInformationFound) {
+          if(worldMap.visaInformationFound && country.visa_required !== '') {
             $('#country-tooltip .details').html(
               // CountryDataHelpers.getCountryDetailsByVisaStatus(country) +
               '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(country) + '</span> ' +
@@ -982,7 +982,7 @@ export function updateCountryTooltip(worldMap, country) {
             $('#country-tooltip .details').html('');
 
           } else {
-            if(worldMap.visaInformationFound) {
+            if(worldMap.visaInformationFound && country.visa_required !== '') {
               $('#country-tooltip .details').html(
                 // CountryDataHelpers.getCountryDetailsByVisaStatus(country) +
                 '<span class="visa-title">' + CountryDataHelpers.getCountryVisaTitle(country) + '</span> ' +
