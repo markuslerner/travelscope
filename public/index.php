@@ -1,20 +1,26 @@
 <?php
-	$brand = "Travelscope";
+  // error_reporting(E_ALL);
+
+  $brand = "Travelscope";
 	$title = $brand . " – Interactive worldmap of visa-free travel – A Chrome Experiment";
 	$description = "A visual exploration of the travel freedom attached to passports";
+  $visa_requirements_folder = "data/visa_requirements";
 
-	define('CDN_URL', '//cdn.markuslerner.com/travelscope/'); // http://cdn.markuslerner.com/travelscope/
-	define('VERSION', '2.3');
 
-	$visa_requirements_folder = "data/visa_requirements";
+  require __DIR__ . '/../vendor/autoload.php';
+  $dotenv = new Dotenv\Dotenv(__DIR__ . '/../');
+  $dotenv->load();
 
-	require_once 'php/Mobile_Detect.php';
+	define('CDN_URL', getenv('CDN_URL')); // http://cdn.markuslerner.com/travelscope/
+
+  $package = file_get_contents('../package.json');
+  $package = json_decode($package, true);
+	define('VERSION', $package['version']);
+
 	$detect = new Mobile_Detect;
 	$isDesktop = !$detect->isMobile() && !$detect->isTablet();
 
 	// get most recent visa requirements filename:
-	$path = $visa_requirements_folder;
-
 	function getLatestVisaRequirementsFilename($path) {
 		$latest_ctime = 0;
 		$latest_filename = '';
@@ -94,7 +100,7 @@
 
     <script language="JavaScript" type="text/javascript">
       var IS_DESKTOP = <? echo $isDesktop ? 'true' : 'false'; ?>;
-			var CDN_URL = '<?=CDN_URL?>';
+      var CDN_URL = '<?=CDN_URL?>';
       var VISA_REQUIREMENTS_URL = '<?=$latest_visa_requirements_filename;?>';
     </script>
 
