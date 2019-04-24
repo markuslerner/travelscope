@@ -1,6 +1,6 @@
 {
   "name": "travelscope",
-  "version": "2.3.3",
+  "version": "2.4",
   "description": "Interactive worldmap of visa-free travel using Three.js and D3.js",
   "author": "Markus Lerner <m@markuslerner.com>",
   "engines": {
