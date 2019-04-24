@@ -12,8 +12,17 @@ export function isCountry(country) {
     return false;
   }
 
-  return country.type === 'Sovereign country' ||
-    (country.type === 'Country' && (country.sovereignt === country.name || country.sovereignt === country.nameSort));
+  const isCountry = country.type === 'Sovereign country' ||
+    (country.type === 'Country' && (country.sovereignt === country.name || country.sovereignt === country.nameSort)) ||
+    country.name === 'Hong Kong' ||
+    country.name === 'Macao'
+    ;
+
+  // if(country.name.includes('Hong')) {
+  //   console.log(country, isCountry);
+  // }
+
+  return isCountry;
 
 };
 
@@ -39,6 +48,8 @@ export function matchDestinationToCountryName(destination, country) {
     destination = 'Republic of Korea';
   } else if(destination === 'Laos') {
     destination = 'Lao PDR';
+  } else if(destination === 'Macau') {
+    destination = 'Macao';
   } else if(destination === 'Burma') {
     destination = 'Myanmar';
   } else if(destination === 'Russia') {

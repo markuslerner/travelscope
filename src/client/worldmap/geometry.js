@@ -72,9 +72,17 @@ export function createCountriesGeometry(worldMap) {
           for(var r = 0; r < worldMap.visaRequirements.countries.length; r++) {
             // 199 nationalities travelling to 243 (?) countries, assuming nationals from a country don't need a visa to the sovereignty's main country:
             // if(CountryDataHelpers.matchDestinationToCountryName(country.name_long, worldMap.visaRequirements.countries[r].name) || CountryDataHelpers.matchDestinationToCountryName(worldMap.visaRequirements.countries[r].name, country.name)) {
-            if(CountryDataHelpers.matchDestinationToCountryName(country.sovereignt, worldMap.visaRequirements.countries[r].name) || CountryDataHelpers.matchDestinationToCountryName(worldMap.visaRequirements.countries[r].name, country.sovereignt)) {
+
+            const requirementsCountry = worldMap.visaRequirements.countries[r];
+
+            if(
+              CountryDataHelpers.matchDestinationToCountryName(country.name, requirementsCountry.name) ||
+              CountryDataHelpers.matchDestinationToCountryName(requirementsCountry.name, country.name) ||
+              CountryDataHelpers.matchDestinationToCountryName(country.sovereignt, requirementsCountry.name) ||
+              CountryDataHelpers.matchDestinationToCountryName(requirementsCountry.name, country.sovereignt)
+            ) {
               // log('Loading visa requirements for: ' + country.name);
-              country.destinations = worldMap.visaRequirements.countries[r].destinations;
+              country.destinations = requirementsCountry.destinations;
               numVisaRequirementsFound++;
             }
           }
