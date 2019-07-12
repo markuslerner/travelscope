@@ -1,6 +1,6 @@
 {
   "name": "travelscope",
-  "version": "2.4",
+  "version": "2.4.1",
   "description": "Interactive worldmap of visa-free travel using Three.js and D3.js",
   "author": "Markus Lerner <m@markuslerner.com>",
   "engines": {
@@ -38,11 +38,10 @@
     "eslint-plugin-babel": "^3.2.0",
     "eslint-plugin-promise": "^2.0.0",
     "eslint-plugin-standard": "^2.0.0",
-    "gulp": "^3.9.1",
     "gulp-autoprefixer": "^3.1.1",
+    "gulp-clean-css": "4.2.0",
     "gulp-eslint": "^3.0.1",
     "gulp-if": "^2.0.1",
-    "gulp-minify-css": "^1.2.1",
     "gulp-plumber": "^1.0.1",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^4.0.2",
@@ -66,10 +65,12 @@
     "babel-runtime": "^6.11.6",
     "connect-history-api-fallback": "^1.1.0",
     "d3": "^3.4.11",
+    "gulp": "^3.9.1",
     "jquery": "^3.1.0",
     "jquery-mousewheel": "^3.1.13",
     "jquery-ui": "^1.12.0",
-    "lodash": "^4.17.5",
+    "lodash": "4.17.14",
+    "npm-check-updates": "^3.1.18",
     "three": "^0.80.0",
     "tween.js": "^16.3.5"
   }

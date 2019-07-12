@@ -10,7 +10,7 @@ var browserify = require('browserify');
 var autoprefixer = require('gulp-autoprefixer');
 var eslint = require('gulp-eslint');
 var gulpif = require('gulp-if');
-var minifyCSS = require('gulp-minify-css');
+var cleanCSS = require('gulp-clean-css');
 var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
 var sass = require('gulp-sass');
@@ -75,9 +75,7 @@ gulp.task('sass', function() {
     .pipe(gulpif(!options.dev, autoprefixer({
       browsers: ['last 2 versions']
     })))
-    .pipe(gulpif(!options.dev, minifyCSS({
-      keepBreaks: true
-    })))
+    .pipe(gulpif(!options.dev, cleanCSS()))
     .pipe(browserSync.reload({
       stream: true
     }))
