@@ -11,7 +11,7 @@
   $dotenv = new Dotenv\Dotenv(__DIR__ . '/../');
   $dotenv->load();
 
-	define('CDN_URL', getenv('CDN_URL')); // http://cdn.markuslerner.com/travelscope/
+	define('CDN_URL', getenv('CDN_URL'));
 
   $package = file_get_contents('../package.json');
   $package = json_decode($package, true);
@@ -69,7 +69,7 @@
   	<meta property="og:site_name" content="<?=$brand?>" />
   	<meta property="og:description" content="<?=$title?>" />
   	<meta property="og:type" content="website" />
-  	<meta property="og:image" content="//cdn.markuslerner.com/wordpress/wp-content/uploads/2016/04/travelscope_4k_1_cropped-640x400@2x.png" />
+  	<meta property="og:image" content="<?=CDN_URL?>../wordpress/wp-content/uploads/2016/04/travelscope_4k_1_cropped-640x400@2x.png" />
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
