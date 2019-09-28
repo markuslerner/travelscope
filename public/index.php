@@ -11,6 +11,7 @@
   $dotenv = new Dotenv\Dotenv(__DIR__ . '/../');
   $dotenv->load();
 
+  define('URL', getenv('URL'));
 	define('CDN_URL', getenv('CDN_URL'));
 
   $package = file_get_contents('../package.json');
@@ -59,9 +60,6 @@
 
   	<meta http-equiv="X-UA-Compatible" content="chrome=1">
 
-  	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-  	<link rel="apple-touch-icon" href="apple-touch-icon.png"/>
-
   	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
   	<meta name="apple-mobile-web-app-capable" content="yes">
   	<meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -69,7 +67,7 @@
   	<meta property="og:site_name" content="<?=$brand?>" />
   	<meta property="og:description" content="<?=$title?>" />
   	<meta property="og:type" content="website" />
-  	<meta property="og:image" content="<?=CDN_URL?>../wordpress/wp-content/uploads/2016/04/travelscope_4k_1_cropped-640x400@2x.png" />
+  	<meta property="og:image" content="//cdn.markuslerner.com/wordpress/wp-content/uploads/2016/04/travelscope_4k_1_cropped-640x400@2x.png" />
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -91,6 +89,11 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/3.4.0/es5-sham.js"></script>
     <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+    <link rel="canonical" href="<?=URL?>" />
+
+  	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+  	<link rel="apple-touch-icon" href="apple-touch-icon.png"/>
 
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,300,600,400' rel='stylesheet' type='text/css'>
 
@@ -422,14 +425,14 @@ var rsypgei = ['m','=','p','r','e','c','l','t','a','"','s','s','e','c','t','s','
     <i class="icon-facebook" onclick="
       FB.ui({
         method: 'share',
-        href: 'https://www.markuslerner.com/travelscope'
+        href: '<?=URL?>'
       }, function(response){});
       event.preventDefault();
       event.stopPropagation();
     "></i>
 
     <i class="icon-twitter-bird" onclick="
-      var url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent('Interactive worldmap of visa-free travel. https://www.markuslerner.com/travelscope/ by @markuslerner #dataviz');
+      var url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent('Interactive worldmap of visa-free travel. <?=URL?> by @markuslerner #dataviz');
       window.open(url, '_blank', 'width=640,height=320');
       event.preventDefault();
       event.stopPropagation();
