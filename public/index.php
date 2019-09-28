@@ -92,13 +92,17 @@
 
     <link rel="canonical" href="<?=URL?>" />
 
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
   	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-  	<link rel="apple-touch-icon" href="apple-touch-icon.png"/>
 
-    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,300,600,400' rel='stylesheet' type='text/css'>
+    <link rel="preload" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,300,600,400" as="style" />
+    <link rel="preload" href="<?=CDN_URL?>assets/fonts/fonts.css?v=<?=VERSION?>" as="style" />
+    <link rel="preload" href="<?=CDN_URL?>css/main.css?v=<?=VERSION?>" as="style" />
 
-    <link rel="stylesheet" type="text/css" href="<?=CDN_URL?>assets/fonts/fonts.css?v=<?=VERSION?>">
+    <link rel="preload" href="<?=CDN_URL?>js/client.js?v=<?=VERSION?>" as="script" />
 
+    <link rel='stylesheet' type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,300,600,400" />
+    <link rel="stylesheet" type="text/css" href="<?=CDN_URL?>assets/fonts/fonts.css?v=<?=VERSION?>" />
     <link rel="stylesheet" type="text/css" href="<?=CDN_URL?>css/main.css?v=<?=VERSION?>" />
 
     <script language="JavaScript" type="text/javascript">
