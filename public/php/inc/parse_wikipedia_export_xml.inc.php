@@ -50,7 +50,7 @@ foreach ($pages as $page) {
 						// }
 
             // if($debug)
-            echo sizeof($destinations) . ' destinations found for citizens from ' . $country[0] . '<br>';
+            // echo sizeof($destinations) . ' destinations found for citizens from ' . $country[0] . '<br>';
 
 					} else {
 						echo "No destinations found in: <a href=\"" . $wikipedia_url . $country[2] . "\" target=\"_blank\">" . $title . "</a><br/>\n";
