@@ -92,8 +92,8 @@
 
     <link rel="canonical" href="<?=URL?>" />
 
-    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-  	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
 
     <link rel="preload" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,300,600,400" as="style" />
     <link rel="preload" href="<?=CDN_URL?>assets/fonts/fonts.css?v=<?=VERSION?>" as="style" />
