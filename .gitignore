@@ -66,6 +66,7 @@ public/js
 public/images
 public/src
 public/index.html
+public/content
 
 .env
 .azk
