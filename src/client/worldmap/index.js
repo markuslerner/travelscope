@@ -849,9 +849,6 @@ WorldMap.prototype = {
   },
 
   trackEvent: function(category, action) {
-    if(typeof ga !== undefined) {
-      ga('send', 'event', category, action);
-    }
   },
 
   setSelectedCountry: function(selectedCountry) {
