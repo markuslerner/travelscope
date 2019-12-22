@@ -1,10 +1,12 @@
 RewriteEngine On
 
+
 # force https
 # not on *.local domains:
 RewriteCond %{HTTP_HOST} !.local$
 RewriteCond %{HTTPS} off
 RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
 
 # force www
 # not on *.local domains:
@@ -14,9 +16,11 @@ RewriteCond %{HTTP_HOST} !^www\. [NC]
 RewriteCond %{HTTPS}s ^on(s)|
 RewriteRule ^ http%1://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
+
 # rewrite to public folder
 RewriteBase /travelscope
 RewriteRule (.*) public/$1 [L]
+
 
 # Optimize cache-control
 <IfModule mod_expires.c>
@@ -38,4 +42,11 @@ ExpiresByType application/x-javascript "access plus 1 month"
 ExpiresByType image/x-ico "access plus 1 year"
 ExpiresByType image/x-icon "access plus 1 year"
 ExpiresByType application/pdf "access plus 1 month"
+</IfModule>
+
+
+# Allow cross-domain access only from certain domains:
+<IfModule mod_headers.c>
+    SetEnvIf Origin "http(s)?://(www\.)?(markuslerner.com|localhost\:3000)$" AccessControlAllowOrigin=$0
+    Header set Access-Control-Allow-Origin %{AccessControlAllowOrigin}e env=AccessControlAllowOrigin
 </IfModule>
