@@ -32,7 +32,7 @@ foreach ($pages as $page) {
 							$d = "\t{ \"d_name\": " . json_encode($destination['d_name']) . ",
 								\"visa_required\": " . json_encode($destination['visa_required']) . ",
 								\"visa_title\": " . json_encode($destination['visa_title']) . ",
-								\"notes\": " . (isset($destination['notes']) ? json_encode($destination['notes']) : "") . " }";
+								\"notes\": " . json_encode($destination['notes']) . " }";
 							// echo $d . "<br/>";
 							$string .= $d;
 							if($key < sizeof($destinations) - 1) {
