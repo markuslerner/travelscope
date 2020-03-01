@@ -54,8 +54,6 @@ export function matchDestinationToCountryName(destination, country) {
     destination = 'Myanmar';
   } else if(destination === 'Russia') {
     destination = 'Russian Federation';
-  } else if(destination === 'São Tomé and Príncipe') {
-    destination = 'São Tomé and Principe';
   } else if(destination === 'Vatican City') {
     destination = 'Vatican';
   } else if(destination === 'United States of America') {
@@ -64,6 +62,8 @@ export function matchDestinationToCountryName(destination, country) {
     destination = 'Serbia';
   } else if(destination === 'eSwatini') {
     destination = 'Swaziland';
+  } else if(destination === 'São Tomé and Príncipe') {
+    destination = 'São Tomé and Principe';
   } else if(destination === 'São Tomé and Principe') {
     destination = 'Sao Tome and Principe';
   }

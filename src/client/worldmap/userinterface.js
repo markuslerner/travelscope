@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import * as TWEEN from 'tween.js';
 
 import Config from '../config';
-import { formatNumber } from '../utils';
+import { formatNumber, cleanURLString } from '../utils';
 import * as CountryDataHelpers from '../utils/countryDataHelpers';
 import { worldMap } from './index.js';
 import * as Panels from './panel';
@@ -730,7 +730,15 @@ export function initSourceCountryDropDown(worldMap) {
   $('#country_dropdown_container').css('pointer-events', 'auto');
   $('#country_dropdown_container').css('opacity', '1');
 
-  $('#country_dropdown').immybox({ choices: worldMap.countryDropdownChoices, maxResults: 300 });
+  $('#country_dropdown').immybox({
+    choices: worldMap.countryDropdownChoices,
+    maxResults: 300,
+    filterFn: function(query) {
+      return function(choice) {
+        return cleanURLString(choice.text).toLowerCase().indexOf(cleanURLString(query).toLowerCase()) >= 0;
+      };
+    },
+  });
 
   $('#country_dropdown_container form').bind('submit', function(e) {
     e.preventDefault();
