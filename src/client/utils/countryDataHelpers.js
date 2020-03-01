@@ -64,9 +64,9 @@ export function matchDestinationToCountryName(destination, country) {
     destination = 'Serbia';
   } else if(destination === 'eSwatini') {
     destination = 'Swaziland';
+  } else if(destination === 'São Tomé and Principe') {
+    destination = 'Sao Tome and Principe';
   }
-
-  // Swaziland
 
   return country === destination;
 };
