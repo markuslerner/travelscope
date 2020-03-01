@@ -59,6 +59,11 @@ function parseWikiText($text, $debug, $country_name) {
 	$start_string = "{| class=\"sortable wikitable\"";
 	$rows = getAllRows($text, $start_string);
 
+  if(sizeof($rows) == 0) {
+    $start_string = "{|class=\"sortable wikitable\"";
+  	$rows = getAllRows($text, $start_string);
+  }
+
 	// load info for territories (not used yet, because many pages still don't have this info in tabular form):
 	// $start_string = "{| class=\"wikitable\"";
 	// $rows2 = getAllRows($text, $start_string);
