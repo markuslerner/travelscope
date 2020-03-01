@@ -1,5 +1,5 @@
 <?php
-error_reporting(E_ALL);
+error_reporting(E_ERROR);
 
 require __DIR__ . '/../../vendor/autoload.php';
 $dotenv = new Dotenv\Dotenv(__DIR__ . '/../../');
@@ -32,7 +32,7 @@ require_once('class.XMLParser.php');
 require_once('inc/parse_wikitext.inc.php');
 require_once('inc/countries.inc.php');
 
-echo sizeof($countries) . " Wikipedia pages in list.<br/>";
+echo sizeof($countries) . " Wikipedia pages in list.<br/>\n";
 
 
 $parser = new XMLParser();
@@ -60,7 +60,7 @@ if(!file_exists($wikipedia_cache_filename)) {
 	$load_from_cache = false;
 }
 
-echo 'Loading data from cache: ' . ($load_from_cache ? 'true' : 'false') . '<br/>';
+echo 'Loading data from cache: ' . ($load_from_cache ? 'true' : 'false') . "<br/>\n";
 
 if(file_exists($wikipedia_cache_filename) && $load_from_cache) {
 	$export_xml_string = file_get_contents($wikipedia_cache_filename);
@@ -79,7 +79,7 @@ if(file_exists($wikipedia_cache_filename) && $load_from_cache) {
 	foreach ($countries as $country) {
 		$pagename = $country[2];
 		$export_url = $wikipedia_export_url . urlencode($pagename);
-		if($debug) echo "Exporting pages from Wikipedia: " . $export_url . "<br/><br/>";
+		if($debug) echo "Exporting pages from Wikipedia: " . $export_url . "<br/><br/>\n\n";
 
 		if(!$xml = file_get_contents($export_url)) {
 			echo "Error loading pages from Wikipedia";
@@ -110,7 +110,7 @@ if(file_exists($wikipedia_cache_filename) && $load_from_cache) {
 
 	if(!file_exists($wikipedia_cache_filename)) {
 		file_put_contents($wikipedia_cache_filename, $export_xml_string);
-		echo "<br><b>Wikipedia cache XML file saved to: '" . $wikipedia_cache_filename . "'.</b><br/>";
+		echo "<br><b>Wikipedia cache XML file saved to: '" . $wikipedia_cache_filename . "'.</b><br/>\n\n";
 	}
 
 }
@@ -123,7 +123,7 @@ $countries_json = array();
 
 require_once('inc/parse_wikipedia_export_xml.inc.php');
 
-echo "<b>Visa requirements loaded for " . sizeof($countries_json) . " countries.</b>";
+echo "<b>Visa requirements loaded for " . sizeof($countries_json) . " countries.</b><br>\n";
 
 foreach ($countries_json as $key => $country_json) {
 	$json_contents .= $country_json;
@@ -139,7 +139,7 @@ if($write_json_file) {
 	$json_archivefilename = $json_archive_folder . "/" . $year . "-" . $month . "-" . $day . "_" . $hour . "." . $minute . $json_filename;
 	if(!file_exists($json_archivefilename)) {
 		file_put_contents($json_archivefilename, $json_contents);
-		echo "<br><b>Archive JSON file saved to: '" . $json_archivefilename . "'.</b><br/>";
+		echo "<b>Archive JSON file saved to: '" . $json_archivefilename . "'.</b><br/>\n";
 	}
 
 }

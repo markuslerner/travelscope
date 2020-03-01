@@ -18,7 +18,7 @@ foreach ($pages as $page) {
 				$country = getCountryByTitle($countries, $title);
 
 				if($country[0] != "COUNTRY_NAME") {
-				// if($country[0] == "United States of America") {
+				// if($country[0] == "Pakistan") {
 					// echo "Country:" . $country[0] . "\n<br>";
 
 					$destinations = parseWikiText($text, $debug, $country[0]);
@@ -32,7 +32,7 @@ foreach ($pages as $page) {
 							$d = "\t{ \"d_name\": " . json_encode($destination['d_name']) . ",
 								\"visa_required\": " . json_encode($destination['visa_required']) . ",
 								\"visa_title\": " . json_encode($destination['visa_title']) . ",
-								\"notes\": " . json_encode($destination['notes']) . " }";
+								\"notes\": " . (isset($destination['notes']) ? json_encode($destination['notes']) : "") . " }";
 							// echo $d . "<br/>";
 							$string .= $d;
 							if($key < sizeof($destinations) - 1) {
