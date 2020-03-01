@@ -62,7 +62,11 @@ export function matchDestinationToCountryName(destination, country) {
     destination = 'United States';
   } else if(destination === 'Republic of Serbia') {
     destination = 'Serbia';
+  } else if(destination === 'eSwatini') {
+    destination = 'Swaziland';
   }
+
+  // Swaziland
 
   return country === destination;
 };
