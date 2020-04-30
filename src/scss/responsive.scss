@@ -23,7 +23,7 @@
     font-weight: 400;
   }
 
-  #logo_ml {
+  #support {
     margin-right: 1px;
   }
 
@@ -32,9 +32,11 @@
     left: 15px;
   }
 
-  .country_dropdown {
-    width: 180px;
-    padding: 0.25em 0.5em 0.4em 2.1em;
+  .country_dropdown_container {
+    .country_dropdown {
+      width: 170px;
+      padding: 0.25em 0.5em 0.4em 2.1em;
+    }
   }
 
   #travelscope {
@@ -101,18 +103,18 @@
 
 @media only screen and (max-width: 1100px) {
 
-  #logo_ml {
-    width: 70px;
+  #support {
+    // width: 70px;
   }
 
-  #logo_ml .text {
-    display: none;
+  #support .text {
+    // display: none;
   }
 
 }
 
 
-@media only screen and (max-width: 1023px) {
+@media only screen and (max-width: 1070px) {
 
   .country_dropdown_container {
     .country_dropdown {
@@ -122,6 +124,33 @@
 
 }
 
+
+@media only screen and (max-width: 960px) {
+
+  #map_mode {
+    width: calc(100vw - 770px);
+  }
+
+  #map_mode .dropdown-toggle {
+    height: 35px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-right: 20px;
+
+    .dropdown-label {
+      display: inline;
+      overflow: hidden;
+    }
+
+    .caret {
+      position: absolute;
+      right: 3px;
+      top: 15px;
+    }
+  }
+
+}
 
 
 @media only screen and (max-width: 860px) {
@@ -166,16 +195,16 @@
     display: none;
   }
 
-  #logo_ml {
-    width: 100%;
+  #support {
+    // width: 100%;
     text-align: left;
   }
 
-  #logo_ml a {
+  #support a {
     height: 40px;
   }
 
-  #logo_ml .text {
+  #support .text {
     font-size: 12px;
     right: auto;
     top: 11px;
@@ -183,7 +212,7 @@
     color: #fff;
   }
 
-  #logo_ml img {
+  #support .logo-svg {
     left: 160px;
     top: -8px;
     right: auto;

@@ -154,21 +154,22 @@ b {
 	/* background-color: transparent !important; */
 }
 
-#logo_ml {
+#support {
 	padding: 0;
 	margin-right: 15px;
 	position: relative;
-	opacity: 0.85;
-	width: 200px;
+	// opacity: 0.85;
+	width: 182px;
 	height: 50px;
 
   &:hover {
-    opacity: 1;
+    // opacity: 1;
   }
 
   a {
     height: 50px;
     width: 100%;
+    transition: none;
   }
 
   .text {
@@ -182,7 +183,7 @@ b {
     color: white;
   }
 
-  img {
+  .logo-svg {
     margin: 0;
     width: 50px;
     height: 50px;
