@@ -114,42 +114,44 @@ export function getAllCountriesWithSameSovereignty(countries, sov) {
 
 
 export function correctCenter(country) {
+  var offset = { x: Config.mapOffsetX + 540, y: Config.mapOffsetY - 200 };
+
   if(country.name === 'France') {
-    country.center2D.x = -55;
-    country.center2D.y = 89;
+    country.center2D.x = -55 + offset.x;
+    country.center2D.y = 89 + offset.y;
   } else if(country.name === 'Netherlands') {
-    country.center2D.x = -47;
-    country.center2D.y = 104;
+    country.center2D.x = -47 + offset.x;
+    country.center2D.y = 104 + offset.y;
   } else if(country.name === 'Norway') {
-    country.center2D.x = -35;
-    country.center2D.y = 140;
+    country.center2D.x = -35 + offset.x;
+    country.center2D.y = 140 + offset.y;
   } else if(country.name === 'United States') {
-    country.center2D.x = -300;
-    country.center2D.y = 65;
+    country.center2D.x = -300 + offset.x;
+    country.center2D.y = 65 + offset.y;
   } else if(country.name === 'Canada') {
-    country.center2D.x = -290;
-    country.center2D.y = 130;
+    country.center2D.x = -290 + offset.x;
+    country.center2D.y = 130 + offset.y;
   } else if(country.name === 'Denmark') {
-    country.center2D.x = -38;
-    country.center2D.y = 114;
+    country.center2D.x = -38 + offset.x;
+    country.center2D.y = 114 + offset.y;
   } else if(country.name === 'India') {
-    country.center2D.x = 145;
-    country.center2D.y = 20;
+    country.center2D.x = 145 + offset.x;
+    country.center2D.y = 20 + offset.y;
   } else if(country.name === 'Russia') {
-    country.center2D.x = 135;
-    country.center2D.y = 132;
+    country.center2D.x = 135 + offset.x;
+    country.center2D.y = 132 + offset.y;
   } else if(country.name === 'Brazil') {
-    country.center2D.x = -190;
-    country.center2D.y = -78;
+    country.center2D.x = -190 + offset.x;
+    country.center2D.y = -78 + offset.y;
   } else if(country.name === 'United Kingdom') {
-    country.center2D.x = -64;
-    country.center2D.y = 107;
+    country.center2D.x = -64 + offset.x;
+    country.center2D.y = 107 + offset.y;
   } else if(country.name === 'Spain') {
-    country.center2D.x = -67;
-    country.center2D.y = 70;
+    country.center2D.x = -67 + offset.x;
+    country.center2D.y = 70 + offset.y;
   } else if(country.name === 'Portugal') {
-    country.center2D.x = -79;
-    country.center2D.y = 67;
+    country.center2D.x = -79 + offset.x;
+    country.center2D.y = 67 + offset.y;
   }
 };
 

@@ -45,7 +45,7 @@ const config = {
 
   geoScale: 150, // 115
   mapOffsetX: -540, // -500
-  mapOffsetY: 200, // 160
+  mapOffsetY: 160, // 160
   globeRadius: 180,
   globeRotationX: -2.25,
   globeRotationY: 1.7,
