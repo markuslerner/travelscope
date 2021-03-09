@@ -66,6 +66,8 @@ export function matchDestinationToCountryName(destination, country) {
     destination = 'São Tomé and Principe';
   } else if(destination === 'São Tomé and Principe') {
     destination = 'Sao Tome and Principe';
+  } else if(destination === 'Cape Verde') {
+    destination = 'Republic of Cabo Verde';
   }
 
   return country === destination;
