@@ -1166,24 +1166,8 @@ export function updateModeStatement(worldMap) {
 
   }
 
-  if(!$('#travelscope').is( ':visible' )) {
-    // $('#travelscope').fadeIn(600);
-
-    $('#travelscope').css('top', '50px');
-    $('#travelscope').css('display', 'block');
-    $('#travelscope').css('opacity', '0');
-
-    var top = '70px';
-    if($(window).width() <= 1100) {
-      top = '60px';
-    }
-    $('#travelscope').animate({
-      top: top,
-      opacity: 1
-    }, {
-      easing: 'easeOutCubic',
-      duration: 800
-    });
+  if(!$('#travelscope').hasClass('visible')) {
+    $('#travelscope').addClass('visible');
 
     $('#legend_main').fadeIn(800);
     $('#slider_zoom').fadeIn(800);

@@ -39,7 +39,7 @@ const config = {
   updateColorsDuration: 800,
 
   sourceCountryDefaultText: 'Source country',
-  destinationCountryDefaultText: 'Destination country',
+  destinationCountryDefaultText: 'Dest. country',
 
   viewSwitchDuration: 800,
 

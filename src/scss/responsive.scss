@@ -157,6 +157,11 @@
 
   #travelscope {
     width: calc(100% - 250px);
+    top: 90px;
+
+    &.visible {
+      top: 105px;
+    }
   }
 
   #slider_zoom {
@@ -164,22 +169,40 @@
   }
 
   .country_dropdown_container {
-    margin-left: 15px;
-    width: 290px;
+    display: inline-block !important;
+    width: calc(50% - 28px);
+    margin-top: 0;
+    margin-bottom: 4px;
 
     .country_dropdown {
-      width: 290px;
+      width: 100%;
+      padding-right: 25px;
     }
-
-    .cancel {
-      right: 3px;
-    }
-
   }
 
-  #destination_country_dropdown_container {
-    margin-left: 15px;
+  .navbar #arrow_right {
+    display: inline-block !important;
+    float: none;
+    top: 0;
   }
+
+  // .country_dropdown_container {
+  //   margin-left: 15px;
+  //   width: 290px;
+  //
+  //   .country_dropdown {
+  //     width: 290px;
+  //   }
+  //
+  //   .cancel {
+  //     right: 3px;
+  //   }
+  //
+  // }
+
+  // #destination_country_dropdown_container {
+  //   margin-left: 15px;
+  // }
 
   #map_mode {
     width: 291px;
@@ -187,12 +210,21 @@
     font-size: 12px;
   }
 
-  #map_mode .dropdown-toggle .dropdown-label {
-    width: 210px;
+  // #map_mode .dropdown-toggle .dropdown-label {
+  //   width: 210px;
+  // }
+
+  // #arrow_right {
+  //   display: none;
+  // }
+
+  #button_country_list {
+    top: 115px;
   }
 
-  #arrow_right {
-    display: none;
+  #country_list {
+    top: 155px;
+    height: calc(100% - 220px);
   }
 
   #support {
@@ -254,13 +286,13 @@
   }
 
   .country_dropdown_container {
-    width: calc(100% - 30px);
+    // width: calc(100% - 30px);
 
-    .country_dropdown {
-      top: 110px;
-      left: 15px;
-      width: 100%;
-    }
+    // .country_dropdown {
+    //   top: 110px;
+    //   left: 15px;
+    //   width: 100%;
+    // }
   }
 
   #map_mode {
@@ -275,7 +307,6 @@
     font-size: 15px;
     line-height: 22px;
     font-weight: 300;
-    top: 60px;
     left: 15px;
     width: calc(100% - 40px);
   }
@@ -283,7 +314,7 @@
   #button_country_list {
     top: 160px;
     right: 15px;
-    display: none;
+    // display: none;
   }
 
   #country_list {
