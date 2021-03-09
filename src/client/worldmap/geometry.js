@@ -98,7 +98,13 @@ export function createCountriesGeometry(worldMap) {
           countriesUsed.push(country.name);
 
           if(CountryDataHelpers.isCountry(country)) {
-            worldMap.countryDropdownChoices.push({text: country.name, value: country.name});
+            var text = country.name;
+            if(text === 'United States') {
+              text += ' (USA)';
+            } else if(text === 'United Kingdom') {
+              text += ' (UK)';
+            }
+            worldMap.countryDropdownChoices.push({text, value: country.name});
           } else {
             worldMap.countryDropdownChoices.push({text: country.name + ' (' + country.sovereignt + ')', value: country.name});
           }
