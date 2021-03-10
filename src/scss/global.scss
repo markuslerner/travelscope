@@ -284,7 +284,7 @@ b {
 	color: white;
 }
 
-.country_dropdown_container {
+.country-dropdown-container {
 	margin: 8px;
 	pointer-events: none;
 	opacity: 0.5;
@@ -323,13 +323,13 @@ b {
   }
 
   &:hover, &:focus {
-    .country_dropdown {
+    .country-dropdown {
       background-color: #222;
       color: #fff;
     }
   }
 
-  .country_dropdown {
+  .country-dropdown {
     width: 200px;
     // border: 1px solid #aaa;
     border: 1px solid transparent;
@@ -362,7 +362,7 @@ b {
   }
 }
 
-#destination_country_dropdown_container {
+#destination-country-dropdown-container {
 	margin-left: 0;
 }
 

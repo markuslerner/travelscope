@@ -138,9 +138,9 @@
 
     <div id="navbar-search">
       <ul class="nav navbar-nav">
-        <li id="country_dropdown_container" class="country_dropdown_container">
+        <li id="country-dropdown-container" class="country-dropdown-container">
           <form action="#" autocomplete="off">
-            <input type="text" name="country_dropdown" id="country_dropdown" class="country_dropdown" autocomplete="off" placeholder="Source country" disabled />
+            <input type="text" name="country-dropdown" id="country-dropdown" class="country-dropdown" autocomplete="off" placeholder="Source country" disabled />
             <span class="glyphicon glyphicon-search"></span>
             <span class="cancel"></span>
           </form>
@@ -148,9 +148,9 @@
 
         <div id="arrow_right" class="glyphicon glyphicon-arrow-right"></div>
 
-        <li id="destination_country_dropdown_container" class="country_dropdown_container">
+        <li id="destination-country-dropdown-container" class="country-dropdown-container">
           <form action="#" autocomplete="off">
-            <input type="text" name="destination_country_dropdown" id="destination_country_dropdown" class="country_dropdown" autocomplete="off" placeholder="Dest. country" disabled />
+            <input type="text" name="destination-country-dropdown" id="destination-country-dropdown" class="country-dropdown" autocomplete="off" placeholder="Dest. country" disabled />
             <span class="glyphicon glyphicon-search"></span>
             <span class="cancel"></span>
           </form>

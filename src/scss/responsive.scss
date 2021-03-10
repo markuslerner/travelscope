@@ -32,8 +32,8 @@
     left: 15px;
   }
 
-  .country_dropdown_container {
-    .country_dropdown {
+  .country-dropdown-container {
+    .country-dropdown {
       width: 170px;
       padding: 0.25em 0.5em 0.4em 2.1em;
     }
@@ -115,8 +115,8 @@
 
 @media only screen and (max-width: 1070px) {
 
-  .country_dropdown_container {
-    .country_dropdown {
+  .country-dropdown-container {
+    .country-dropdown {
       width: 120px;
     }
   }
@@ -167,14 +167,14 @@
     display: none;
   }
 
-  .country_dropdown_container {
+  .country-dropdown-container {
     display: inline-block !important;
     width: calc(50% - 23px);
     margin-top: 0;
     margin-bottom: 4px;
     margin-right: 3px;
 
-    .country_dropdown {
+    .country-dropdown {
       width: 100%;
       padding-right: 25px;
     }
@@ -187,11 +187,11 @@
     margin-right: 3px;
   }
 
-  // .country_dropdown_container {
+  // .country-dropdown-container {
   //   margin-left: 15px;
   //   width: 290px;
   //
-  //   .country_dropdown {
+  //   .country-dropdown {
   //     width: 290px;
   //   }
   //
@@ -201,7 +201,7 @@
   //
   // }
 
-  // #destination_country_dropdown_container {
+  // #destination-country-dropdown-container {
   //   margin-left: 15px;
   // }
 
@@ -286,10 +286,10 @@
     left: 15px;
   }
 
-  .country_dropdown_container {
+  .country-dropdown-container {
     // width: calc(100% - 30px);
 
-    // .country_dropdown {
+    // .country-dropdown {
     //   top: 110px;
     //   left: 15px;
     //   width: 100%;
