@@ -28,9 +28,9 @@ const config = {
   saveMapData: false,
   mergedCountriesFilename: 'country_data.json',
 
-  introRotateDuration: 4000, // 4000
-  introWarpDelay: 2000, // 2000
-  introWarpDuration: 2500, // 2500
+  introRotateDuration: 2000, // 4000
+  introWarpDelay: 500, // 2000
+  introWarpDuration: 2000, // 2500
 
   lineAnimateDuration: 800,
   lineAnimateSpeed: 10.0,
