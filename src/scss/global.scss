@@ -366,10 +366,16 @@ b {
 	margin-left: 0;
 }
 
-#arrow_right {
+#src-dest-arrow-right {
 	float: left;
 	top: 18px;
 	margin: 0 7px 0 0;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+
+	&.loading {
+		opacity: 0.5;
+	}
 }
 
 .immybox_results {
@@ -714,7 +720,7 @@ b {
 
 #legend {
   position: fixed;
-	bottom: 35px;
+	bottom: 30px;
 	left: 30px;
 	font-size: 10px;
 	letter-spacing: 0.03em;
@@ -1048,7 +1054,7 @@ b {
 
 #zoom-slider {
 	position: absolute;
-	bottom: 15px;
+	bottom: 25px;
 	left: 400px;
 	width: 150px;
 	display: none;
@@ -1056,7 +1062,7 @@ b {
 
 #view-switch {
 	position: fixed;
-	bottom: 35px;
+	bottom: 30px;
 	right: 30px;
 	display: none;
 

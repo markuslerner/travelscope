@@ -146,7 +146,7 @@
           </form>
         </li>
 
-        <div id="arrow_right" class="glyphicon glyphicon-arrow-right"></div>
+        <div id="src-dest-arrow-right" class="glyphicon glyphicon-arrow-right loading"></div>
 
         <li id="destination-country-dropdown-container" class="country-dropdown-container">
           <form action="#" autocomplete="off">

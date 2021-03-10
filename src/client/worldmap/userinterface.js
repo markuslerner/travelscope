@@ -791,6 +791,8 @@ export function clearSourceCountryDropDown() {
 
 
 export function initDestinationCountryDropDown(worldMap) {
+  $('#src-dest-arrow-right').removeClass('loading');
+
   $('#destination-country-dropdown').prop('disabled', false);
 
   $('#destination-country-dropdown-container').css('pointer-events', 'auto');

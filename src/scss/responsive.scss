@@ -65,7 +65,15 @@
 
   #view-switch {
     right: 15px;
+    bottom: 20px;
+  }
+
+  #zoom-slider {
     bottom: 15px;
+  }
+
+  #legend {
+    bottom: 20px;
   }
 
   #social {
@@ -180,7 +188,7 @@
     }
   }
 
-  .navbar #arrow_right {
+  .navbar #src-dest-arrow-right {
     display: inline-block !important;
     float: none;
     top: 0;
@@ -215,7 +223,7 @@
   //   width: 210px;
   // }
 
-  // #arrow_right {
+  // #src-dest-arrow-right {
   //   display: none;
   // }
 
@@ -315,7 +323,7 @@
   #btn-country-list {
     right: 15px;
     top: auto;
-    bottom: 35px;
+    bottom: 20px;
     width: 120px;
     height: 32px;
 
@@ -339,7 +347,7 @@
 
   #view-switch {
     right: calc(55vw - 45px);
-    bottom: 35px;
+    bottom: 20px;
   }
 
   #legend {
