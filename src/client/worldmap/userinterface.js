@@ -70,11 +70,11 @@ export function createLegend(worldMap) {
   $('.btn-legend').click(function(event) {
     if($('.legend-container').is(':visible')) {
       $('.legend-container').slideToggle();
-      $('.btn-legend .caret').css('-webkit-transform', 'rotate(0deg)');
+      $(this).removeClass('open');
 
     } else {
       $('.legend-container').slideToggle();
-      $('.btn-legend .caret').css('-webkit-transform', 'rotate(180deg)');
+      $(this).addClass('open');
     }
   });
 };
@@ -226,14 +226,14 @@ export function createCountryList(worldMap) {
   $('#btn-country-list').click(function(event) {
     if($('#country-list').is(':visible')) {
       $('#country-list').slideToggle();
-      $('#btn-country-list .caret').css('-webkit-transform', 'rotate(0deg)');
+      $(this).removeClass('open');
 
     } else {
       $('#country-list').show();
       updateCountryList(worldMap);
       $('#country-list').hide();
       $('#country-list').slideToggle();
-      $('#btn-country-list .caret').css('-webkit-transform', 'rotate(180deg)');
+      $(this).addClass('open');
     }
   });
 
@@ -283,7 +283,7 @@ export function showCountryList(worldMap) {
     if(!$('#country-list').is(':visible')) {
       updateCountryList(worldMap);
       $('#country-list').slideToggle();
-      $('#btn-country-list .caret').css('-webkit-transform', 'rotate(180deg)');
+      $('#btn-country-list').addClass('open');
     }
   }
 };
@@ -658,10 +658,10 @@ export function initGeneralElements(worldMap) {
   });
 
   $('#map_mode').on('show.bs.dropdown', function() {
-    $(this).find('.caret').css('-webkit-transform', 'rotate(180deg)');
+    $(this).find('.caret').css('transform', 'rotate(180deg)');
     // return false;
   }).on('hide.bs.dropdown', function() {
-    $(this).find('.caret').css('-webkit-transform', 'rotate(0deg)');
+    $(this).find('.caret').css('transform', 'rotate(0deg)');
     // return false;
   });
 
@@ -1134,15 +1134,9 @@ export function updateModeStatement(worldMap) {
 
     $('#legend-main').fadeIn(800);
     $('#zoom-slider').fadeIn(800);
-    if($(window).width() > 860) {
-      $('#social').fadeIn(800);
-    }
     $('#view-switch').fadeIn(800);
     $('.btn-legend').fadeIn(800);
-
-    if($(window).width() > 480) {
-      $('#btn-country-list').fadeIn(800);
-    }
+    $('#btn-country-list').fadeIn(800);
   }
 
 };
@@ -1254,20 +1248,6 @@ function onWindowResize() {
     if(worldMap.controls) {
       worldMap.controls.screen.width = viewportWidth;
       worldMap.controls.handleResize();
-    }
-
-    if(worldMap.inited && !worldMap.introRunning) {
-      if($(window).width() > 480) {
-        $('#btn-country-list').show();
-      } else {
-        $('#btn-country-list').hide();
-        $('#country-list').hide();
-      }
-      if($(window).width() > 860) {
-        $('#social').show();
-      } else {
-        $('#social').hide();
-      }
     }
 
     worldMap.render();

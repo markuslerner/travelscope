@@ -584,7 +584,14 @@ b {
     position: absolute;
     right: 10px;
     top: 12px;
+    transform: rotate(0deg);
     transition: all .2s ease-in-out;
+  }
+
+  &.open {
+    .caret {
+      transform: rotate(180deg);
+    }
   }
 
 }
@@ -722,8 +729,15 @@ b {
 
     .caret {
       margin-top: -2px;
-      margin-left: 10px;
+      margin-left: 8px;
+      transform: rotate(180deg);
       transition: all .2s ease-in-out;
+    }
+
+    &.open {
+      .caret {
+        transform: rotate(0deg);
+      }
     }
   }
 

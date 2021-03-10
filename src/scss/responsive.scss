@@ -313,18 +313,32 @@
   }
 
   #btn-country-list {
-    top: 160px;
     right: 15px;
-    // display: none;
+    top: auto;
+    bottom: 35px;
+    width: 120px;
+    height: 32px;
+
+    .caret {
+      transform: rotate(180deg);
+    }
+
+    &.open {
+      .caret {
+        transform: rotate(0deg);
+      }
+    }
   }
 
   #country-list {
     right: 15px;
-    height: calc(100% - 420px);
+    top: auto;
+    bottom: 80px;
+    height: calc(100% - 350px);
   }
 
   #view-switch {
-    right: 15px;
+    right: calc(55vw - 45px);
     bottom: 35px;
   }
 
@@ -355,4 +369,16 @@
     visibility: hidden;
   }
 
+}
+
+
+@media only screen and (max-width: 360px) {
+  #view-switch {
+    right: calc(55vw - 35px);
+    bottom: 35px;
+
+    .btn {
+      padding: 6px 8px;
+    }
+  }
 }
