@@ -18,7 +18,6 @@ export const mouseNormalizedTouchStart = new THREE.Vector3( 0, 0, 1 );
 var selectCountryOnTouchEnd = true;
 var isMouseDown = false;
 var countryListSorting = '';
-var uiReady = false;
 var focus = 'source';
 
 
@@ -37,11 +36,6 @@ export function init(worldMap) {
   bindEventHandlers();
 
   closeLoadingInfo();
-};
-
-
-export function completeInit() {
-  uiReady = true;
 };
 
 
@@ -1251,9 +1245,6 @@ function onWindowResize() {
     }
 
     worldMap.render();
-
-    if(uiReady) {
-    }
   }
 
   centerCountryHoverInfoToScreen();

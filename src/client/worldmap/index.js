@@ -295,7 +295,6 @@ WorldMap.prototype = {
           UI.initDestinationCountryDropDown(worldMap);
           UI.showCountryList(worldMap);
           UI.updateModeStatement(worldMap);
-          UI.completeInit();
 
           worldMap.geometryNeedsUpdate = true;
           worldMap.introRunning = false;
