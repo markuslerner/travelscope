@@ -121,74 +121,76 @@
 
   <div id="container"></div>
 
-	<nav class="navbar navbar-default navbar-fixed-top">
-	  <div class="container-fluid">
-		<div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
 
-			<h1>
-				<a class="navbar-brand" href="#"><?=$brand?></a>
-			</h1>
-		</div><!-- /.navbar-header -->
+      <h1>
+        <a class="navbar-brand" href="#">Travelscope</a>
+      </h1>
+    </div><!-- /.navbar-header -->
 
-		<!-- Collect the nav links, forms, and other content for toggling -->
-		<div id="navbar" class="navbar-collapse collapse">
-			<ul class="nav navbar-nav">
+    <div id="navbar-search">
+      <ul class="nav navbar-nav">
+        <li id="country_dropdown_container" class="country_dropdown_container">
+          <form action="#" autocomplete="off">
+            <input type="text" name="country_dropdown" id="country_dropdown" class="country_dropdown" autocomplete="off" placeholder="Source country" disabled />
+            <span class="glyphicon glyphicon-search"></span>
+            <span class="cancel"></span>
+          </form>
+        </li>
 
-			<li id="country_dropdown_container" class="country_dropdown_container">
-				<form action="#" autocomplete="off">
-					<input type="text" name="country_dropdown" id="country_dropdown" class="country_dropdown" autocomplete="off" disabled />
-					<span class="glyphicon glyphicon-search"></span>
-					<span class="cancel"></span>
-				</form>
-			</li>
+        <div id="arrow_right" class="glyphicon glyphicon-arrow-right"></div>
 
-			<div id="arrow_right" class="glyphicon glyphicon-arrow-right"></div>
+        <li id="destination_country_dropdown_container" class="country_dropdown_container">
+          <form action="#" autocomplete="off">
+            <input type="text" name="destination_country_dropdown" id="destination_country_dropdown" class="country_dropdown" autocomplete="off" placeholder="Dest. country" disabled />
+            <span class="glyphicon glyphicon-search"></span>
+            <span class="cancel"></span>
+          </form>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
 
-			<li id="destination_country_dropdown_container" class="country_dropdown_container">
-				<form action="#" autocomplete="off">
-					<input type="text" name="destination_country_dropdown" id="destination_country_dropdown" class="country_dropdown" autocomplete="off" disabled />
-					<span class="glyphicon glyphicon-search"></span>
-					<span class="cancel"></span>
-				</form>
-			</li>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li id="map_mode" class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+             <span class="mode">Mode: </span><span data-bind="label" class="dropdown-label"> Visa-free destinations</span>&nbsp;<span class="caret"></span>
+          </a>
+           <ul class="dropdown-menu" role="menu">
+             <li><a href="#" class="mode" data-mode="destinations">Visa-free destinations</a></li>
+             <li><a href="#" class="mode" data-mode="sources">Visa-free sources</a></li>
+             <li><a href="#" class="mode" data-mode="gdp">GDP</a></li>
+             <li><a href="#" class="mode" data-mode="gdp-per-capita">GDP per Capita</a></li>
+             <li><a href="#" class="mode" data-mode="population">Population</a></li>
+           </ul>
+        </li>
+      </ul>
 
-			<li id="map_mode" class="dropdown">
-				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-					 <span class="mode">Mode: </span><span data-bind="label" class="dropdown-label"> Visa-free destinations</span>&nbsp;<span class="caret"></span>
-				</a>
-				 <ul class="dropdown-menu" role="menu">
-				   <li><a href="#" class="mode" data-mode="destinations">Visa-free destinations</a></li>
-				   <li><a href="#" class="mode" data-mode="sources">Visa-free sources</a></li>
-				   <li><a href="#" class="mode" data-mode="gdp">GDP</a></li>
-				   <li><a href="#" class="mode" data-mode="gdp-per-capita">GDP per Capita</a></li>
-				   <li><a href="#" class="mode" data-mode="population">Population</a></li>
-				 </ul>
-			</li>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#" id="button_about">About</a></li>
 
-			<li class="divider"></li>
-
-			</ul>
-
-			<ul class="nav navbar-nav navbar-right">
-				<li><a href="#" id="button_about">About</a></li>
-
-				<li><a href="#" id="button_disclaimer">Disclaimer</a></li>
+        <li><a href="#" id="button_disclaimer">Disclaimer</a></li>
 
         <li id="support">
+					<!-- <a href="https://www.markuslerner.com/" target="_blank">
+						<span class="text">Concept/development:</span>
+						<img class="logo-svg" alt="Markus Lerner Design" src="assets/img/ml-white.svg"/>
+					</a> -->
           <style>.bmc-button-n img{height: 34px !important;width: 35px !important;margin-bottom: 1px !important;box-shadow: none !important;border: none !important;vertical-align: middle !important;}.bmc-button-n{ left: 15px; transform-origin: center left; transform: scale(0.7, 0.7); padding: 7px 10px 7px 10px !important;line-height: 35px !important;height:51px !important;min-width:217px !important;text-decoration: none !important;display:inline-flex !important;color:#FFFFFF !important;background-color:#FF813F !important;border-radius: 5px !important;border: 1px solid transparent !important;padding: 7px 10px 7px 10px !important;font-size: 28px !important;letter-spacing:0.6px !important; margin: 0 auto !important;font-family:'Cookie', cursive !important;-webkit-box-sizing: border-box !important;box-sizing: border-box !important;}.bmc-button-n:hover, .bmc-button-n:active, .bmc-button-n:focus {text-decoration: none !important; opacity: 0.85 !important;color:#FFFFFF !important;}</style><link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet"><a class="bmc-button-n" target="_blank" href="https://www.buymeacoffee.com/markuslerner"><img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:15px;font-size:28px !important;">Buy me a coffee</span></a>
 				</li>
-			</ul>
+      </ul>
+    </div><!-- /.navbar-collapse -->
 
-		</div><!-- /.navbar-collapse -->
-
-	  </div><!-- /.container-fluid -->
-	</nav>
+    </div><!-- /.container-fluid -->
+  </nav>
 
 	<div id="top-overlay">
 		<div class="background"></div>

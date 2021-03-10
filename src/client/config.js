@@ -38,9 +38,6 @@ const config = {
 
   updateColorsDuration: 800,
 
-  sourceCountryDefaultText: 'Source country',
-  destinationCountryDefaultText: 'Dest. country',
-
   viewSwitchDuration: 800,
 
   geoScale: 150, // 115

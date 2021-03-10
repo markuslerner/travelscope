@@ -19,6 +19,7 @@ var selectCountryOnTouchEnd = true;
 var isMouseDown = false;
 var countryListSorting = '';
 var uiReady = false;
+var focus = 'source';
 
 
 
@@ -82,13 +83,6 @@ export function updateLegend(worldMap) {
     // $('#last_update_wikipedia').fadeIn(800);
     // $('#last_update_naturalearthdata').fadeOut(800);
 
-    /*
-    if(worldMap.selectedDestinationCountry) {
-      var s = worldMap.selectedDestinationCountry;
-      worldMap.clearSelectedDestinationCountry();
-      worldMap.setSelectedCountry(s);
-    }
-    */
     // $('#destination_country_dropdown_container').show();
 
   } else if(worldMap.mode === 'sources') {
@@ -99,13 +93,6 @@ export function updateLegend(worldMap) {
     // $('#last_update_wikipedia').fadeIn(800);
     // $('#last_update_naturalearthdata').fadeOut(800);
 
-    /*
-    if(worldMap.selectedCountry) {
-      var s = worldMap.selectedCountry;
-      worldMap.clearSelectedSourceCountry();
-      worldMap.setSelectedDestinationCountry(s);
-    }
-    */
     // $('#destination_country_dropdown_container').show();
 
   } else if(worldMap.mode === 'gdp') {
@@ -170,8 +157,8 @@ export function createCountryList(worldMap) {
     var name = country.name;
 
     // if(name === 'United States') {
-      // console.log(country.properties, CountryDataHelpers.isCountry(country), country.type === 'Country', country.sovereignt);
-      // console.log(country.type);
+    // console.log(country.properties, CountryDataHelpers.isCountry(country), country.type === 'Country', country.sovereignt);
+    // console.log(country.type);
     // }
 
     // add only proper countries:
@@ -205,7 +192,9 @@ export function createCountryList(worldMap) {
 
     if(worldMap.mode === 'sources') {
       if(worldMap.selectedDestinationCountry !== selectedCountryNew) {
-        if(event.ctrlKey || event.altKey || event.metaKey) {
+        var sourceFocus = focus === 'source';
+
+        if(event.ctrlKey || event.altKey || event.metaKey || sourceFocus) {
           worldMap.setSelectedCountry(selectedCountryNew);
           worldMap.trackEvent('sourceCountryListClick', selectedCountryNew.name);
         } else {
@@ -216,7 +205,9 @@ export function createCountryList(worldMap) {
 
     } else {
       if(worldMap.selectedCountry !== selectedCountryNew) {
-        if(event.ctrlKey || event.altKey || event.metaKey) {
+        var destinationFocus = focus === 'destination';
+
+        if(event.ctrlKey || event.altKey || event.metaKey || destinationFocus) {
           worldMap.setSelectedDestinationCountry(selectedCountryNew);
           worldMap.trackEvent('destinationCountryListClick', selectedCountryNew.name);
         } else {
@@ -313,20 +304,20 @@ export function showCountryList(worldMap) {
 };
 
 
-function sortCountryListByName() {
-  var newSorting = 'name';
-  if(countryListSorting !== newSorting) {
-    countryListSorting = newSorting;
-
-    var li = $('#country_list').children('li');
-    li.sort(function(a, b) {
-      var aName = $(a).data('country').name;
-      var bName = $(b).data('country').name;
-      return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
-    });
-    repositionCountryList(li);
-  }
-}
+// function sortCountryListByName() {
+//   var newSorting = 'name';
+//   if(countryListSorting !== newSorting) {
+//     countryListSorting = newSorting;
+//
+//     var li = $('#country_list').children('li');
+//     li.sort(function(a, b) {
+//       var aName = $(a).data('country').name;
+//       var bName = $(b).data('country').name;
+//       return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
+//     });
+//     repositionCountryList(li);
+//   }
+// }
 
 
 function sortCountryListByFreeDestinations() {
@@ -745,22 +736,9 @@ export function initSourceCountryDropDown(worldMap) {
     collapseNavBar();
   });
 
-  $('#country_dropdown').val(Config.sourceCountryDefaultText);
-
-  $('#country_dropdown').on('click', function(event, value) {
-    if($(this).val() === Config.sourceCountryDefaultText) {
-      $(this).val('');
-    }
-  });
-  $('#country_dropdown').focusout( function(event, value) {
-    // $('#country_dropdown').immybox('hideResults', '');
-    // collapseNavBar();
-    if( $('#country_dropdown').val() === '') {
-      $('#country_dropdown').val(Config.sourceCountryDefaultText);
-    }
-  });
   $('#country_dropdown_container .cancel').bind('click', function() {
     $('#country_dropdown').focus();
+    focus = 'source';
     worldMap.clearSelectedSourceCountry();
   });
   $('#country_dropdown').bind('keyup', function() {
@@ -796,7 +774,6 @@ export function initSourceCountryDropDown(worldMap) {
             worldMap.clearSelectedCountry();
           } else {
             $('#country_dropdown').immybox('setValue', '');
-            $('#country_dropdown').val(Config.sourceCountryDefaultText);
           }
           return;
         }
@@ -818,12 +795,13 @@ export function setSourceCountryDropdownValue(value) {
   $('#country_dropdown').val(value);
   $('#country_dropdown').addClass('filled');
   $('#country_dropdown_container .cancel').fadeIn();
+  $('#destination_country_dropdown').focus();
+  focus = 'destination';
 };
 
 
 export function clearSourceCountryDropDown() {
   $('#country_dropdown').immybox('setValue', '');
-  $('#country_dropdown').val(Config.sourceCountryDefaultText);
   $('#country_dropdown').removeClass('filled');
   $('#country_dropdown_container .cancel').fadeOut();
 };
@@ -842,24 +820,9 @@ export function initDestinationCountryDropDown(worldMap) {
     collapseNavBar();
   });
 
-  $('#destination_country_dropdown').val(Config.destinationCountryDefaultText);
-
-  $('#destination_country_dropdown').on( 'click', function(event, value) {
-    if($(this).val() === Config.destinationCountryDefaultText) {
-      $(this).val('');
-    }
-  });
-
-  $('#destination_country_dropdown').focusout( function(event, value) {
-    // $('#destination_country_dropdown').immybox('hideResults', '');
-    // collapseNavBar();
-    if( $('#destination_country_dropdown').val() === '') {
-      $('#destination_country_dropdown').val(Config.destinationCountryDefaultText);
-    }
-  });
-
   $('#destination_country_dropdown_container .cancel').bind('click', function() {
     $('#destination_country_dropdown').focus();
+    focus = 'destination';
     worldMap.clearSelectedDestinationCountry();
   });
 
@@ -896,7 +859,6 @@ export function initDestinationCountryDropDown(worldMap) {
             worldMap.clearSelectedDestinationCountry();
           } else {
             $('#destination_country_dropdown').immybox('setValue', '');
-            $('#destination_country_dropdown').val(Config.destinationCountryDefaultText);
           }
           return;
         }
@@ -918,14 +880,22 @@ export function setDestinationCountryDropdownValue(value) {
   $('#destination_country_dropdown').val(value);
   $('#destination_country_dropdown').addClass('filled');
   $('#destination_country_dropdown_container .cancel').fadeIn();
+  $('#destination_country_dropdown').focus();
+  focus = 'destination';
 };
 
 
 export function clearDestinationCountryDropDown() {
   $('#destination_country_dropdown').immybox('setValue', '');
-  $('#destination_country_dropdown').val(Config.destinationCountryDefaultText);
   $('#destination_country_dropdown').removeClass('filled');
   $('#destination_country_dropdown_container .cancel').fadeOut();
+};
+
+
+export function blurBothCountryDropDowns() {
+  $('#country_dropdown').blur();
+  $('#destination_country_dropdown').blur();
+  focus = '';
 };
 
 
@@ -1360,8 +1330,8 @@ function onMouseUp(event) {
 function onMouseClick(event) {
   // log('onMouseClick()');
 
-  $('#country_dropdown').blur();
-  $('#destination_country_dropdown').blur();
+  // $('#country_dropdown').blur();
+  // $('#destination_country_dropdown').blur();
   $('#slider_zoom .ui-slider-handle').blur();
 
   if(selectCountryOnTouchEnd) {

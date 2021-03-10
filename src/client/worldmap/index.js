@@ -672,6 +672,9 @@ WorldMap.prototype = {
   selectCountryFromMap: function(event) {
     // log('selectCountryFromMap');
 
+    var sourceFocus = $('#country_dropdown').is(':focus');
+    var destinationFocus = $('#destination_country_dropdown').is(':focus');
+
     var intersects = Geometry.getIntersects(this, UI.mouseNormalizedTouchStart);
 
     if( intersects.length > 0 ) {
@@ -681,12 +684,12 @@ WorldMap.prototype = {
         if(intersects[ 0 ].object.name !== 'sphere') {
           if(this.mode === 'destinations') {
             if(intersects[ 0 ].object.countryObject.disputed) {
-              if(event.ctrlKey || event.altKey || event.metaKey) {
+              if(event.ctrlKey || event.altKey || event.metaKey || destinationFocus) {
               } else {
                 this.setSelectedDisputedCountry(intersects[ 0 ].object.countryObject);
               }
             } else {
-              if(event.ctrlKey || event.altKey || event.metaKey) {
+              if(event.ctrlKey || event.altKey || event.metaKey || destinationFocus) {
                 if(this.selectedCountry && this.selectedCountry.disputed) {
                   this.selectedCountry = null;
                 } else {
@@ -701,12 +704,12 @@ WorldMap.prototype = {
 
           } else if(this.mode === 'sources') {
             if(intersects[ 0 ].object.countryObject.disputed) {
-              if(event.ctrlKey || event.altKey || event.metaKey) {
+              if(event.ctrlKey || event.altKey || event.metaKey || sourceFocus) {
               } else {
                 this.setSelectedDisputedDestinationCountry(intersects[ 0 ].object.countryObject);
               }
             } else {
-              if(event.ctrlKey || event.altKey || event.metaKey) {
+              if(event.ctrlKey || event.altKey || event.metaKey || sourceFocus) {
                 this.setSelectedCountry(intersects[ 0 ].object.countryObject);
                 this.trackEvent('sourceCountryMapClick', intersects[ 0 ].object.countryObject.name);
               } else {
@@ -718,7 +721,7 @@ WorldMap.prototype = {
           } else {
             // this.setSelectedCountry(intersects[ 0 ].object.countryObject);
             // this.trackEvent('mapClickSourceCountry', intersects[ 0 ].object.countryObject.name);
-            if(event.ctrlKey || event.altKey || event.metaKey) {
+            if(event.ctrlKey || event.altKey || event.metaKey || destinationFocus) {
               this.setSelectedDestinationCountry(intersects[ 0 ].object.countryObject);
               this.trackEvent('destinationCountryMapClick', intersects[ 0 ].object.countryObject.name);
             } else {
@@ -734,19 +737,19 @@ WorldMap.prototype = {
       }
     } else {
       if(this.mode === 'destinations') {
-        if(event.ctrlKey || event.altKey || event.metaKey) {
+        if(event.ctrlKey || event.altKey || event.metaKey || (destinationFocus && $('#destination_country_dropdown').val() !== '')) {
           this.clearSelectedDestinationCountry();
         } else {
           this.clearBothSelectedCountries();
         }
       } else if(this.mode === 'sources') {
-        if(event.ctrlKey || event.altKey || event.metaKey) {
+        if(event.ctrlKey || event.altKey || event.metaKey || sourceFocus) {
           this.clearSelectedSourceCountry();
         } else {
           this.clearBothSelectedCountries();
         }
       } else {
-        if(event.ctrlKey || event.altKey || event.metaKey) {
+        if(event.ctrlKey || event.altKey || event.metaKey || (destinationFocus && $('#destination_country_dropdown').val() !== '')) {
           this.clearSelectedDestinationCountry();
         } else {
           this.clearBothSelectedCountries();
@@ -783,6 +786,8 @@ WorldMap.prototype = {
       UI.clearSourceCountryDropDown();
 
       UI.clearDestinationCountryDropDown();
+
+      UI.blurBothCountryDropDowns();
 
       UI.showMainLegend();
 
@@ -855,6 +860,10 @@ WorldMap.prototype = {
     // log('setSelectedCountry()');
 
     if(!this.introRunning) {
+      if(this.selectedCountry) {
+        if(this.selectedCountry.listItem !== undefined) this.selectedCountry.listItem.removeClass('selected');
+      }
+
       this.selectedCountry = selectedCountry;
 
       if(this.selectedCountry) {
@@ -870,6 +879,10 @@ WorldMap.prototype = {
     // log('setSelectedDestinationCountry()');
 
     if(!this.introRunning) {
+      if(this.selectedDestinationCountry) {
+        if(this.selectedDestinationCountry.listItem !== undefined) this.selectedDestinationCountry.listItem.removeClass('selected');
+      }
+
       this.selectedDestinationCountry = selectedDestinationCountry;
 
       if(this.selectedDestinationCountry) {

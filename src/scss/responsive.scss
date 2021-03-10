@@ -170,9 +170,10 @@
 
   .country_dropdown_container {
     display: inline-block !important;
-    width: calc(50% - 28px);
+    width: calc(50% - 23px);
     margin-top: 0;
     margin-bottom: 4px;
+    margin-right: 3px;
 
     .country_dropdown {
       width: 100%;
@@ -184,6 +185,7 @@
     display: inline-block !important;
     float: none;
     top: 0;
+    margin-right: 3px;
   }
 
   // .country_dropdown_container {
