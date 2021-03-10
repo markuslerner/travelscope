@@ -81,7 +81,12 @@ b {
 .navbar-default {
 	background-color: #444444;
 	border-color: #444444;
+
+	a {
+		outline: none;
+	}
 }
+
 .navbar-default .navbar-brand {
 	color: #ecf0f1;
 	font-size: 20px;
