@@ -614,17 +614,17 @@ b {
 	-webkit-overflow-scrolling: touch;
 	margin: 0;
 	font-weight: 400;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(25, 25, 25, 0.5);
   border-radius: 3px;
 
-	// background: #000000; /* Old browsers */
-	// background: -moz-linear-gradient(top,  #000000 0%, #333333 100%); /* FF3.6+ */
-	// background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#000000), color-stop(100%,#333333)); /* Chrome,Safari4+ */
-	// background: -webkit-linear-gradient(top,  #000000 0%,#333333 100%); /* Chrome10+,Safari5.1+ */
-	// background: -o-linear-gradient(top,  #000000 0%,#333333 100%); /* Opera 11.10+ */
-	// background: -ms-linear-gradient(top,  #000000 0%,#333333 100%); /* IE10+ */
-	// background: linear-gradient(to bottom,  rgba(0,0,0,0.75) -20%, rgba(50,50,50,0.75) 120%); /* W3C */
-	// filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#333333',GradientType=0 ); /* IE6-9 */
+	background: #000000; /* Old browsers */
+	background: -moz-linear-gradient(top,  #000000 0%, #333333 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#000000), color-stop(100%,#333333)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #000000 0%,#333333 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #000000 0%,#333333 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #000000 0%,#333333 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  rgba(0,0,0,0.75) -20%, rgba(50,50,50,0.75) 120%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#333333',GradientType=0 ); /* IE6-9 */
 
   li {
     list-style-type: none;
@@ -656,7 +656,7 @@ b {
     display: block;
     width: 10px;
     height: 10px;
-    margin: 3px 5px 0 0;
+    margin: 4px 5px 0 0;
     background: transparent;
     position: absolute;
     left: 0px;
@@ -722,8 +722,7 @@ b {
   position: fixed;
 	bottom: 30px;
 	left: 30px;
-	font-size: 10px;
-	letter-spacing: 0.03em;
+	font-size: 12px;
 	font-weight: 400;
   pointer-events: none;
 
@@ -749,15 +748,20 @@ b {
 
   .legend-container {
     display: none;
-    margin-bottom: 45px;
+    position: absolute;
+    bottom: 45px;
+    background-color: rgba(50, 50, 50, 0.5);
+    border-radius: 3px;
+    padding: 4px 8px;
+    width: 250px;
   }
 
   .legend {
   	display: none;
 
     .range {
-      width: 220px;
-      margin-top: 25px;
+      width: 100%;
+      margin-top: 4px;
       margin-bottom: 30px;
       clear: left;
     }
@@ -810,14 +814,16 @@ b {
   	// left: 30px;
     display: block;
     clear: left;
-    width: 100vw;
+    width: 100%;
   	font-size: 10px;
-  	letter-spacing: 0.03em;
+    line-height: 1.5em;
   	color: #999;
   	font-weight: 400;
   	// display: none;
+    padding: 5px 0;
 
     a {
+      color: #ccc;
       pointer-events: auto;
     }
   }

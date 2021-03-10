@@ -70,6 +70,12 @@ export function createLegend(worldMap) {
       $('.legend-container').slideToggle();
       $(this).addClass('open');
     }
+
+    if($('#country-list').is(':visible')) {
+      $('#country-list').slideToggle();
+      $('#btn-country-list').removeClass('open');
+    }
+
   });
 };
 
@@ -229,6 +235,12 @@ export function createCountryList(worldMap) {
       $('#country-list').slideToggle();
       $(this).addClass('open');
     }
+
+    if($('.legend-container').is(':visible')) {
+      $('.legend-container').slideToggle();
+      $('.btn-legend').removeClass('open');
+    }
+
   });
 
 };
@@ -546,7 +558,7 @@ function sortCountryListByPopulation() {
 
 
 function repositionCountryList(li) {
-  var top = 0;
+  var top = 4;
 
   if($('#country-list').is(':visible')) {
     $('#country-list li').css('transition', 'top 0.5s ease-out');

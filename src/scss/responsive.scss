@@ -341,8 +341,19 @@
   #country-list {
     right: 15px;
     top: auto;
-    bottom: 80px;
+    bottom: 65px;
+    width: calc(100% - 30px);
     height: calc(100% - 350px);
+    font-size: 13px;
+
+    &.narrownumbers {
+      .text {
+        width: calc(100vw - 110px);
+      }
+      .number {
+        left: calc(100vw - 80px);
+      }
+    }
   }
 
   #view-switch {
@@ -352,10 +363,23 @@
 
   #legend {
     left: 15px;
-  }
+    font-size: 13px;
 
-  #legend .range {
-    width: 150px;
+    .legend-container  {
+      width: calc(100vw - 30px);
+    }
+
+    .legend {
+      .range {
+        width: 100%;
+      }
+    }
+
+    .last-update {
+      font-size: 11px;
+      width: calc(100vw - 30px);
+      padding: 5px 0;
+    }
   }
 
   .panel .inside {
