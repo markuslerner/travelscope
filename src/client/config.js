@@ -92,18 +92,23 @@ const config = {
 // only for non-BufferedGeometries:
 config.materialCountryDefault = new THREE.MeshPhongMaterial({ color: config.colorCountryDefault, transparent: false, wireframe: false, shading: THREE.SmoothShading, side: THREE.DoubleSide });
 
+var lighten = function(color) {
+  var lightenColor = new THREE.Color(0x333333);
+  return color.clone().add(lightenColor);
+};
+
 // Chrome and Firefox seem to ignore linewidth when using WebGLRenderer:
 config.materialCountryBorder = new THREE.LineBasicMaterial( { color: 0xFFFFFF, linewidth: 1.5 } );
 config.materialCountryBorderDisputed = new THREE.LineBasicMaterial( { color: 0x444444, linewidth: 2.0 } );
-config.materialLineDefault = new THREE.LineDashedMaterial( { color: config.colorCountryDefault, linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
-config.materialLineVisaNotRequired = new THREE.LineDashedMaterial( { color: config.colorVisaNotRequired, linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
-config.materialLineVisaOnArrival = new THREE.LineDashedMaterial( { color: config.colorVisaOnArrival, linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
-config.materialLineVisaETA = new THREE.LineDashedMaterial( { color: config.colorVisaETA, linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
-config.materialLineVisaFreeEU = new THREE.LineDashedMaterial( { color: config.colorVisaFreeEU, linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
-config.materialLineVisaRequired = new THREE.LineDashedMaterial( { color: config.colorVisaRequired, linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
-config.materialLineVisaSpecial = new THREE.LineDashedMaterial( { color: config.colorVisaSpecial, linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
-config.materialLineVisaAdmissionRefused = new THREE.LineDashedMaterial( { color: config.colorVisaAdmissionRefused, linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
-config.materialLineVisaDataNotAvailable = new THREE.LineDashedMaterial( { color: config.colorVisaDataNotAvailable, linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
+config.materialLineDefault = new THREE.LineDashedMaterial( { color: lighten(config.colorCountryDefault), linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
+config.materialLineVisaNotRequired = new THREE.LineDashedMaterial( { color: lighten(config.colorVisaNotRequired), linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
+config.materialLineVisaOnArrival = new THREE.LineDashedMaterial( { color: lighten(config.colorVisaOnArrival), linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
+config.materialLineVisaETA = new THREE.LineDashedMaterial( { color: lighten(config.colorVisaETA), linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
+config.materialLineVisaFreeEU = new THREE.LineDashedMaterial( { color: lighten(config.colorVisaFreeEU), linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
+config.materialLineVisaRequired = new THREE.LineDashedMaterial( { color: lighten(config.colorVisaRequired), linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
+config.materialLineVisaSpecial = new THREE.LineDashedMaterial( { color: lighten(config.colorVisaSpecial), linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
+config.materialLineVisaAdmissionRefused = new THREE.LineDashedMaterial( { color: lighten(config.colorVisaAdmissionRefused), linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
+config.materialLineVisaDataNotAvailable = new THREE.LineDashedMaterial( { color: lighten(config.colorVisaDataNotAvailable), linewidth: 1.2, dashSize: 3, gapSize: 2, opacity: 0.5, transparent: true } ); // blending: THREE.AdditiveBlending
 
 
 export default config;
