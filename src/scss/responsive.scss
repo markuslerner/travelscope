@@ -59,7 +59,7 @@
 
   #country_list {
     right: 15px;
-    top: 105px;
+    top: 100px;
     height: calc(100% - 170px);
   }
 
@@ -73,7 +73,7 @@
     bottom: 10px;
   }
 
-  .last_update {
+  .last-update {
     left: 15px;
     bottom: 12px;
   }
@@ -84,12 +84,11 @@
     font-weight: 300;
   }
 
-  .legend {
+  #legend {
     left: 15px;
-    bottom: 30px;
   }
 
-  .legend .colors .box {
+  #legend .colors .box {
     margin: 2px 5px 5px 0;
   }
 
@@ -221,12 +220,12 @@
   // }
 
   #button_country_list {
-    top: 115px;
+    top: 110px;
   }
 
   #country_list {
-    top: 155px;
-    height: calc(100% - 220px);
+    top: 145px;
+    height: calc(100% - 210px);
   }
 
   #support {
@@ -306,11 +305,11 @@
   }
 
   #travelscope {
-    font-size: 15px;
+    font-size: 16px;
     line-height: 22px;
     font-weight: 300;
     left: 15px;
-    width: calc(100% - 40px);
+    width: calc(100% - 30px);
   }
 
   #button_country_list {
@@ -329,11 +328,11 @@
     bottom: 35px;
   }
 
-  .legend {
+  #legend {
     left: 15px;
   }
 
-  .legend .range {
+  #legend .range {
     width: 150px;
   }
 

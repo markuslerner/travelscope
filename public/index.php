@@ -206,20 +206,35 @@
 		<button type="button" id="view_switch_spherical" class="btn btn-default" title="Spherical view"><span class="glyphicon glyphicon-globe"></span> </button>
 	</div>
 
+  <div id="legend">
+    <button type="button" class="btn btn-default btn-legend" title="Toggle legend"><span class="title">Legend</span><span class="caret"></span></button>
 
-	<div id="legend_main" class="legend">
-		<div class="range">
-			<div class="box"></div>
-			<div class="min"></div>
-			<div class="rangelabel"></div>
-			<div class="max"></div>
-		</div>
-		<div class="colors"></div>
-	</div>
+    <div class="legend-container">
+      <div id="legend_main" class="legend">
+        <div class="range">
+          <div class="box"></div>
+          <div class="min"></div>
+          <div class="rangelabel"></div>
+          <div class="max"></div>
+        </div>
+        <div class="colors"></div>
+      </div>
 
-	<div id="legend_selected" class="legend">
-		<div class="colors"></div>
-	</div>
+      <div id="legend_selected" class="legend">
+        <div class="colors"></div>
+      </div>
+
+      <div class="last-update">
+        Sources:
+        <a href="http://www.naturalearthdata.com/" target="_blank">Natural Earth Data</a> (4.1.0, 2018-05-21),
+        <a href="http://en.wikipedia.org/wiki/Category:Visa_requirements_by_nationality" target="_new">Wikipedia</a> (<?php
+    		if (file_exists($latest_visa_requirements_filename)) {
+    			date_default_timezone_set('Europe/Berlin');
+    		    echo date("Y-m-d", filemtime($latest_visa_requirements_filename));
+    		}
+    	?>)</div>
+    </div>
+  </div>
 
 	<div id="country-tooltip">
 		<div class="title"></div>
@@ -237,16 +252,6 @@
 		<div class="panel-close"></div>
     <?php if(file_exists('content/disclaimer.inc.php')) require_once('content/disclaimer.inc.php'); ?>
 	</div>
-
-	<div id="last_update_wikipedia" class="last_update">
-    Sources:
-    <a href="http://www.naturalearthdata.com/" target="_blank">Natural Earth Data</a> (4.1.0, 2018-05-21),
-    <a href="http://en.wikipedia.org/wiki/Category:Visa_requirements_by_nationality" target="_new">Wikipedia</a> (<?php
-		if (file_exists($latest_visa_requirements_filename)) {
-			date_default_timezone_set('Europe/Berlin');
-		    echo date("Y-m-d", filemtime($latest_visa_requirements_filename));
-		}
-	?>)</div>
 
 	<div id="loading">
 		<div class="title">Loading world map and visa data</div>

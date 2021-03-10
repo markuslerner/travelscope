@@ -14,6 +14,7 @@ body {
 	overflow: hidden;
 	max-width: 100%;
 	max-height: 100%;
+  -webkit-font-smoothing: antialiased;
 }
 
 input:focus {
@@ -91,14 +92,12 @@ b {
 	color: #ecf0f1;
 	font-size: 20px;
 	font-weight: 400;
-	-webkit-font-smoothing: antialiased;
 	padding-left: 30px;
 	padding-right: 50px;
 }
 .navbar-default .navbar-brand .beta {
 	font-size: 10px;
 	font-weight: 400;
-	-webkit-font-smoothing: antialiased;
 	letter-spacing: 0.05em;
 	top: 7px;
 	margin-left: 2px;
@@ -337,7 +336,6 @@ b {
     font-size: 14px;
     line-height: 22px;
     font-weight: 400;
-    -webkit-font-smoothing: antialiased;
     background-color: #333;
     color: #ddd;
     padding: 0.25em 2.1em 0.4em 2.1em;
@@ -389,7 +387,6 @@ b {
   font-size: 14px;
   line-height: 22px;
   font-weight: 400;
-  -webkit-font-smoothing: antialiased;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
   box-shadow: 0px 3px 20px 5px rgba(0,0,0,0.6);
@@ -449,7 +446,6 @@ b {
 
 #map_mode {
   margin: 8px 0 0 5px;
-  -webkit-font-smoothing: antialiased;
 }
 
 .navbar-default .dropdown-toggle {
@@ -514,7 +510,6 @@ b {
       background-color: #222222;
       padding: 0.5em 0.75em;
       font-weight: 400;
-      -webkit-font-smoothing: antialiased;
     }
     > li > a:hover, > li > a:focus {
       color: #ffffff;
@@ -542,7 +537,6 @@ b {
 	pointer-events: none;
 	width: 100%;
 	max-width: 650px;
-	-webkit-font-smoothing: antialiased;
   opacity: 0;
   top: 50px;
   transition: opacity 0.6s ease, top 0.6s ease;
@@ -585,26 +579,11 @@ b {
 	width: 212px;
 	text-align: left;
 	display: none;
-  background-color: #333333;
-  border: none;
-  color: #dddddd;
-  padding: 0.75em 1em;
-  font-weight: normal;
-  -webkit-font-smoothing: antialiased;
-  transition: all .2s ease-in-out;
-
-  &:active {
-    outline: none;
-  }
-
-  &:hover {
-    background-color: #444;
-  }
 
   .caret {
     position: absolute;
     right: 10px;
-    top: 16px;
+    top: 12px;
     transition: all .2s ease-in-out;
   }
 
@@ -612,7 +591,7 @@ b {
 
 #country_list {
 	position: absolute;
-	top: 115px;
+	top: 110px;
 	right: 30px;
 	width: 210px;
 	height: calc(100% - 210px);
@@ -621,9 +600,9 @@ b {
 	overflow-y: auto;
 	-webkit-overflow-scrolling: touch;
 	margin: 0;
-	padding: 0;
 	font-weight: 400;
-	-webkit-font-smoothing: antialiased;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 3px;
 
 	// background: #000000; /* Old browsers */
 	// background: -moz-linear-gradient(top,  #000000 0%, #333333 100%); /* FF3.6+ */
@@ -637,6 +616,7 @@ b {
   li {
     list-style-type: none;
     margin: 0;
+    padding: 0px 8px;
     margin-bottom: 10px;
     position: absolute;
     top: 0;
@@ -671,7 +651,7 @@ b {
 
   li .number {
     display: block;
-    margin: 0 5px 0 0;
+    margin: 0;
     position: absolute;
     left: 15px;
     text-align: right;
@@ -703,7 +683,7 @@ b {
   &.narrownumbers .number {
     display: block;
     width: 30px;
-    left: 160px;
+    left: 163px;
   }
 
   &.widenumbers .text {
@@ -714,7 +694,7 @@ b {
   &.widenumbers .number {
     display: block;
     width: 80px;
-    left: 110px;
+    left: 112px;
   }
 
 }
@@ -725,74 +705,101 @@ b {
 	padding: 0 2px;
 }
 
-.last_update {
-	position: fixed;
-	bottom: 30px;
-	left: 30px;
-	font-size: 10px;
-	letter-spacing: 0.03em;
-	color: #999;
-	font-weight: 400;
-	-webkit-font-smoothing: antialiased;
-	// display: none;
-}
-
-.legend {
-	position: fixed;
-	bottom: 55px;
+#legend {
+  position: fixed;
+	bottom: 35px;
 	left: 30px;
 	font-size: 10px;
 	letter-spacing: 0.03em;
 	font-weight: 400;
-	-webkit-font-smoothing: antialiased;
-	pointer-events: none;
-	display: none;
+  pointer-events: none;
 
-  .range {
-    width: 220px;
-    margin-top: 25px;
-    margin-bottom: 30px;
+  .btn-legend {
+    position: absolute;
+    bottom: 0;
+    pointer-events: auto;
+		display: none;
+
+    .caret {
+      margin-top: -2px;
+      margin-left: 10px;
+      transition: all .2s ease-in-out;
+    }
+  }
+
+  .legend-container {
+    display: none;
+    margin-bottom: 45px;
+  }
+
+  .legend {
+  	display: none;
+
+    .range {
+      width: 220px;
+      margin-top: 25px;
+      margin-bottom: 30px;
+      clear: left;
+    }
+
+    .range .box {
+      width: 100%;
+      height: 10px;
+      margin-bottom: 3px;
+    }
+
+    .range .min {
+      float: left;
+      width: 33%;
+    }
+
+    .range .rangelabel {
+      float: left;
+      text-align: center;
+      width: 34%;
+    }
+
+    .range .max {
+      float: right;
+      text-align: right;
+      width: 33%;
+    }
+
+    .colors .box {
+      width: 10px;
+      height: 10px;
+      margin: 4px 6px 6px 0;
+      float: left;
+      clear: left;
+    }
+
+    .colors .text {
+      float: left;
+    }
+
+    .info_visa_free {
+      clear: left;
+      margin-bottom: 15px;
+    }
+
+  }
+
+  .last-update {
+  	// position: fixed;
+  	// bottom: 30px;
+  	// left: 30px;
+    display: block;
     clear: left;
-  }
+    width: 100vw;
+  	font-size: 10px;
+  	letter-spacing: 0.03em;
+  	color: #999;
+  	font-weight: 400;
+  	// display: none;
 
-  .range .box {
-    width: 100%;
-    height: 10px;
-    margin-bottom: 3px;
-  }
-
-  .range .min {
-    float: left;
-    width: 33%;
-  }
-
-  .range .rangelabel {
-    float: left;
-    text-align: center;
-    width: 34%;
-  }
-
-  .range .max {
-    float: right;
-    text-align: right;
-    width: 33%;
-  }
-
-  .colors .box {
-    width: 10px;
-    height: 10px;
-    margin: 4px 6px 6px 0;
-    float: left;
-    clear: left;
-  }
-
-  .colors .text {
-    float: left;
-  }
-
-  .info_visa_free {
-    clear: left;
-    margin-bottom: 15px;
+    a {
+      pointer-events: auto;
+    }
   }
 
 }
@@ -801,7 +808,6 @@ b {
 	position: fixed;
 	font-size: 18px;
 	font-weight: 400;
-	-webkit-font-smoothing: antialiased;
 	color: white;
 	background-color: #333;
 	width: auto;
@@ -827,7 +833,6 @@ b {
   bottom: 30px;
   font-size: 1.4em;
   font-weight: normal;
-  -webkit-font-smoothing: antialiased;
   display: none;
 
   i {
@@ -864,7 +869,6 @@ b {
 	position: fixed;
 	top: 100px;
 	font-weight: 400;
-	-webkit-font-smoothing: antialiased;
 	color: white;
 	width: auto;
 	margin-left: auto;
@@ -887,7 +891,6 @@ b {
 	display: none;
 	z-index: 500;
 	box-shadow: 0px 3px 40px 5px rgba(0,0,0,0.4);
-  // -webkit-font-smoothing: antialiased;
 
   .title {
   }
@@ -917,7 +920,6 @@ b {
 	position: absolute;
 	font-size: 15px;
 	font-weight: 400;
-	-webkit-font-smoothing: antialiased;
 	color: #ddd;
 	background-color: #333;
 	width: 750px;
@@ -1075,13 +1077,17 @@ b {
 }
 
 .btn {
+  font-size: 12px;
+  line-height: 20px;
   border: none;
-  background-color: #555;
+  background-color: #444;
   color: #ddd;
   transition: all .2s ease-in-out;
+  outline: none !important;
 
   &:focus {
-    outline: none;
+    background-color: #555;
+    color: #fff;
   }
 
   &:hover, &:active, &.active {
@@ -1089,6 +1095,7 @@ b {
     background-color: #666;
     color: #fff;
     box-shadow: none;
+    outline: none;
   }
 
 }

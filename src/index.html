@@ -158,19 +158,30 @@
     <button type="button" id="view_switch_spherical" class="btn btn-default" title="Spherical view"><span class="glyphicon glyphicon-globe"></span> </button>
   </div>
 
+  <div id="legend">
+    <button type="button" class="btn btn-default btn-legend" title="Toggle legend"><span class="title">Legend</span><span class="caret"></span></button>
 
-  <div id="legend_main" class="legend">
-    <div class="range">
-      <div class="box"></div>
-      <div class="min"></div>
-      <div class="rangelabel"></div>
-      <div class="max"></div>
+    <div class="legend-container">
+      <div id="legend_main" class="legend">
+        <div class="range">
+          <div class="box"></div>
+          <div class="min"></div>
+          <div class="rangelabel"></div>
+          <div class="max"></div>
+        </div>
+        <div class="colors"></div>
+      </div>
+
+      <div id="legend_selected" class="legend">
+        <div class="colors"></div>
+      </div>
+
+      <div class="last-update">
+        Sources:
+        <a href="http://www.naturalearthdata.com/" target="_blank">Natural Earth Data</a> (4.1.0, 2018-05-21),
+        <a href="http://en.wikipedia.org/wiki/Category:Visa_requirements_by_nationality" target="_new">Wikipedia</a>
+      </div>
     </div>
-    <div class="colors"></div>
-  </div>
-
-  <div id="legend_selected" class="legend">
-    <div class="colors"></div>
   </div>
 
   <div id="country-tooltip">
@@ -197,13 +208,6 @@
 
       </div>
     </div>
-  </div>
-
-
-  <div class="last_update">
-    Sources:
-    <a href="http://www.naturalearthdata.com/" target="_blank">Natural Earth Data</a> (4.1.0, 2018-05-21),
-    <a href="http://en.wikipedia.org/wiki/Category:Visa_requirements_by_nationality" target="_new">Wikipedia</a>
   </div>
 
 

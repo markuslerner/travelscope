@@ -67,6 +67,16 @@ export function createLegend(worldMap) {
   $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaRequired.getHexString() + '"></div><div class="text">Visa required</div></div>');
   $('#legend_selected .colors').append('<div class="color no-data"><div class="box" style="background-color: #' + Config.colorVisaDataNotAvailable.getHexString() + '"></div><div class="text">Data not available</div></div>');
 
+  $('.btn-legend').click(function(event) {
+    if($('.legend-container').is(':visible')) {
+      $('.legend-container').slideToggle();
+      $('.btn-legend .caret').css('-webkit-transform', 'rotate(0deg)');
+
+    } else {
+      $('.legend-container').slideToggle();
+      $('.btn-legend .caret').css('-webkit-transform', 'rotate(180deg)');
+    }
+  });
 };
 
 
@@ -80,18 +90,12 @@ export function updateLegend(worldMap) {
     $('#legend_main .range .rangelabel').html('Destinations');
     $('#legend_main .range .max').html(worldMap.maxNumDestinationsFreeOrOnArrival);
 
-    // $('#last_update_wikipedia').fadeIn(800);
-    // $('#last_update_naturalearthdata').fadeOut(800);
-
     // $('#destination_country_dropdown_container').show();
 
   } else if(worldMap.mode === 'sources') {
     $('#legend_main .range .min').html(0);
     $('#legend_main .range .rangelabel').html('Sources');
     $('#legend_main .range .max').html(worldMap.maxNumSourcesFreeOrOnArrival);
-
-    // $('#last_update_wikipedia').fadeIn(800);
-    // $('#last_update_naturalearthdata').fadeOut(800);
 
     // $('#destination_country_dropdown_container').show();
 
@@ -102,9 +106,6 @@ export function updateLegend(worldMap) {
     num = formatNumber(num, 0);
     $('#legend_main .range .max').html(num + ' b USD');
 
-    // $('#last_update_wikipedia').fadeOut(800);
-    // $('#last_update_naturalearthdata').fadeIn(800);
-
     // $('#destination_country_dropdown_container').hide();
 
   } else if(worldMap.mode === 'gdp-per-capita') {
@@ -114,9 +115,6 @@ export function updateLegend(worldMap) {
     num = formatNumber(num, 0);
     $('#legend_main .range .max').html(num + ' USD');
 
-    // $('#last_update_wikipedia').fadeOut(800);
-    // $('#last_update_naturalearthdata').fadeIn(800);
-
     // $('#destination_country_dropdown_container').hide();
 
   } else if(worldMap.mode === 'population') {
@@ -125,9 +123,6 @@ export function updateLegend(worldMap) {
     num = Math.round(worldMap.maxPopulation / 1000000);
     num = formatNumber(num, 0);
     $('#legend_main .range .max').html(num + ' m');
-
-    // $('#last_update_wikipedia').fadeOut(800);
-    // $('#last_update_naturalearthdata').fadeIn(800);
 
     // $('#destination_country_dropdown_container').hide();
 
@@ -149,7 +144,7 @@ export function showSelectedLegend() {
 
 
 export function createCountryList(worldMap) {
-  $('body').append('<div id="country_list_container"><ul id="country_list"></ul></div>');
+  $('body').append('<ul id="country_list"></ul>');
 
   var count = 0;
   for(var i = 0; i < worldMap.countries.length; i++) {
@@ -1145,7 +1140,8 @@ export function updateModeStatement(worldMap) {
       $('#social').fadeIn(800);
     }
     $('#view_switch').fadeIn(800);
-    $('#last_update_wikipedia').fadeIn(800);
+    $('.btn-legend').fadeIn(800);
+
     if($(window).width() > 480) {
       $('#button_country_list').fadeIn(800);
     }
