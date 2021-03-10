@@ -71,9 +71,12 @@ export function createLegend(worldMap) {
       $(this).addClass('open');
     }
 
-    if($('#country-list').is(':visible')) {
-      $('#country-list').slideToggle();
-      $('#btn-country-list').removeClass('open');
+    if($(window).width() <= 480) {
+      // Hide country list on small screens, if open:
+      if($('#country-list').is(':visible')) {
+        $('#country-list').slideToggle();
+        $('#btn-country-list').removeClass('open');
+      }
     }
 
   });
@@ -236,9 +239,12 @@ export function createCountryList(worldMap) {
       $(this).addClass('open');
     }
 
-    if($('.legend-container').is(':visible')) {
-      $('.legend-container').slideToggle();
-      $('.btn-legend').removeClass('open');
+    if($(window).width() <= 480) {
+      // Hide legend on small screens, if open:
+      if($('.legend-container').is(':visible')) {
+        $('.legend-container').slideToggle();
+        $('.btn-legend').removeClass('open');
+      }
     }
 
   });
