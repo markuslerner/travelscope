@@ -736,11 +736,11 @@ export function initSourceCountryDropDown(worldMap) {
 
   $('#country-dropdown').on( 'update', function(event, value) {
     if(!worldMap.introRunning) {
-      $('#country-dropdown').blur();
-
-      window.setTimeout(function() {
-        $('#country-dropdown').blur();
-      }, 100);
+      // $('#country-dropdown').blur();
+      //
+      // window.setTimeout(function() {
+      //   $('#country-dropdown').blur();
+      // }, 100);
 
       if(value !== null) collapseNavBar();
 
@@ -780,8 +780,12 @@ export function setSourceCountryDropdownValue(value) {
   $('#country-dropdown').val(value);
   $('#country-dropdown').addClass('filled');
   $('#country-dropdown-container .cancel').fadeIn();
-  $('#destination-country-dropdown').focus();
-  focus = 'destination';
+
+  // Set with timeout, so that focus gets re-set when clicking item in country dropdown:
+  setTimeout(function() {
+    $('#destination-country-dropdown').focus();
+    focus = 'destination';
+  }, 17);
 };
 
 
@@ -821,11 +825,11 @@ export function initDestinationCountryDropDown(worldMap) {
 
   $('#destination-country-dropdown').on( 'update', function(event, value) {
     if(!worldMap.introRunning) {
-      $('#destination-country-dropdown').blur();
-
-      window.setTimeout(function() {
-        $('#destination-country-dropdown').blur();
-      }, 100);
+      // $('#destination-country-dropdown').blur();
+      //
+      // window.setTimeout(function() {
+      //   $('#destination-country-dropdown').blur();
+      // }, 100);
 
       if(value !== null) collapseNavBar();
 
@@ -865,8 +869,12 @@ export function setDestinationCountryDropdownValue(value) {
   $('#destination-country-dropdown').val(value);
   $('#destination-country-dropdown').addClass('filled');
   $('#destination-country-dropdown-container .cancel').fadeIn();
-  $('#destination-country-dropdown').focus();
-  focus = 'destination';
+
+  // Set with timeout, so that focus gets re-set when clicking item in country dropdown:
+  setTimeout(function() {
+    $('#destination-country-dropdown').focus();
+    focus = 'destination';
+  }, 100);
 };
 
 
