@@ -741,6 +741,11 @@ export function initSourceCountryDropDown(worldMap) {
     focus = 'source';
     worldMap.clearSelectedSourceCountry();
   });
+
+  $('#country-dropdown').bind('click', function() {
+    focus = 'source';
+  });
+
   $('#country-dropdown').bind('keyup', function() {
     if($('#country-dropdown').val() === '') {
       $('#country-dropdown-container .cancel').fadeOut();
@@ -798,8 +803,10 @@ export function setSourceCountryDropdownValue(value) {
 
   // Set with timeout, so that focus gets re-set when clicking item in country dropdown:
   setTimeout(function() {
-    $('#destination-country-dropdown').focus();
-    focus = 'destination';
+    $('#country-dropdown').focus();
+    focus = 'source';
+    // $('#destination-country-dropdown').focus();
+    // focus = 'destination';
   }, 17);
 };
 
@@ -830,6 +837,10 @@ export function initDestinationCountryDropDown(worldMap) {
     $('#destination-country-dropdown').focus();
     focus = 'destination';
     worldMap.clearSelectedDestinationCountry();
+  });
+
+  $('#destination-country-dropdown').bind('click', function() {
+    focus = 'destination';
   });
 
   $('#destination-country-dropdown').bind('keyup', function() {
