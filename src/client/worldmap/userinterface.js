@@ -1382,6 +1382,10 @@ function onTouchEnd(event) {
   mouseNormalized.x = ( touch.pageX / viewportWidth ) * 2 - 1;
   mouseNormalized.y = -( touch.pageY / viewportHeight ) * 2 + 1;
 
+  $('#country-dropdown').immybox('hideResults');
+  $('#destination-country-dropdown').immybox('hideResults');
+  $('#zoom-slider .ui-slider-handle').blur();
+
   if(selectCountryOnTouchEnd) {
     worldMap.selectCountryFromMap(event);
   }
