@@ -240,6 +240,8 @@ WorldMap.prototype = {
 
     worldMap.updateCountryColorsOneByOne();
 
+    UI.scrollCountryListToTop();
+
     UI.updateModeStatement(worldMap);
 
   },

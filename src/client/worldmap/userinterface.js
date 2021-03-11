@@ -285,8 +285,11 @@ export function updateCountryList(worldMap) {
     }
   }
 
-  $('#country-list').scrollTop(0);
+};
 
+
+export function scrollCountryListToTop() {
+  $('#country-list').scrollTop(0);
 };
 
 
