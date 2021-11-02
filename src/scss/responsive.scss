@@ -44,7 +44,6 @@
     top: 60px;
     width: calc(100% - 450px);
     font-size: 20px; /* 15px */
-    line-height: 27px; /* 22px */
     font-weight: 300;
   }
 
@@ -103,19 +102,6 @@
   #logterminal {
     top: 200px !important;
     left: 0px !important;
-  }
-
-}
-
-
-@media only screen and (max-width: 1100px) {
-
-  #support {
-    // width: 70px;
-  }
-
-  #support .text {
-    // display: none;
   }
 
 }
@@ -313,8 +299,7 @@
   }
 
   #travelscope {
-    font-size: 16px;
-    line-height: 22px;
+    font-size: 18px;
     font-weight: 300;
     left: 15px;
     width: calc(100% - 30px);

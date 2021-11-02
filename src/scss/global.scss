@@ -539,7 +539,7 @@ b {
 	margin: 0;
 	font-size: 24px; /* 15px */
 	font-weight: 400;
-	line-height: 34px; /* 22px */
+	line-height: 1.3em; /* 22px */
 	pointer-events: none;
 	width: 100%;
 	max-width: 650px;
@@ -557,9 +557,21 @@ b {
   }
 
   .notes {
-    font-size: 12px;
+    font-size: 13px;
     line-height: 18px;
     margin: 10px 0 0 0;
+
+		.more {
+      // display: block;
+      background-color: transparent;
+      border: none;
+      color: #fff;
+      padding-left: 0px;
+      // padding: 5px;
+      // margin-left: -5px;
+      // margin-top: 5px;
+			pointer-events: auto;
+		}
   }
 
   .glyphicon-arrow-right {

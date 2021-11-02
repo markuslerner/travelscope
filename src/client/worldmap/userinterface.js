@@ -1114,6 +1114,27 @@ export function showCountryHoverInfoPopulation(country) {
 
 export function setHeadline(html) {
   $('#travelscope').html(html);
+
+  if($('#travelscope .notes').length > 0) {
+    var notes = $('#travelscope .notes').html();
+    var words = notes.split(' ');
+    var limit = 28;
+    if(words.length > limit) {
+      var teaser = words.slice(0, limit).join(' ');
+      var rest = words.slice(limit + 1).join(' ');
+
+      $('#travelscope .notes').html('<span class="teaser">' + teaser + '</span> <span class="rest" style="display: none;">' + rest + '</span> <button class="more">... more</button>');
+
+      $('#travelscope .notes .more').click(function() {
+        $('#travelscope .notes .rest').toggle();
+        if($('#travelscope .notes .rest').is(':visible')) {
+          $(this).text('... less');
+        } else {
+          $(this).text('... more');
+        }
+      });
+    }
+  }
 };
 
 
@@ -1141,8 +1162,6 @@ export function updateModeStatement(worldMap) {
       }
       keyboardhint += ' to select destination county.';
 
-      $('#travelscope').append('<div class="notes">' + keyboardhint + '</div>');
-
     } else if(worldMap.mode === 'sources') {
       keyboardhint = 'Click map to select destination country,<br/>';
       if(Config.isMac) {
@@ -1152,8 +1171,9 @@ export function updateModeStatement(worldMap) {
       }
       keyboardhint += ' to select source county.';
 
-      $('#travelscope').append('<div class="notes">' + keyboardhint + '</div>');
     }
+
+    $('#travelscope').append('<div class="notes">' + keyboardhint + '</div>');
 
   }
 
