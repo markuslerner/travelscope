@@ -140,7 +140,7 @@ $countries = array(
 	array("Republic of Serbia",	"SRB",	"Visa_requirements_for_Serbian_citizens"),
 	array("Slovenia",			"SVN",	"Visa_requirements_for_Slovenian_citizens"),
 	array("Liechtenstein",		"LIE",	"Visa_requirements_for_Liechtenstein_citizens"),
-	array("Uzbekistan",			"UZB",	"Visa_requirements_for_Uzbekistani_citizens"),
+	array("Uzbekistan",			"UZB",	"Visa_requirements_for_Uzbekistan_citizens"),
 	array("Belarus",				"BLR",	"Visa_requirements_for_Belarusian_citizens"),
 	array("Armenia",				"ARM",	"Visa_requirements_for_Armenian_citizens"),
 	array("Taiwan",				"TWN",	"Visa_requirements_for_Taiwanese_citizens"),
