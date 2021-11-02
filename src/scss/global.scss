@@ -1,5 +1,8 @@
 html {
 	height: 100%;
+
+	// iOS: Make sure fullscreen elements like the lightbox use the full window height:
+  min-height: calc(1vh * 100);
 }
 
 body {
@@ -246,6 +249,7 @@ b {
 	position: fixed;
 	top: 0px;
 	left: 0px;
+	min-height: 100%;
 }
 
 #top-overlay {
