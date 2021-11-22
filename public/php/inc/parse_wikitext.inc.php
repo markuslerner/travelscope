@@ -119,14 +119,21 @@ function parseWikiText($text, $debug, $country_name) {
 						}
 						if($debug) echo 'visa_title: ' . $data['visa_title'] . "<br>";
 
-						// if(stripos($col, "Visa required") > -1) {
-						if ( containsString("{{no|", $col) ) {
+            if ( containsString("{{no|", $col) ) {
+							$data['visa_required'] = "yes";
+
+						} else if ( containsString("yes|√", $col) ) {
+							$data['visa_required'] = "yes";
+
+						} else if ( containsString("yes|[[Visa Waiver Program]]", $col) ) {
+							$data['visa_required'] = "yes";
+
+						} else if ( containsString("yes|Visa required", $col) ) {
 							$data['visa_required'] = "yes";
 
 						} else if ( containsString("{{yes-no|", $col) ) {
 							$data['visa_required'] = "on-arrival";
 
-						// } else if(stripos($col, "free|{{sort|EU|Visa not required") > -1) {
 						} else if ( containsString("{{free|{{sort|EU|Visa not required", $col) ) {
 							$data['visa_required'] = "free-eu";
 
@@ -136,37 +143,42 @@ function parseWikiText($text, $debug, $country_name) {
 						} else if ( containsString("{{yes2|", $col) ) {
 							$data['visa_required'] = "eta";
 
-						// } else if(stripos($col, "Visa on arrival") > -1) {
-						} else if ( containsString("Visa on arrival", $col) ) {
+            } else if ( containsString("on-arrival", $col) ) {
+              $data['visa_required'] = "on-arrival";
+
+            } else if ( containsString("on arrival", $col) ) {
+              $data['visa_required'] = "on-arrival";
+
+            } else if ( containsString("yes|Free Visitor", $col) ) {
 							$data['visa_required'] = "on-arrival";
 
-						// } else if(stripos($col, "eVisitor") > -1) {
+            } else if ( containsString("yes|Free Entry", $col) ) {
+              $data['visa_required'] = "on-arrival";
+
 						} else if ( containsString("evisitor", $col) ) {
 							$data['visa_required'] = "eta";
 
-						// } else if(stripos($col, "eVisa") > -1) {
 						} else if ( containsString("evisa", $col) ) {
 							$data['visa_required'] = "eta";
 
-						// } else if(stripos($col, "Electronic Travel Authorization") > -1) {
 						} else if ( containsString("Electronic Travel Authorization", $col) ) {
 							$data['visa_required'] = "eta";
 
-						// } else if(stripos($col, "eta") > -1) {
 						} else if ( containsString("eta", $col) ) {
 							$data['visa_required'] = "eta";
 
-						// } else if(stripos($col, "Admission refused") > -1) {
+            } else if ( containsString("yes|Free e-Visa", $col) ) {
+							$data['visa_required'] = "eta";
+
 						} else if ( containsString("Admission refused", $col) ) {
 							$data['visa_required'] = "admission-refused";
 
-						// } else if(stripos($col, "Visa not required") > -1) {
+            } else if ( containsString("Travel banned", $col) ) {
+              $data['visa_required'] = "admission-refused";
+
 						} else if ( containsString("Visa not required", $col) ) {
 							$data['visa_required'] = "no";
 
-						// } else if(stripos($col, "free") > -1) {
-							// } else if ( containsString("free", $col) ) {
-							// $data['visa_required'] = "no";
 						}
 
 						// replace line breaks:
