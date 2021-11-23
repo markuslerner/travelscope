@@ -69,7 +69,7 @@ public/index.html
 public/content
 
 .env
-.azk
+.nvmrc
 
 # composer
 composer.phar
