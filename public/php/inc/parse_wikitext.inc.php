@@ -43,7 +43,7 @@ function containsString($needle, $haystack) {
 }
 
 function parseWikiText($text, $debug, $country_name) {
-	echo "parseWikiText() " . $country_name . "<br>";
+	if($debug) echo "parseWikiText() " . $country_name . "<br>";
 
 	// $start_string = "== Visa requirements ==\n\n{| class=\"sortable wikitable\"";
 
