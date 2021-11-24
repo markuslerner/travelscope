@@ -4,21 +4,19 @@ function getAllRows($text, $start_string) {
 	$start_index = 0;
 	$all_rows = array();
 
-	for($i = 0; $i < 100; $i++) {
-		if(stripos($text, $start_string) > -1) {
-			$start = stripos($text, $start_string) + strlen($start_string) + 3;
-			$table = substr($text, $start);
-			$end = stripos($table, "|}");
-			$table = substr($text, $start, $end);
-			// echo $table;
+	if(stripos($text, $start_string) > -1) {
+		$start = stripos($text, $start_string) + strlen($start_string) + 3;
+		$table = substr($text, $start);
+		$end = stripos($table, "|}");
+		$table = substr($text, $start, $end);
+		// echo $table;
 
-			$table = strip_tags($table);
-			$rows = explode("|-", $table);
+		$table = strip_tags($table);
+		$rows = explode("|-", $table);
 
-			$all_rows = array_merge($all_rows, $rows);
-			$text = substr($text, $start_index);
-			$start_index = $end;
-		}
+		$all_rows = array_merge($all_rows, $rows);
+		$text = substr($text, $start_index);
+		$start_index = $end;
 	}
 
 	return $all_rows;
@@ -45,7 +43,7 @@ function containsString($needle, $haystack) {
 }
 
 function parseWikiText($text, $debug, $country_name) {
-	// echo "parseWikiText() " . $country_name . "<br>";
+	echo "parseWikiText() " . $country_name . "<br>";
 
 	// $start_string = "== Visa requirements ==\n\n{| class=\"sortable wikitable\"";
 
@@ -117,7 +115,7 @@ function parseWikiText($text, $debug, $country_name) {
 									}
 								}
 							}
-							// if($debug) echo 'visa_title: ' . $data['visa_title'] . "<br>";
+							if($debug) echo 'visa_title: ' . $data['visa_title'] . "<br>";
 
 	            if ( containsString("{{no|", $col) ) {
 								$data['visa_required'] = "yes";
@@ -185,9 +183,7 @@ function parseWikiText($text, $debug, $country_name) {
 							$data['visa_required'] = str_replace(array("\r\n", "\r", "\n"), "", $data['visa_required']);
 							$data['visa_required'] = trim($data['visa_required']);
 
-							// if($debug) {
-							// 	echo "<span style=\"color: red;\">visa_required: " . $data['visa_required'] . "</span><br>";
-							// }
+							if($debug) echo "<span style=\"color: red;\">visa_required: " . $data['visa_required'] . "</span><br>";
 
 						} else if($colID == 3) {
 							$data['notes'] = $col;
@@ -200,9 +196,7 @@ function parseWikiText($text, $debug, $country_name) {
 							$data['notes'] = str_replace("colspan=2 , ", "", $data['notes']);
 							$data['notes'] = str_replace("\n", "", (htmlspecialchars(cleanURLs($data['notes']))));
 
-							// if($debug) {
-							// 	echo "notes: " . $data['notes'] . "<br>";
-							// }
+							// if($debug) echo "notes: " . $data['notes'] . "<br>";
 
 						}
 
