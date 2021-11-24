@@ -45,7 +45,9 @@ function containsString($needle, $haystack) {
 }
 
 function parseWikiText($text, $debug, $country_name) {
-	// echo "parseWikiText()";
+	echo "parseWikiText() " . $country_name . "<br>";
+
+  if($country_name != "Ghana") return null;
 
 	// $start_string = "== Visa requirements ==\n\n{| class=\"sortable wikitable\"";
 
@@ -79,149 +81,151 @@ function parseWikiText($text, $debug, $country_name) {
 			if($debug) echo "<br/><br/>ROW " . $rowID . ": " . $row . "\n<br><br>";
 
 			if($rowID > 0) {
-        // $cols = spliti("\n\\| ", $row);
-				$cols = explode("\n| ", $row);
-				// $cols = explode(" |", $row);
-				// $cols = preg_split('/\|+/', $row);
+				// $cols = explode("\n| ", $row);
+        preg_match_all('/\{+.*?\}+|^[\s|\s]/', $row, $matches);
 
-				$data = array();
+        if(count($matches) > 0) {
+          $cols = $matches[0];
+          $data = array();
+  				$colID = 0;
 
-				$colID = 0;
-				foreach($cols as $col) {
-					if($debug) echo "COL " . $colID . ": " . $col . "<br>";
+				  foreach($cols as $col) {
+						if($debug) echo "COL " . $colID . ": " . $col . "<br>";
 
-					if($colID == 1) {
-						$data['d_name'] = trim(getSubString($col, "{{flag|", "}}"));
+						if($colID == 1) {
+							$data['d_name'] = trim(getSubString($col, "{{flag|", "}}"));
 
-						if(stripos($data['d_name'], "|") > -1) {
-							// $split = spliti("\\|", $data['d_name']);
-              $split = explode("|", $data['d_name']);
-							$data['d_name'] = $split[0];
-						}
+							if(stripos($data['d_name'], "|") > -1) {
+								// $split = spliti("\\|", $data['d_name']);
+	              $split = explode("|", $data['d_name']);
+								$data['d_name'] = $split[0];
+							}
 
-						if($debug) echo "d_name: " . $data['d_name'] . "<br>";
+							if($debug) echo "d_name: " . $data['d_name'] . "<br>";
 
-					} else if($colID == 2) {
+						} else if($colID == 2) {
 
-						$data['visa_required'] = getSubString($col, "{{", "}}");
-						$data['visa_title'] = '';
-						if(stripos($data['visa_required'], '|') > -1) {
-							$data['visa_title'] = getSubStringAfter($data['visa_required'], "|");
-							$data['visa_title'] = str_replace(array("[[", "]]"), "", $data['visa_title']);
-							$data['visa_title'] = preg_replace( "/\r|\n/", "", $data['visa_title']); // remove line breaks
-							if(stripos($data['visa_title'], '|') > -1) {
-								// $parts = spliti("\\|", $data['visa_title']);
-                $parts = explode("|", $data['visa_title']);
-								if(sizeof($parts) > 0) {
-									$data['visa_title'] = $parts[sizeof($parts) - 1];
+							$data['visa_required'] = getSubString($col, "{{", "}}");
+							$data['visa_title'] = '';
+							if(stripos($data['visa_required'], '|') > -1) {
+								$data['visa_title'] = getSubStringAfter($data['visa_required'], "|");
+								$data['visa_title'] = str_replace(array("[[", "]]"), "", $data['visa_title']);
+								$data['visa_title'] = preg_replace( "/\r|\n/", "", $data['visa_title']); // remove line breaks
+								if(stripos($data['visa_title'], '|') > -1) {
+									// $parts = spliti("\\|", $data['visa_title']);
+	                $parts = explode("|", $data['visa_title']);
+									if(sizeof($parts) > 0) {
+										$data['visa_title'] = $parts[sizeof($parts) - 1];
+									}
 								}
 							}
+							// if($debug) echo 'visa_title: ' . $data['visa_title'] . "<br>";
+
+	            if ( containsString("{{no|", $col) ) {
+								$data['visa_required'] = "yes";
+
+							} else if ( containsString("yes|√", $col) ) {
+								$data['visa_required'] = "yes";
+
+							} else if ( containsString("yes|[[Visa Waiver Program]]", $col) ) {
+								$data['visa_required'] = "yes";
+
+							} else if ( containsString("yes|Visa required", $col) ) {
+								$data['visa_required'] = "yes";
+
+							} else if ( containsString("{{yes-no|", $col) ) {
+								$data['visa_required'] = "on-arrival";
+
+							} else if ( containsString("{{free|{{sort|EU|Visa not required", $col) ) {
+								$data['visa_required'] = "free-eu";
+
+							} else if ( containsString("{{free|{{sort|EU|Freedom of movement", $col) ) {
+								$data['visa_required'] = "free-eu";
+
+							} else if ( containsString("{{yes2|", $col) ) {
+								$data['visa_required'] = "eta";
+
+	            } else if ( containsString("on-arrival", $col) ) {
+	              $data['visa_required'] = "on-arrival";
+
+	            } else if ( containsString("on arrival", $col) ) {
+	              $data['visa_required'] = "on-arrival";
+
+	            } else if ( containsString("yes|Free Visitor", $col) ) {
+								$data['visa_required'] = "on-arrival";
+
+	            } else if ( containsString("yes|Free Entry", $col) ) {
+	              $data['visa_required'] = "on-arrival";
+
+							} else if ( containsString("evisitor", $col) ) {
+								$data['visa_required'] = "eta";
+
+							} else if ( containsString("evisa", $col) ) {
+								$data['visa_required'] = "eta";
+
+							} else if ( containsString("Electronic Travel Authorization", $col) ) {
+								$data['visa_required'] = "eta";
+
+							} else if ( containsString("eta", $col) ) {
+								$data['visa_required'] = "eta";
+
+	            } else if ( containsString("yes|Free e-Visa", $col) ) {
+								$data['visa_required'] = "eta";
+
+							} else if ( containsString("Admission refused", $col) ) {
+								$data['visa_required'] = "admission-refused";
+
+	            } else if ( containsString("Travel banned", $col) ) {
+	              $data['visa_required'] = "admission-refused";
+
+							} else if ( containsString("Visa not required", $col) ) {
+								$data['visa_required'] = "no";
+
+							}
+
+							// replace line breaks:
+							$data['visa_required'] = str_replace(array("\r\n", "\r", "\n"), "", $data['visa_required']);
+							$data['visa_required'] = trim($data['visa_required']);
+
+							// if($debug) {
+							// 	echo "<span style=\"color: red;\">visa_required: " . $data['visa_required'] . "</span><br>";
+							// }
+
+						} else if($colID == 3) {
+							$data['notes'] = $col;
+							$data['notes'] = str_replace("[[", "", $data['notes']);
+							$data['notes'] = str_replace("]]", "", $data['notes']);
+	            $data['notes'] = trim($data['notes']);
+	            if($data['notes'] == '|') $data['notes'] = '';
+	            // $data['notes'] = str_replace("|", ", ", $data['notes']);
+	            $data['notes'] = join(', ', array_filter(explode('|', $data['notes'])));
+							$data['notes'] = str_replace("colspan=2 , ", "", $data['notes']);
+							$data['notes'] = str_replace("\n", "", (htmlspecialchars(cleanURLs($data['notes']))));
+
+							// if($debug) {
+							// 	echo "notes: " . $data['notes'] . "<br>";
+							// }
+
 						}
-						if($debug) echo 'visa_title: ' . $data['visa_title'] . "<br>";
 
-            if ( containsString("{{no|", $col) ) {
-							$data['visa_required'] = "yes";
+						$colID++;
+					} // end foreach cols
 
-						} else if ( containsString("yes|√", $col) ) {
-							$data['visa_required'] = "yes";
+  				if($data['d_name'] != "" && strpos($data['d_name'], 'text-align') === false) {
+  					$found = false;
+  					foreach($destinations as $d) {
+  						if($d['d_name'] == $data['d_name']) {
+  							$found = true;
+  							break;
+  						}
+  					}
+  					if(!$found) {
+  						array_push($destinations, $data);
+  					}
 
-						} else if ( containsString("yes|[[Visa Waiver Program]]", $col) ) {
-							$data['visa_required'] = "yes";
+  				}
 
-						} else if ( containsString("yes|Visa required", $col) ) {
-							$data['visa_required'] = "yes";
-
-						} else if ( containsString("{{yes-no|", $col) ) {
-							$data['visa_required'] = "on-arrival";
-
-						} else if ( containsString("{{free|{{sort|EU|Visa not required", $col) ) {
-							$data['visa_required'] = "free-eu";
-
-						} else if ( containsString("{{free|{{sort|EU|Freedom of movement", $col) ) {
-							$data['visa_required'] = "free-eu";
-
-						} else if ( containsString("{{yes2|", $col) ) {
-							$data['visa_required'] = "eta";
-
-            } else if ( containsString("on-arrival", $col) ) {
-              $data['visa_required'] = "on-arrival";
-
-            } else if ( containsString("on arrival", $col) ) {
-              $data['visa_required'] = "on-arrival";
-
-            } else if ( containsString("yes|Free Visitor", $col) ) {
-							$data['visa_required'] = "on-arrival";
-
-            } else if ( containsString("yes|Free Entry", $col) ) {
-              $data['visa_required'] = "on-arrival";
-
-						} else if ( containsString("evisitor", $col) ) {
-							$data['visa_required'] = "eta";
-
-						} else if ( containsString("evisa", $col) ) {
-							$data['visa_required'] = "eta";
-
-						} else if ( containsString("Electronic Travel Authorization", $col) ) {
-							$data['visa_required'] = "eta";
-
-						} else if ( containsString("eta", $col) ) {
-							$data['visa_required'] = "eta";
-
-            } else if ( containsString("yes|Free e-Visa", $col) ) {
-							$data['visa_required'] = "eta";
-
-						} else if ( containsString("Admission refused", $col) ) {
-							$data['visa_required'] = "admission-refused";
-
-            } else if ( containsString("Travel banned", $col) ) {
-              $data['visa_required'] = "admission-refused";
-
-						} else if ( containsString("Visa not required", $col) ) {
-							$data['visa_required'] = "no";
-
-						}
-
-						// replace line breaks:
-						$data['visa_required'] = str_replace(array("\r\n", "\r", "\n"), "", $data['visa_required']);
-						$data['visa_required'] = trim($data['visa_required']);
-
-						if($debug) {
-							echo "<span style=\"color: red;\">visa_required: " . $data['visa_required'] . "</span><br>";
-						}
-
-					} else if($colID == 3) {
-						$data['notes'] = $col;
-						$data['notes'] = str_replace("[[", "", $data['notes']);
-						$data['notes'] = str_replace("]]", "", $data['notes']);
-            $data['notes'] = trim($data['notes']);
-            if($data['notes'] == '|') $data['notes'] = '';
-            // $data['notes'] = str_replace("|", ", ", $data['notes']);
-            $data['notes'] = join(', ', array_filter(explode('|', $data['notes'])));
-						$data['notes'] = str_replace("colspan=2 , ", "", $data['notes']);
-						$data['notes'] = str_replace("\n", "", (htmlspecialchars(cleanURLs($data['notes']))));
-
-						if($debug) {
-							echo "notes: " . $data['notes'] . "<br>";
-						}
-
-					}
-
-					$colID++;
-				} // end foreach cols
-
-				if($data['d_name'] != "" && strpos($data['d_name'], 'text-align') === false) {
-					$found = false;
-					foreach($destinations as $d) {
-						if($d['d_name'] == $data['d_name']) {
-							$found = true;
-							break;
-						}
-					}
-					if(!$found) {
-						array_push($destinations, $data);
-					}
-
-				}
+        }
 
 			} // end if
 			$rowID++;
