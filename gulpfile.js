@@ -182,6 +182,8 @@ gulp.task('copy', function() {
   if(options.dev) {
     gulp.src(options.src + '/*.html')
       .pipe(gulp.dest(options.dest));
+    gulp.src(options.src + '/data/visa_requirements/**')
+      .pipe(gulp.dest(options.dest + '/data/visa_requirements'));
   }
 
 });
