@@ -20,7 +20,7 @@ $countries = array(
 	array("Estonia",				"EST",	"Visa_requirements_for_Estonian_citizens"),
 	array("Finland",				"FI1",	"Visa_requirements_for_Finnish_citizens"),
 	array("France",				"FR1",	"Visa_requirements_for_French_citizens"),
-	array("Germany",				"DEU",	"Visa_requirements_for_German_citizens"),
+	array("Germany",				"DEU",	"Travel_requirements_for_German_citizens"),
 	array("Ghana",				"GHA",	"Visa_requirements_for_Ghanaian_citizens"),
 	array("Guatemala",			"GTM",	"Visa_requirements_for_Guatemalan_citizens"),
 	array("Hungary",				"HUN",	"Visa_requirements_for_Hungarian_citizens"),
