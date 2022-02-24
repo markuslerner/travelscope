@@ -5,7 +5,6 @@ import Config from '../config';
 import * as CountryDataHelpers from '../utils/countryDataHelpers';
 import { transformSVGPath } from '../three/d3-threeD';
 import { log } from '../LogTerminal';
-// import { find } from 'lodash';
 
 
 
@@ -119,19 +118,6 @@ export function createCountriesGeometry(worldMap) {
   // console.log(JSON.stringify(countriesUsed.sort()));
 
   // console.log(worldMap.countries);
-
-  // console.log(find(worldMap.countries, (c) => c.name === 'China'));
-
-  // Add countries that didn't exist in geojson:
-  // for(r = 0; r < worldMap.visaRequirements.countries.length; r++) {
-  //   if(!find(worldMap.countries, (c) => {
-  //     return c.name === worldMap.visaRequirements.countries[r].name ||
-  //     c.sovereignt === worldMap.visaRequirements.countries[r].name
-  //     ;
-  //   })) {
-  //     console.log(worldMap.visaRequirements.countries[r]);
-  //   }
-  // }
 
   var d;
   // var country;
