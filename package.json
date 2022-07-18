@@ -68,7 +68,7 @@
     "gulp": "^3.9.1",
     "jquery": "^3.5.0",
     "jquery-mousewheel": "^3.1.13",
-    "jquery-ui": "^1.13.0",
+    "jquery-ui": "^1.13.2",
     "three": "^0.80.0",
     "tween.js": "^16.3.5"
   }
