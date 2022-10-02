@@ -47,6 +47,6 @@ ExpiresByType application/pdf "access plus 1 month"
 
 # Allow cross-domain access only from certain domains:
 <IfModule mod_headers.c>
-    SetEnvIf Origin "http(s)?://(www\.)?(markuslerner.com|localhost\:3000)$" AccessControlAllowOrigin=$0
+    SetEnvIf Origin "http(s)?://(www\.)?(markuslerner.com|localhost\:3000|travelscope.local)$" AccessControlAllowOrigin=$0
     Header set Access-Control-Allow-Origin %{AccessControlAllowOrigin}e env=AccessControlAllowOrigin
 </IfModule>
