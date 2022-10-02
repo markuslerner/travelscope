@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import Detector from './three/Detector';
 
-const mapVersion = '5.1.1.4';
+const mapVersion = '5.1.1.5';
 
 
 
@@ -20,9 +20,9 @@ const config = {
   mergeDataFromMapDataFile2: false,
   mergeDataFromDisputedAreasFile: true,
   // mapDataFile: CDN_URL + 'map/5.1.1/country_data.json?v=' + mapVersion,
-  mapDataFile: CDN_URL + 'map/5.1.1/ne_50m_admin_0_countries.geojson?v=' + mapVersion,
+  mapDataFile: CDN_URL + 'map/5.1.1/ne_50m_admin_0_countries.json?v=' + mapVersion,
   mapDataFile2: CDN_URL + '', // add countries from this higher res file and merge into: ne_50m_admin_0_countries_simplified
-  disputedAreasFile: CDN_URL + 'map/5.1.1/ne_10m_admin_0_disputed_areas.geojson?v=' + mapVersion,
+  disputedAreasFile: CDN_URL + 'map/5.1.1/ne_10m_admin_0_disputed_areas.json?v=' + mapVersion,
 
   saveMapData: false,
   saveURL: 'http://dev.local/save-to-file/index.php',
