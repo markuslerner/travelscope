@@ -1282,6 +1282,27 @@ WorldMap.prototype = {
 }; /* WorldMap end */
 
 
+function mergeDisputed() {
+  if(Config.mergeDataFromDisputedAreasFile) {
+    $.when( $.getJSON(Config.disputedAreasFile) ).then(function(disputedAreas) {
+      // merge disputed areas:
+      for(var i = 0; i < disputedAreas.features.length; i++) {
+        var disputedArea = disputedAreas.features[i];
+        disputedArea.disputed = true;
+        // if(disputedArea.properties.TYPE !== 'Disputed') console.log(disputedArea.properties.TYPE, disputedArea.properties.NAME, disputedArea.properties);
+        worldMap.dataCountries.features.push(disputedArea);
+      }
+
+      console.log(disputedAreas.features.length + ' disputed areas loaded');
+
+      completeInit();
+    });
+  } else {
+    completeInit();
+
+  }
+}
+
 function init() {
 
   if(!Config.logTerminalVisible) {
@@ -1376,33 +1397,18 @@ function init() {
 
             if(!found) {
               worldMap.dataCountries.features.push(feature2);
-              log('Adding country: ' + feature2.properties.NAME + ', type: ' + feature2.properties.TYPE);
+              log('Adding country from higher res file: ' + feature2.properties.NAME + ', type: ' + feature2.properties.TYPE);
             }
           }
 
-          if(Config.mergeDataFromDisputedAreasFile) {
-            $.when( $.getJSON(Config.disputedAreasFile) ).then(function(disputedAreas) {
-              // merge disputed areas:
-              for(var i = 0; i < disputedAreas.features.length; i++) {
-                var disputedArea = disputedAreas.features[i];
-                disputedArea.disputed = true;
-                // if(disputedArea.properties.TYPE !== 'Disputed') console.log(disputedArea.properties.TYPE, disputedArea.properties.NAME, disputedArea.properties);
-                worldMap.dataCountries.features.push(disputedArea);
-              }
-
-              console.log(disputedAreas.features.length + ' disputed areas loaded');
-
-              completeInit();
-            });
-          } else {
-            completeInit();
-
-          }
+          mergeDisputed();
 
         });
 
       } else {
-        completeInit();
+
+        mergeDisputed();
+
       }
 
     });
@@ -1429,7 +1435,7 @@ function completeInit() {
     var jsonPretty = JSON.stringify(worldMap.dataCountries, null, '');
     $.ajax({
       type: 'POST',
-      url: 'http://test.local/save-to-file/index.php',
+      url: Config.saveURL,
       data: {filename: Config.mergedCountriesFilename, data: jsonPretty},
       success: function() {
         log('JSON map data sent');

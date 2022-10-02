@@ -226,7 +226,7 @@
 
       <div class="last-update">
         Sources:
-        <a href="http://www.naturalearthdata.com/" target="_blank">Natural Earth Data</a> (4.1.0, 2018-05-21),
+        <a href="http://www.naturalearthdata.com/" target="_blank">Natural Earth Data</a> (5.1.1, 2022-05-09),
         <a href="http://en.wikipedia.org/wiki/Category:Visa_requirements_by_nationality" target="_new">Wikipedia</a> (<?php
     		if (file_exists($latest_visa_requirements_filename)) {
     			date_default_timezone_set('Europe/Berlin');

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import Detector from './three/Detector';
 
-const mapVersion = '4.1.0.2';
+const mapVersion = '5.1.1.4';
 
 
 
@@ -15,17 +15,17 @@ const config = {
 
   rendererContainer: '#container',
 
-  mapDataFile: CDN_URL + 'map/4.1.0/country_data.json?v=' + mapVersion,
-
   visaRequirementsFile: CDN_URL + VISA_REQUIREMENTS_URL,
 
   mergeDataFromMapDataFile2: false,
-  mergeDataFromDisputedAreasFile: false,
-  // mapDataFile: CDN_URL + 'map/4.1.0/ne_50m_admin_0_countries_simplified.json?v=' + mapVersion,
-  mapDataFile2: CDN_URL + 'map/4.1.0/ne_10m_admin_0_countries_simplified.json?v=' + mapVersion, // merge into: ne_50m_admin_0_countries_simplified
-  disputedAreasFile: CDN_URL + 'map/4.1.0/ne_10m_admin_0_disputed_areas_simplified.json?v=' + mapVersion,
+  mergeDataFromDisputedAreasFile: true,
+  // mapDataFile: CDN_URL + 'map/5.1.1/country_data.json?v=' + mapVersion,
+  mapDataFile: CDN_URL + 'map/5.1.1/ne_50m_admin_0_countries.geojson?v=' + mapVersion,
+  mapDataFile2: CDN_URL + '', // add countries from this higher res file and merge into: ne_50m_admin_0_countries_simplified
+  disputedAreasFile: CDN_URL + 'map/5.1.1/ne_10m_admin_0_disputed_areas.geojson?v=' + mapVersion,
 
   saveMapData: false,
+  saveURL: 'http://dev.local/save-to-file/index.php',
   mergedCountriesFilename: 'country_data.json',
 
   introRotateDuration: 2000, // 4000
