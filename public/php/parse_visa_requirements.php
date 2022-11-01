@@ -60,9 +60,9 @@ if(!file_exists($wikipedia_cache_filename)) {
 	$load_from_cache = false;
 }
 
-echo 'Loading data from cache: ' . ($load_from_cache ? 'true' : 'false') . "<br/>\n";
-
 if(file_exists($wikipedia_cache_filename) && $load_from_cache) {
+  echo "Loading data from cache file '" . $wikipedia_cache_filename . "'<br/>\n";
+
 	$export_xml_string = file_get_contents($wikipedia_cache_filename);
 
 } else {
