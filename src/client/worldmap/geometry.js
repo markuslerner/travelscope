@@ -1,12 +1,10 @@
-import * as THREE from 'three';
-import * as TWEEN from 'tween.js';
+import * as THREE from "three";
+import * as TWEEN from "tween.js";
 
-import Config from '../config';
-import * as CountryDataHelpers from '../utils/countryDataHelpers';
-import { transformSVGPath } from '../three/d3-threeD';
-import { log } from '../LogTerminal';
-
-
+import Config from "../config";
+import * as CountryDataHelpers from "../utils/countryDataHelpers";
+import { transformSVGPath } from "../three/d3-threeD";
+import { log } from "../LogTerminal";
 
 export function createCountriesGeometry(worldMap) {
   var data = worldMap.dataCountries;
@@ -24,24 +22,25 @@ export function createCountriesGeometry(worldMap) {
   // features = countries
   var i;
   var destinations;
-  for(i = 0; i < data.features.length; i++) {
+  for (i = 0; i < data.features.length; i++) {
     var feature = data.features[i];
 
-    if(feature.properties.NAME !== 'Antarctica') { //  && feature.properties.name === 'Germany'
+    if (feature.properties.NAME !== "Antarctica") {
+      //  && feature.properties.name === 'Germany'
       // convert SVG data to three.js Shapes array (all shapes in one country):
       var t = worldMap.geo.path(feature);
 
-      if(t !== undefined) {
-        var shapes = transformSVGPath( t );
+      if (t !== undefined) {
+        var shapes = transformSVGPath(t);
 
         var pointCount = 0;
-        for(var p = 0; p < shapes.length; p++) {
+        for (var p = 0; p < shapes.length; p++) {
           pointCount += shapes[p].getPoints().length;
         }
         globalPointCount += pointCount;
 
         var country = {
-          name: feature.properties.NAME_LONG,
+          name: feature.properties.NAME, // NAME_LONG
           nameSort: feature.properties.NAME_SORT,
           sovereignt: feature.properties.SOVEREIGNT,
           brkName: feature.properties.BRK_NAME, // in disputed areas
@@ -58,27 +57,45 @@ export function createCountriesGeometry(worldMap) {
           numDestinationsFreeOrOnArrival: 0,
           numSourcesFreeOrOnArrival: 0,
           color: new THREE.Color(Config.colorCountryDefault),
-          colorLast: new THREE.Color(Config.colorCountryDefault)
+          colorLast: new THREE.Color(Config.colorCountryDefault),
         };
 
-        if(country.disputed) {
-          country.name = country.brkName === country.name
-            ? country.name + ' (' + country.type + ')'
-            : country.name + '/' + country.brkName + ' (' + country.type + ')';
+        if (country.disputed) {
+          country.name =
+            country.brkName === country.name
+              ? country.name + " (" + country.type + ")"
+              : country.name +
+                "/" +
+                country.brkName +
+                " (" +
+                country.type +
+                ")";
         }
 
-        if(!country.disputed) {
-          for(var r = 0; r < worldMap.visaRequirements.countries.length; r++) {
+        if (!country.disputed) {
+          for (var r = 0; r < worldMap.visaRequirements.countries.length; r++) {
             // 199 nationalities travelling to 243 (?) countries, assuming nationals from a country don't need a visa to the sovereignty's main country:
             // if(CountryDataHelpers.matchDestinationToCountryName(country.name_long, worldMap.visaRequirements.countries[r].name) || CountryDataHelpers.matchDestinationToCountryName(worldMap.visaRequirements.countries[r].name, country.name)) {
 
             const requirementsCountry = worldMap.visaRequirements.countries[r];
 
-            if(
-              CountryDataHelpers.matchDestinationToCountryName(country.name, requirementsCountry.name) ||
-              CountryDataHelpers.matchDestinationToCountryName(requirementsCountry.name, country.name) ||
-              CountryDataHelpers.matchDestinationToCountryName(country.sovereignt, requirementsCountry.name) ||
-              CountryDataHelpers.matchDestinationToCountryName(requirementsCountry.name, country.sovereignt)
+            if (
+              CountryDataHelpers.matchDestinationToCountryName(
+                country.name,
+                requirementsCountry.name
+              ) ||
+              CountryDataHelpers.matchDestinationToCountryName(
+                requirementsCountry.name,
+                country.name
+              ) ||
+              CountryDataHelpers.matchDestinationToCountryName(
+                country.sovereignt,
+                requirementsCountry.name
+              ) ||
+              CountryDataHelpers.matchDestinationToCountryName(
+                requirementsCountry.name,
+                country.sovereignt
+              )
             ) {
               // log('Loading visa requirements for: ' + country.name);
               country.destinations = requirementsCountry.destinations;
@@ -93,24 +110,26 @@ export function createCountriesGeometry(worldMap) {
         //   console.error('Geometry: No visa requirements found for: ' + country.name);
         // }
 
-        if(!country.disputed) {
+        if (!country.disputed) {
           countriesUsed.push(country.name);
 
-          if(CountryDataHelpers.isCountry(country)) {
+          if (CountryDataHelpers.isCountry(country)) {
             var text = country.name;
-            if(text === 'United States') {
-              text += ' (USA)';
-            } else if(text === 'United Kingdom') {
-              text += ' (UK)';
+            if (text === "United States") {
+              text += " (USA)";
+            } else if (text === "United Kingdom") {
+              text += " (UK)";
             }
-            worldMap.countryDropdownChoices.push({text, value: country.name});
+            worldMap.countryDropdownChoices.push({ text, value: country.name });
           } else {
-            worldMap.countryDropdownChoices.push({text: country.name + ' (' + country.sovereignt + ')', value: country.name});
+            worldMap.countryDropdownChoices.push({
+              text: country.name + " (" + country.sovereignt + ")",
+              value: country.name,
+            });
           }
         }
 
         // log("Geometry" + country.name + " | shapes: " + shapes.length + ", total points: " + pointCount);
-
       }
     }
   }
@@ -123,12 +142,15 @@ export function createCountriesGeometry(worldMap) {
   // var country;
   // var countriesString = '';
   // remove destinations who's country doesn't exist:
-  for(i = 0; i < worldMap.countries.length; i++) {
+  for (i = 0; i < worldMap.countries.length; i++) {
     destinations = worldMap.countries[i].destinations;
     var destinationsNew = [];
-    for(d = 0; d < destinations.length; d++) {
-      country = CountryDataHelpers.getCountryByName(worldMap.countries, destinations[d].d_name);
-      if(country !== null) {
+    for (d = 0; d < destinations.length; d++) {
+      country = CountryDataHelpers.getCountryByName(
+        worldMap.countries,
+        destinations[d].d_name
+      );
+      if (country !== null) {
         destinationsNew.push(destinations[d]);
       }
     }
@@ -138,46 +160,63 @@ export function createCountriesGeometry(worldMap) {
     // if(i < worldMap.countries.length - 1) {
     //   countriesString += '\n';
     // }
-
   }
   // console.log(countriesString);
 
-  if(!country.disputed) {
+  if (!country.disputed) {
     // count visa-free destinations:
-    for(i = 0; i < worldMap.countries.length; i++) {
+    for (i = 0; i < worldMap.countries.length; i++) {
       destinations = worldMap.countries[i].destinations;
 
       worldMap.countries[i].numDestinationsFreeOrOnArrival = 0;
-      for(d = 0; d < destinations.length; d++) {
-        if(destinations[d].visa_required === 'no' || destinations[d].visa_required === 'on-arrival' || destinations[d].visa_required === 'free-eu'
-           // || destinations[d].visa_required === 'evisa' || destinations[d].visa_required === 'evisitor' || destinations[d].visa_required === 'eta'
-          ) {
+      for (d = 0; d < destinations.length; d++) {
+        if (
+          destinations[d].visa_required === "no" ||
+          destinations[d].visa_required === "on-arrival" ||
+          destinations[d].visa_required === "free-eu"
+          // || destinations[d].visa_required === 'evisa' || destinations[d].visa_required === 'evisitor' || destinations[d].visa_required === 'eta'
+        ) {
           worldMap.countries[i].numDestinationsFreeOrOnArrival++;
         }
-
       }
 
       // add main sovereignty, if exists:
-      var mainCountry = CountryDataHelpers.getCountryByName(worldMap.countries, worldMap.countries[i].sovereignt);
-      if(mainCountry && mainCountry.sovereignt !== worldMap.countries[i].name) {
+      var mainCountry = CountryDataHelpers.getCountryByName(
+        worldMap.countries,
+        worldMap.countries[i].sovereignt
+      );
+      if (
+        mainCountry &&
+        mainCountry.sovereignt !== worldMap.countries[i].name
+      ) {
         worldMap.countries[i].numDestinationsFreeOrOnArrival++;
       }
 
-      if(worldMap.countries[i].numDestinationsFreeOrOnArrival > worldMap.maxNumDestinationsFreeOrOnArrival) {
-        worldMap.maxNumDestinationsFreeOrOnArrival = worldMap.countries[i].numDestinationsFreeOrOnArrival;
+      if (
+        worldMap.countries[i].numDestinationsFreeOrOnArrival >
+        worldMap.maxNumDestinationsFreeOrOnArrival
+      ) {
+        worldMap.maxNumDestinationsFreeOrOnArrival =
+          worldMap.countries[i].numDestinationsFreeOrOnArrival;
       }
-
     }
 
     // count countries from where people can come without a visa > find most open countries:
-    for(i = 0; i < worldMap.countries.length; i++) {
+    for (i = 0; i < worldMap.countries.length; i++) {
       // if(worldMap.countries[i].sovereignt === worldMap.countries[i].name) {
-      if(CountryDataHelpers.isCountry(worldMap.countries[i])) {
+      if (CountryDataHelpers.isCountry(worldMap.countries[i])) {
         destinations = worldMap.countries[i].destinations;
-        for(d = 0; d < destinations.length; d++) {
-          if(destinations[d].visa_required === 'no' || destinations[d].visa_required === 'on-arrival' || destinations[d].visa_required === 'free-eu') {
-            country = CountryDataHelpers.getCountryByName(worldMap.countries, destinations[d].d_name);
-            if(country !== null) {
+        for (d = 0; d < destinations.length; d++) {
+          if (
+            destinations[d].visa_required === "no" ||
+            destinations[d].visa_required === "on-arrival" ||
+            destinations[d].visa_required === "free-eu"
+          ) {
+            country = CountryDataHelpers.getCountryByName(
+              worldMap.countries,
+              destinations[d].d_name
+            );
+            if (country !== null) {
               country.numSourcesFreeOrOnArrival++;
             }
           }
@@ -185,21 +224,29 @@ export function createCountriesGeometry(worldMap) {
       }
     }
 
-    for(i = 0; i < worldMap.countries.length; i++) {
-      if( worldMap.countries[i].numSourcesFreeOrOnArrival > worldMap.maxNumSourcesFreeOrOnArrival ) {
-        worldMap.maxNumSourcesFreeOrOnArrival = worldMap.countries[i].numSourcesFreeOrOnArrival;
+    for (i = 0; i < worldMap.countries.length; i++) {
+      if (
+        worldMap.countries[i].numSourcesFreeOrOnArrival >
+        worldMap.maxNumSourcesFreeOrOnArrival
+      ) {
+        worldMap.maxNumSourcesFreeOrOnArrival =
+          worldMap.countries[i].numSourcesFreeOrOnArrival;
       }
-      if( worldMap.countries[i].gdp > worldMap.maxGDP ) {
+      if (worldMap.countries[i].gdp > worldMap.maxGDP) {
         worldMap.maxGDP = worldMap.countries[i].gdp;
       }
-      if( worldMap.countries[i].population > worldMap.maxPopulation ) {
+      if (worldMap.countries[i].population > worldMap.maxPopulation) {
         worldMap.maxPopulation = worldMap.countries[i].population;
       }
       worldMap.totalPopulation += worldMap.countries[i].population;
-      worldMap.countries[i].gdpPerCapita = worldMap.countries[i].gdp / worldMap.countries[i].population * 1000000;
-      if( worldMap.countries[i].gdpPerCapita > worldMap.maxGDPPerCapita ) {
-        if(worldMap.countries[i].gdp > 100) {
-          worldMap.maxGDPPerCapita = worldMap.countries[i].gdp / worldMap.countries[i].population * 1000000;
+      worldMap.countries[i].gdpPerCapita =
+        (worldMap.countries[i].gdp / worldMap.countries[i].population) *
+        1000000;
+      if (worldMap.countries[i].gdpPerCapita > worldMap.maxGDPPerCapita) {
+        if (worldMap.countries[i].gdp > 100) {
+          worldMap.maxGDPPerCapita =
+            (worldMap.countries[i].gdp / worldMap.countries[i].population) *
+            1000000;
           // log( worldMap.countries[i].name );
           // log( 'population: ' + worldMap.countries[i].population );
           // log( 'gdp: ' + worldMap.countries[i].gdp );
@@ -212,16 +259,30 @@ export function createCountriesGeometry(worldMap) {
   worldMap.countryDropdownChoices.sort((a, b) => {
     var aName = a.text.toLowerCase();
     var bName = b.text.toLowerCase();
-    return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
+    return aName < bName ? -1 : aName > bName ? 1 : 0;
   });
 
-  var stringLoaded = worldMap.countries.length + ' countries and territories loaded (' + globalPointCount + ' points total) from \'' + Config.mapDataFile + '\'';
-  if(Config.mergeDataFromMapDataFile2) {
-    stringLoaded += ' and \'' + Config.mapDataFile2 + '\'';
+  var stringLoaded =
+    worldMap.countries.length +
+    " countries and territories loaded (" +
+    globalPointCount +
+    " points total) from '" +
+    Config.mapDataFile +
+    "'";
+  if (Config.mergeDataFromMapDataFile2) {
+    stringLoaded += " and '" + Config.mapDataFile2 + "'";
   }
-  log('Geometry: ' + stringLoaded);
+  log("Geometry: " + stringLoaded);
 
-  log('Geometry: visa requirements matched from ' + worldMap.visaRequirements.countries.length + ' sovereignties to ' + numVisaRequirementsFound + ' countries from \'' + Config.visaRequirementsFile + '\'');
+  log(
+    "Geometry: visa requirements matched from " +
+      worldMap.visaRequirements.countries.length +
+      " sovereignties to " +
+      numVisaRequirementsFound +
+      " countries from '" +
+      Config.visaRequirementsFile +
+      "'"
+  );
   // log('Max number of visa-free destinations: ' + worldMap.maxNumDestinationsFreeOrOnArrival);
   // log('Max number of visa-free sources: ' + worldMap.maxNumSourcesFreeOrOnArrival);
   // log('Total population: ' + worldMap.totalPopulation.formatNumber(0));
@@ -229,46 +290,76 @@ export function createCountriesGeometry(worldMap) {
   var m = new THREE.Matrix4();
   var m1 = new THREE.Matrix4();
   var m2 = new THREE.Matrix4();
-  m1.makeRotationX( Config.globeRotationX );
-  m2.makeRotationY( Config.globeRotationY );
-  m.multiplyMatrices( m1, m2 );
+  m1.makeRotationX(Config.globeRotationX);
+  m2.makeRotationY(Config.globeRotationY);
+  m.multiplyMatrices(m1, m2);
 
-  for(i = 0; i < worldMap.countries.length; i++) {
-    worldMap.countries[i].colorByFreeDestinations = CountryDataHelpers.getCountryColorByFreeDestinations(worldMap.countries[i].numDestinationsFreeOrOnArrival, worldMap.maxNumDestinationsFreeOrOnArrival);
-    worldMap.countries[i].colorByFreeSources = CountryDataHelpers.getCountryColorByFreeSources(worldMap.countries[i].numSourcesFreeOrOnArrival, worldMap.maxNumSourcesFreeOrOnArrival);
-    worldMap.countries[i].colorByGDP = CountryDataHelpers.getCountryColorByGDP(worldMap.countries[i], worldMap.maxGDP);
-    worldMap.countries[i].colorByGDPPerCapita = CountryDataHelpers.getCountryColorByGDPPerCapita(worldMap.countries[i], worldMap.maxGDPPerCapita);
-    worldMap.countries[i].colorByPopulation = CountryDataHelpers.getCountryColorByPopulation(worldMap.countries[i], worldMap.maxPopulation);
+  for (i = 0; i < worldMap.countries.length; i++) {
+    worldMap.countries[i].colorByFreeDestinations =
+      CountryDataHelpers.getCountryColorByFreeDestinations(
+        worldMap.countries[i].numDestinationsFreeOrOnArrival,
+        worldMap.maxNumDestinationsFreeOrOnArrival
+      );
+    worldMap.countries[i].colorByFreeSources =
+      CountryDataHelpers.getCountryColorByFreeSources(
+        worldMap.countries[i].numSourcesFreeOrOnArrival,
+        worldMap.maxNumSourcesFreeOrOnArrival
+      );
+    worldMap.countries[i].colorByGDP = CountryDataHelpers.getCountryColorByGDP(
+      worldMap.countries[i],
+      worldMap.maxGDP
+    );
+    worldMap.countries[i].colorByGDPPerCapita =
+      CountryDataHelpers.getCountryColorByGDPPerCapita(
+        worldMap.countries[i],
+        worldMap.maxGDPPerCapita
+      );
+    worldMap.countries[i].colorByPopulation =
+      CountryDataHelpers.getCountryColorByPopulation(
+        worldMap.countries[i],
+        worldMap.maxPopulation
+      );
 
-    if(Config.extrudeEnabled) {
+    if (Config.extrudeEnabled) {
       // create extruded geometry from path Shape:
-      worldMap.countries[i].geometry = new THREE.ExtrudeGeometry( worldMap.countries[i].shapes, {
-        // amount: Config.extrudeDepth * 10,
-        // amount: 0.5 + worldMap.getPopulationRatio(worldMap.countries[i].properties) * 100,
-        amount: worldMap.countries[i].numDestinationsFreeOrOnArrival / worldMap.maxNumDestinationsFreeOrOnArrival * 100,
-        bevelEnabled: false
-      } );
+      worldMap.countries[i].geometry = new THREE.ExtrudeGeometry(
+        worldMap.countries[i].shapes,
+        {
+          // amount: Config.extrudeDepth * 10,
+          // amount: 0.5 + worldMap.getPopulationRatio(worldMap.countries[i].properties) * 100,
+          amount:
+            (worldMap.countries[i].numDestinationsFreeOrOnArrival /
+              worldMap.maxNumDestinationsFreeOrOnArrival) *
+            100,
+          bevelEnabled: false,
+        }
+      );
     } else {
       // create flat ShapeGeometry from path Shape:
-      worldMap.countries[i].geometry = new THREE.ShapeGeometry( worldMap.countries[i].shapes );
+      worldMap.countries[i].geometry = new THREE.ShapeGeometry(
+        worldMap.countries[i].shapes
+      );
     }
 
-
     // subtesselate surface:
-    if(Config.tesselationEnabled) {
-      var tessellateModifier = new THREE.TessellateModifier( Config.tesselationMaxEdgeLength ); // 2
-      for( var n = 0; n < Config.tesselationIterations; n++ ) { // 10
-        tessellateModifier.modify( worldMap.countries[i].geometry );
+    if (Config.tesselationEnabled) {
+      var tessellateModifier = new THREE.TessellateModifier(
+        Config.tesselationMaxEdgeLength
+      ); // 2
+      for (var n = 0; n < Config.tesselationIterations; n++) {
+        // 10
+        tessellateModifier.modify(worldMap.countries[i].geometry);
       }
     }
 
     // 2D Geometry:
     var k;
     worldMap.countries[i].geometry2D = worldMap.countries[i].geometry.clone();
-    for(k = 0; k < worldMap.countries[i].geometry2D.vertices.length; k++) {
+    for (k = 0; k < worldMap.countries[i].geometry2D.vertices.length; k++) {
       worldMap.countries[i].geometry2D.vertices[k].x += Config.mapOffsetX;
-      worldMap.countries[i].geometry2D.vertices[k].y = -worldMap.countries[i].geometry2D.vertices[k].y + Config.mapOffsetY;
-      if(worldMap.countries[i].disputed) {
+      worldMap.countries[i].geometry2D.vertices[k].y =
+        -worldMap.countries[i].geometry2D.vertices[k].y + Config.mapOffsetY;
+      if (worldMap.countries[i].disputed) {
         // draw disputed areas on top:
         worldMap.countries[i].geometry2D.vertices[k].z += 0.1;
       }
@@ -281,42 +372,49 @@ export function createCountriesGeometry(worldMap) {
     worldMap.countries[i].borderDisputed2D = new THREE.Object3D();
     worldMap.countries[i].center2D = new THREE.Vector3();
     var vertexCount = 0;
-    for(var s = 0; s < worldMap.countries[i].shapes.length; s++) {
-      var pointsGeometry = worldMap.countries[i].shapes[s].createPointsGeometry();
-      for(k = 0; k < pointsGeometry.vertices.length; k++) {
+    for (var s = 0; s < worldMap.countries[i].shapes.length; s++) {
+      var pointsGeometry =
+        worldMap.countries[i].shapes[s].createPointsGeometry();
+      for (k = 0; k < pointsGeometry.vertices.length; k++) {
         pointsGeometry.vertices[k].x += Config.mapOffsetX;
-        pointsGeometry.vertices[k].y = -pointsGeometry.vertices[k].y + Config.mapOffsetY;
+        pointsGeometry.vertices[k].y =
+          -pointsGeometry.vertices[k].y + Config.mapOffsetY;
         pointsGeometry.vertices[k].z += 0.1;
 
         worldMap.countries[i].center2D.add(pointsGeometry.vertices[k]);
         vertexCount++;
       }
-      worldMap.countries[i].border2D.add(new THREE.Line( pointsGeometry, Config.materialCountryBorder ));
-
+      worldMap.countries[i].border2D.add(
+        new THREE.Line(pointsGeometry, Config.materialCountryBorder)
+      );
     }
     worldMap.countries[i].center2D.divideScalar(vertexCount);
     CountryDataHelpers.correctCenter(worldMap.countries[i]);
 
-
     // 2D points meshes (for disputed country border, always visible):
-    if(worldMap.countries[i].disputed) {
+    if (worldMap.countries[i].disputed) {
       worldMap.countries[i].borderDisputed2D = new THREE.Object3D();
-      for(s = 0; s < worldMap.countries[i].shapes.length; s++) {
+      for (s = 0; s < worldMap.countries[i].shapes.length; s++) {
         pointsGeometry = worldMap.countries[i].shapes[s].createPointsGeometry();
-        for(k = 0; k < pointsGeometry.vertices.length; k++) {
+        for (k = 0; k < pointsGeometry.vertices.length; k++) {
           pointsGeometry.vertices[k].x += Config.mapOffsetX;
-          pointsGeometry.vertices[k].y = -pointsGeometry.vertices[k].y + Config.mapOffsetY;
+          pointsGeometry.vertices[k].y =
+            -pointsGeometry.vertices[k].y + Config.mapOffsetY;
           pointsGeometry.vertices[k].z += 0.15;
         }
-        worldMap.countries[i].borderDisputed2D.add(new THREE.Line( pointsGeometry, Config.materialCountryBorderDisputed ));
+        worldMap.countries[i].borderDisputed2D.add(
+          new THREE.Line(pointsGeometry, Config.materialCountryBorderDisputed)
+        );
       }
     }
 
-
     // 3D Geometry:
     worldMap.countries[i].geometry3D = worldMap.countries[i].geometry.clone();
-    for(k = 0; k < worldMap.countries[i].geometry.vertices.length; k++) {
-      var spherical = worldMap.geo.projection.invert([worldMap.countries[i].geometry.vertices[k].x, worldMap.countries[i].geometry.vertices[k].y]);
+    for (k = 0; k < worldMap.countries[i].geometry.vertices.length; k++) {
+      var spherical = worldMap.geo.projection.invert([
+        worldMap.countries[i].geometry.vertices[k].x,
+        worldMap.countries[i].geometry.vertices[k].y,
+      ]);
       spherical[0] = THREE.Math.degToRad(spherical[0]);
       spherical[1] = THREE.Math.degToRad(spherical[1]);
 
@@ -324,20 +422,29 @@ export function createCountriesGeometry(worldMap) {
       // worldMap.countries[i].geometry3D.vertices[k].y = - Config.globeRadius * Math.sin(spherical[1]);
       // worldMap.countries[i].geometry3D.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
 
-      worldMap.countries[i].geometry3D.vertices[k].x = Config.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
-      worldMap.countries[i].geometry3D.vertices[k].y = -Config.globeRadius * Math.sin(spherical[1]);
-      if(worldMap.countries[i].geometry.vertices[k].z < Config.extrudeDepth) {
-        worldMap.countries[i].geometry3D.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
+      worldMap.countries[i].geometry3D.vertices[k].x =
+        Config.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
+      worldMap.countries[i].geometry3D.vertices[k].y =
+        -Config.globeRadius * Math.sin(spherical[1]);
+      if (worldMap.countries[i].geometry.vertices[k].z < Config.extrudeDepth) {
+        worldMap.countries[i].geometry3D.vertices[k].z =
+          Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
         // worldMap.countries[i].geometry3D.vertices[k].multiplyScalar(0.5);
-        if(worldMap.countries[i].disputed) {
+        if (worldMap.countries[i].disputed) {
           // draw disputed areas on top:
           worldMap.countries[i].geometry3D.vertices[k].multiplyScalar(1.0005);
         }
       } else {
-        worldMap.countries[i].geometry3D.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
+        worldMap.countries[i].geometry3D.vertices[k].z =
+          Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
         worldMap.countries[i].geometry3D.vertices[k].multiplyScalar(1.002);
-        if(Config.extrudeEnabled) {
-          worldMap.countries[i].geometry3D.vertices[k].multiplyScalar( 1 + worldMap.countries[i].numDestinationsFreeOrOnArrival / worldMap.maxNumDestinationsFreeOrOnArrival * 0.5);
+        if (Config.extrudeEnabled) {
+          worldMap.countries[i].geometry3D.vertices[k].multiplyScalar(
+            1 +
+              (worldMap.countries[i].numDestinationsFreeOrOnArrival /
+                worldMap.maxNumDestinationsFreeOrOnArrival) *
+                0.5
+          );
         }
       }
     }
@@ -346,110 +453,140 @@ export function createCountriesGeometry(worldMap) {
 
     worldMap.countries[i].center3D = new THREE.Vector3();
     vertexCount = 0;
-    for(k = 0; k < worldMap.countries[i].geometry3D.vertices.length; k++) {
-      worldMap.countries[i].center3D.add(worldMap.countries[i].geometry3D.vertices[k]);
+    for (k = 0; k < worldMap.countries[i].geometry3D.vertices.length; k++) {
+      worldMap.countries[i].center3D.add(
+        worldMap.countries[i].geometry3D.vertices[k]
+      );
       vertexCount++;
     }
     worldMap.countries[i].center3D.divideScalar(vertexCount);
 
     // worldMap.countries[i].center3D.copy(worldMap.countries[i].center2D);
-    spherical = worldMap.geo.projection.invert([worldMap.countries[i].center2D.x - Config.mapOffsetX, -worldMap.countries[i].center2D.y + Config.mapOffsetY]);
+    spherical = worldMap.geo.projection.invert([
+      worldMap.countries[i].center2D.x - Config.mapOffsetX,
+      -worldMap.countries[i].center2D.y + Config.mapOffsetY,
+    ]);
     spherical[0] = THREE.Math.degToRad(spherical[0]);
     spherical[1] = THREE.Math.degToRad(spherical[1]);
-    worldMap.countries[i].center3D.x = Config.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
-    worldMap.countries[i].center3D.y = -Config.globeRadius * Math.sin(spherical[1]);
-    worldMap.countries[i].center3D.z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
+    worldMap.countries[i].center3D.x =
+      Config.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
+    worldMap.countries[i].center3D.y =
+      -Config.globeRadius * Math.sin(spherical[1]);
+    worldMap.countries[i].center3D.z =
+      Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
     worldMap.countries[i].center3D.applyMatrix4(m);
-
 
     // 3D points meshes (for showing country border on hover):
     worldMap.countries[i].border3D = new THREE.Object3D();
-    for(s = 0; s < worldMap.countries[i].shapes.length; s++) {
+    for (s = 0; s < worldMap.countries[i].shapes.length; s++) {
       pointsGeometry = worldMap.countries[i].shapes[s].createPointsGeometry();
-      for(k = 0; k < pointsGeometry.vertices.length; k++) {
-        spherical = worldMap.geo.projection.invert([pointsGeometry.vertices[k].x, pointsGeometry.vertices[k].y]);
+      for (k = 0; k < pointsGeometry.vertices.length; k++) {
+        spherical = worldMap.geo.projection.invert([
+          pointsGeometry.vertices[k].x,
+          pointsGeometry.vertices[k].y,
+        ]);
 
         spherical[0] = THREE.Math.degToRad(spherical[0]);
         spherical[1] = THREE.Math.degToRad(spherical[1]);
 
-        pointsGeometry.vertices[k].x = Config.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
-        pointsGeometry.vertices[k].y = -Config.globeRadius * Math.sin(spherical[1]);
-        pointsGeometry.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
+        pointsGeometry.vertices[k].x =
+          Config.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
+        pointsGeometry.vertices[k].y =
+          -Config.globeRadius * Math.sin(spherical[1]);
+        pointsGeometry.vertices[k].z =
+          Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
 
         pointsGeometry.vertices[k].multiplyScalar(1.001); // 1.004
       }
-      worldMap.countries[i].border3D.add(new THREE.Line( pointsGeometry, Config.materialCountryBorder ));
+      worldMap.countries[i].border3D.add(
+        new THREE.Line(pointsGeometry, Config.materialCountryBorder)
+      );
     }
     // rotate and bake transform into vertices:
     worldMap.countries[i].border3D.applyMatrix(m);
 
-
     // 3D points meshes (for disputed country border, always visible):
-    if(worldMap.countries[i].disputed) {
+    if (worldMap.countries[i].disputed) {
       worldMap.countries[i].borderDisputed3D = new THREE.Object3D();
-      for(s = 0; s < worldMap.countries[i].shapes.length; s++) {
+      for (s = 0; s < worldMap.countries[i].shapes.length; s++) {
         pointsGeometry = worldMap.countries[i].shapes[s].createPointsGeometry();
-        for(k = 0; k < pointsGeometry.vertices.length; k++) {
-          spherical = worldMap.geo.projection.invert([pointsGeometry.vertices[k].x, pointsGeometry.vertices[k].y]);
+        for (k = 0; k < pointsGeometry.vertices.length; k++) {
+          spherical = worldMap.geo.projection.invert([
+            pointsGeometry.vertices[k].x,
+            pointsGeometry.vertices[k].y,
+          ]);
 
           spherical[0] = THREE.Math.degToRad(spherical[0]);
           spherical[1] = THREE.Math.degToRad(spherical[1]);
 
-          pointsGeometry.vertices[k].x = Config.globeRadius * Math.cos(spherical[0]) * Math.cos(spherical[1]);
-          pointsGeometry.vertices[k].y = -Config.globeRadius * Math.sin(spherical[1]);
-          pointsGeometry.vertices[k].z = Config.globeRadius * Math.sin(spherical[0]) * Math.cos(spherical[1]);
+          pointsGeometry.vertices[k].x =
+            Config.globeRadius *
+            Math.cos(spherical[0]) *
+            Math.cos(spherical[1]);
+          pointsGeometry.vertices[k].y =
+            -Config.globeRadius * Math.sin(spherical[1]);
+          pointsGeometry.vertices[k].z =
+            Config.globeRadius *
+            Math.sin(spherical[0]) *
+            Math.cos(spherical[1]);
 
           pointsGeometry.vertices[k].multiplyScalar(1.0015); // 1.004
         }
-        worldMap.countries[i].borderDisputed3D.add(new THREE.Line( pointsGeometry, Config.materialCountryBorderDisputed ));
+        worldMap.countries[i].borderDisputed3D.add(
+          new THREE.Line(pointsGeometry, Config.materialCountryBorderDisputed)
+        );
       }
       // rotate and bake transform into vertices:
       worldMap.countries[i].borderDisputed3D.applyMatrix(m);
     }
 
-
-    worldMap.countries[i].mesh = new THREE.Mesh(worldMap.countries[i].geometry, Config.materialCountryDefault); // worldMap.countries[i].material // worldMap.materialCountryDefault
+    worldMap.countries[i].mesh = new THREE.Mesh(
+      worldMap.countries[i].geometry,
+      Config.materialCountryDefault
+    ); // worldMap.countries[i].material // worldMap.materialCountryDefault
     worldMap.countries[i].mesh.name = worldMap.countries[i].name;
     worldMap.countries[i].mesh.countryObject = worldMap.countries[i];
-    if(!Config.usesWebGL) {
+    if (!Config.usesWebGL) {
       worldMap.countries[i].mesh.material = new THREE.MeshPhongMaterial({
-        color: new THREE.Color(0xFF0000),
+        color: new THREE.Color(0xff0000),
         transparent: false,
         wireframe: false,
         shading: THREE.SmoothShading,
         side: THREE.DoubleSide,
-        overdraw: true
+        overdraw: true,
       });
     }
 
     worldMap.countriesObject3D.add(worldMap.countries[i].mesh);
-
   } // for worldMap.countries.length initial geometry creation end
 
-  if(!Config.usesWebGL) {
+  if (!Config.usesWebGL) {
     worldMap.scene.add(worldMap.countriesObject3D);
   }
 
-  log('Geometry: ' + worldMap.trianglesNumTotal + ' triangles total');
+  log("Geometry: " + worldMap.trianglesNumTotal + " triangles total");
 
   var scaleStart = 0.0;
   worldMap.countriesObject3D.scale.set(scaleStart, scaleStart, scaleStart);
   worldMap.countriesObject3D.rotation.y = -Math.PI * 6.0;
 
-  log('Geometry: creating meshes took ' + (Date.now() - start) + ' ms');
-
-};
-
+  log("Geometry: creating meshes took " + (Date.now() - start) + " ms");
+}
 
 export function updateCountriesGeometry(worldMap, computeFaceNormals) {
   // log('Geometry.updateCountriesGeometry()');
 
   var i;
   var k;
-  for(i = 0; i < worldMap.countries.length; i++) {
-    for(k = 0; k < worldMap.countries[i].geometry.vertices.length; k++) {
-      worldMap.countries[i].geometry.vertices[k].copy(worldMap.countries[i].geometry2D.vertices[k]);
-      worldMap.countries[i].geometry.vertices[k].mix(worldMap.countries[i].geometry3D.vertices[k], worldMap.animationProps.interpolatePos);
+  for (i = 0; i < worldMap.countries.length; i++) {
+    for (k = 0; k < worldMap.countries[i].geometry.vertices.length; k++) {
+      worldMap.countries[i].geometry.vertices[k].copy(
+        worldMap.countries[i].geometry2D.vertices[k]
+      );
+      worldMap.countries[i].geometry.vertices[k].mix(
+        worldMap.countries[i].geometry3D.vertices[k],
+        worldMap.animationProps.interpolatePos
+      );
     }
     // worldMap.countries[i].geometry.verticesNeedUpdate = true; // required to update mesh, also for picking to work
 
@@ -464,123 +601,137 @@ export function updateCountriesGeometry(worldMap, computeFaceNormals) {
     */
 
     worldMap.countries[i].geometry.computeBoundingSphere(); // required for picking to work after updating vertices
-    if(computeFaceNormals) worldMap.countries[i].geometry.computeFaceNormals(); // required for shading to look correct
-
+    if (computeFaceNormals) worldMap.countries[i].geometry.computeFaceNormals(); // required for shading to look correct
   }
 
   // transform sphere:
-  if(worldMap.sphere) {
-    for(k = 0; k < worldMap.sphere.geometry.vertices.length; k++) {
-      worldMap.sphere.geometry.vertices[k].copy(worldMap.sphereGeometry2D.vertices[k]);
-      worldMap.sphere.geometry.vertices[k].mix(worldMap.sphereGeometry3D.vertices[k], worldMap.animationProps.interpolatePos * worldMap.animationProps.interpolatePos);
+  if (worldMap.sphere) {
+    for (k = 0; k < worldMap.sphere.geometry.vertices.length; k++) {
+      worldMap.sphere.geometry.vertices[k].copy(
+        worldMap.sphereGeometry2D.vertices[k]
+      );
+      worldMap.sphere.geometry.vertices[k].mix(
+        worldMap.sphereGeometry3D.vertices[k],
+        worldMap.animationProps.interpolatePos *
+          worldMap.animationProps.interpolatePos
+      );
     }
     worldMap.sphere.geometry.verticesNeedUpdate = true; // required to update mesh
 
     worldMap.sphere.geometry.computeBoundingSphere(); // required for picking to work after updating vertices
     worldMap.sphere.geometry.computeFaceNormals(); // required for shading to look correct
   }
-};
-
+}
 
 export function createCountriesBufferGeometry(worldMap) {
   worldMap.bufferGeometry = new THREE.BufferGeometry();
 
-  var positions = new Float32Array( worldMap.trianglesNumTotal * 3 * 3 );
-  var normals = new Float32Array( worldMap.trianglesNumTotal * 3 * 3 );
-  var colors = new Float32Array( worldMap.trianglesNumTotal * 3 * 3 );
+  var positions = new Float32Array(worldMap.trianglesNumTotal * 3 * 3);
+  var normals = new Float32Array(worldMap.trianglesNumTotal * 3 * 3);
+  var colors = new Float32Array(worldMap.trianglesNumTotal * 3 * 3);
 
   var color = new THREE.Color();
   color.set(Config.colorCountryDefault);
 
   var index = 0;
   var i, f;
-  for(i = 0; i < worldMap.countries.length; i++) {
+  for (i = 0; i < worldMap.countries.length; i++) {
     var vertices = worldMap.countries[i].geometry.vertices;
 
-    for(f = 0; f < worldMap.countries[i].geometry.faces.length; f++) {
+    for (f = 0; f < worldMap.countries[i].geometry.faces.length; f++) {
       var face = worldMap.countries[i].geometry.faces[f];
 
       // positions
 
-      positions[ index ] = vertices[ face.a ].x;
-      positions[ index + 1 ] = vertices[ face.a ].y;
-      positions[ index + 2 ] = vertices[ face.a ].z;
+      positions[index] = vertices[face.a].x;
+      positions[index + 1] = vertices[face.a].y;
+      positions[index + 2] = vertices[face.a].z;
 
-      positions[ index + 3 ] = vertices[ face.b ].x;
-      positions[ index + 4 ] = vertices[ face.b ].y;
-      positions[ index + 5 ] = vertices[ face.b ].z;
+      positions[index + 3] = vertices[face.b].x;
+      positions[index + 4] = vertices[face.b].y;
+      positions[index + 5] = vertices[face.b].z;
 
-      positions[ index + 6 ] = vertices[ face.c ].x;
-      positions[ index + 7 ] = vertices[ face.c ].y;
-      positions[ index + 8 ] = vertices[ face.c ].z;
+      positions[index + 6] = vertices[face.c].x;
+      positions[index + 7] = vertices[face.c].y;
+      positions[index + 8] = vertices[face.c].z;
 
       // normals
 
-      normals[ index ] = face.normal.x;
-      normals[ index + 1 ] = face.normal.y;
-      normals[ index + 2 ] = face.normal.z;
+      normals[index] = face.normal.x;
+      normals[index + 1] = face.normal.y;
+      normals[index + 2] = face.normal.z;
 
-      normals[ index + 3 ] = face.normal.x;
-      normals[ index + 4 ] = face.normal.y;
-      normals[ index + 5 ] = face.normal.z;
+      normals[index + 3] = face.normal.x;
+      normals[index + 4] = face.normal.y;
+      normals[index + 5] = face.normal.z;
 
-      normals[ index + 6 ] = face.normal.x;
-      normals[ index + 7 ] = face.normal.y;
-      normals[ index + 8 ] = face.normal.z;
+      normals[index + 6] = face.normal.x;
+      normals[index + 7] = face.normal.y;
+      normals[index + 8] = face.normal.z;
 
       // colors
 
-      colors[ index ] = color.r;
-      colors[ index + 1 ] = color.g;
-      colors[ index + 2 ] = color.b;
+      colors[index] = color.r;
+      colors[index + 1] = color.g;
+      colors[index + 2] = color.b;
 
-      colors[ index + 3 ] = color.r;
-      colors[ index + 4 ] = color.g;
-      colors[ index + 5 ] = color.b;
+      colors[index + 3] = color.r;
+      colors[index + 4] = color.g;
+      colors[index + 5] = color.b;
 
-      colors[ index + 6 ] = color.r;
-      colors[ index + 7 ] = color.g;
-      colors[ index + 8 ] = color.b;
+      colors[index + 6] = color.r;
+      colors[index + 7] = color.g;
+      colors[index + 8] = color.b;
 
       index += 9;
-
     }
   } // for worldMap.countries.length buffer geometry creation end
 
-  worldMap.bufferGeometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-  worldMap.bufferGeometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-  worldMap.bufferGeometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+  worldMap.bufferGeometry.addAttribute(
+    "position",
+    new THREE.BufferAttribute(positions, 3)
+  );
+  worldMap.bufferGeometry.addAttribute(
+    "normal",
+    new THREE.BufferAttribute(normals, 3)
+  );
+  worldMap.bufferGeometry.addAttribute(
+    "color",
+    new THREE.BufferAttribute(colors, 3)
+  );
 
   worldMap.bufferGeometry.verticesNeedUpdate = true;
   worldMap.bufferGeometry.computeBoundingSphere();
   // worldMap.bufferGeometry.computeVertexNormals();
 
-  var mesh = new THREE.Mesh( worldMap.bufferGeometry, Config.materialMap );
-  worldMap.scene.add( mesh );
-
-};
-
+  var mesh = new THREE.Mesh(worldMap.bufferGeometry, Config.materialMap);
+  worldMap.scene.add(mesh);
+}
 
 export function updateCountriesBufferGeometry(worldMap) {
   // log('Geometry.updateCountriesBufferGeometry()');
 
-  var positions = worldMap.bufferGeometry.getAttribute( 'position' ).array;
-  var normals = worldMap.bufferGeometry.getAttribute( 'normal' ).array;
-  var colors = worldMap.bufferGeometry.getAttribute( 'color' ).array;
+  var positions = worldMap.bufferGeometry.getAttribute("position").array;
+  var normals = worldMap.bufferGeometry.getAttribute("normal").array;
+  var colors = worldMap.bufferGeometry.getAttribute("color").array;
 
   var m = new THREE.Matrix4();
   var m1 = new THREE.Matrix4();
   var m2 = new THREE.Matrix4();
-  m1.makeRotationY( worldMap.countriesObject3D.rotation.y );
-  m2.makeScale( worldMap.countriesObject3D.scale.x, worldMap.countriesObject3D.scale.y, worldMap.countriesObject3D.scale.z );
-  m.multiplyMatrices( m1, m2 );
+  m1.makeRotationY(worldMap.countriesObject3D.rotation.y);
+  m2.makeScale(
+    worldMap.countriesObject3D.scale.x,
+    worldMap.countriesObject3D.scale.y,
+    worldMap.countriesObject3D.scale.z
+  );
+  m.multiplyMatrices(m1, m2);
 
   var color = new THREE.Color();
   var v = new THREE.Vector3();
 
   var index = 0;
   var i, f;
-  for(i = 0; i < worldMap.countries.length; i++) {
+  for (i = 0; i < worldMap.countries.length; i++) {
     var vertices = worldMap.countries[i].geometry.vertices;
 
     // log( worldMap.countries[i].name );
@@ -588,62 +739,61 @@ export function updateCountriesBufferGeometry(worldMap) {
 
     color.set(worldMap.countries[i].color);
 
-    for(f = 0; f < worldMap.countries[i].geometry.faces.length; f++) {
+    for (f = 0; f < worldMap.countries[i].geometry.faces.length; f++) {
       var face = worldMap.countries[i].geometry.faces[f];
 
       // positions
 
-      v.copy( vertices[ face.a ] );
+      v.copy(vertices[face.a]);
       v.applyMatrix4(m);
 
-      positions[ index ] = v.x;
-      positions[ index + 1 ] = v.y;
-      positions[ index + 2 ] = v.z;
+      positions[index] = v.x;
+      positions[index + 1] = v.y;
+      positions[index + 2] = v.z;
 
-      v.copy( vertices[ face.b ] );
+      v.copy(vertices[face.b]);
       v.applyMatrix4(m);
 
-      positions[ index + 3 ] = v.x;
-      positions[ index + 4 ] = v.y;
-      positions[ index + 5 ] = v.z;
+      positions[index + 3] = v.x;
+      positions[index + 4] = v.y;
+      positions[index + 5] = v.z;
 
-      v.copy( vertices[ face.c ] );
+      v.copy(vertices[face.c]);
       v.applyMatrix4(m);
 
-      positions[ index + 6 ] = v.x;
-      positions[ index + 7 ] = v.y;
-      positions[ index + 8 ] = v.z;
+      positions[index + 6] = v.x;
+      positions[index + 7] = v.y;
+      positions[index + 8] = v.z;
 
       // normals
 
-      normals[ index ] = face.normal.x;
-      normals[ index + 1 ] = face.normal.y;
-      normals[ index + 2 ] = face.normal.z;
+      normals[index] = face.normal.x;
+      normals[index + 1] = face.normal.y;
+      normals[index + 2] = face.normal.z;
 
-      normals[ index + 3 ] = face.normal.x;
-      normals[ index + 4 ] = face.normal.y;
-      normals[ index + 5 ] = face.normal.z;
+      normals[index + 3] = face.normal.x;
+      normals[index + 4] = face.normal.y;
+      normals[index + 5] = face.normal.z;
 
-      normals[ index + 6 ] = face.normal.x;
-      normals[ index + 7 ] = face.normal.y;
-      normals[ index + 8 ] = face.normal.z;
+      normals[index + 6] = face.normal.x;
+      normals[index + 7] = face.normal.y;
+      normals[index + 8] = face.normal.z;
 
       // colors
 
-      colors[ index ] = color.r;
-      colors[ index + 1 ] = color.g;
-      colors[ index + 2 ] = color.b;
+      colors[index] = color.r;
+      colors[index + 1] = color.g;
+      colors[index + 2] = color.b;
 
-      colors[ index + 3 ] = color.r;
-      colors[ index + 4 ] = color.g;
-      colors[ index + 5 ] = color.b;
+      colors[index + 3] = color.r;
+      colors[index + 4] = color.g;
+      colors[index + 5] = color.b;
 
-      colors[ index + 6 ] = color.r;
-      colors[ index + 7 ] = color.g;
-      colors[ index + 8 ] = color.b;
+      colors[index + 6] = color.r;
+      colors[index + 7] = color.g;
+      colors[index + 8] = color.b;
 
       index += 9;
-
     }
   } // for worldMap.countries.length buffer geometry update end
 
@@ -654,54 +804,52 @@ export function updateCountriesBufferGeometry(worldMap) {
   // worldMap.bufferGeometry.colorsNeedUpdate = true;
   worldMap.bufferGeometry.computeBoundingSphere();
   // worldMap.bufferGeometry.computeVertexNormals();
-
-};
-
+}
 
 export function updateCountriesBufferGeometryColors(worldMap) {
   // log('Geometry.updateCountriesBufferGeometryColors()');
 
-  var colors = worldMap.bufferGeometry.getAttribute( 'color' ).array;
+  var colors = worldMap.bufferGeometry.getAttribute("color").array;
 
   var color = new THREE.Color();
 
   var index = 0;
   var i, f;
-  for(i = 0; i < worldMap.countries.length; i++) {
+  for (i = 0; i < worldMap.countries.length; i++) {
     color.set(worldMap.countries[i].color);
 
-    for(f = 0; f < worldMap.countries[i].geometry.faces.length; f++) {
-      colors[ index ] = color.r;
-      colors[ index + 1 ] = color.g;
-      colors[ index + 2 ] = color.b;
+    for (f = 0; f < worldMap.countries[i].geometry.faces.length; f++) {
+      colors[index] = color.r;
+      colors[index + 1] = color.g;
+      colors[index + 2] = color.b;
 
-      colors[ index + 3 ] = color.r;
-      colors[ index + 4 ] = color.g;
-      colors[ index + 5 ] = color.b;
+      colors[index + 3] = color.r;
+      colors[index + 4] = color.g;
+      colors[index + 5] = color.b;
 
-      colors[ index + 6 ] = color.r;
-      colors[ index + 7 ] = color.g;
-      colors[ index + 8 ] = color.b;
+      colors[index + 6] = color.r;
+      colors[index + 7] = color.g;
+      colors[index + 8] = color.b;
 
       index += 9;
-
     }
   } // for worldMap.countries.length buffer geometry update end
 
   worldMap.bufferGeometry.attributes.color.needsUpdate = true;
-
-};
-
+}
 
 export function createSphere(worldMap) {
-  worldMap.sphere = new THREE.Mesh( new THREE.PlaneGeometry( 700, 700, 24, 96 ), Config.materialSphere );
-  worldMap.sphere.name = 'sphere';
-  worldMap.scene.add( worldMap.sphere );
+  worldMap.sphere = new THREE.Mesh(
+    new THREE.PlaneGeometry(700, 700, 24, 96),
+    Config.materialSphere
+  );
+  worldMap.sphere.name = "sphere";
+  worldMap.scene.add(worldMap.sphere);
   worldMap.sphere.visible = Config.sphereVisible;
 
   worldMap.sphereGeometry2D = worldMap.sphere.geometry.clone();
   var k;
-  for(k = 0; k < worldMap.sphereGeometry2D.vertices.length; k++) {
+  for (k = 0; k < worldMap.sphereGeometry2D.vertices.length; k++) {
     worldMap.sphereGeometry2D.vertices[k].x -= 20;
     worldMap.sphereGeometry2D.vertices[k].y -= 90;
     worldMap.sphereGeometry2D.vertices[k].z -= Config.extrudeDepth * 2.0;
@@ -709,15 +857,25 @@ export function createSphere(worldMap) {
 
   worldMap.sphereGeometry3D = worldMap.sphere.geometry.clone();
 
-  for(k = 0; k < worldMap.sphere.geometry.vertices.length; k++) {
-    var spherical = worldMap.geo.projection.invert([ -worldMap.sphere.geometry.vertices[k].x, worldMap.sphere.geometry.vertices[k].y * 2.0 + 250 ]); //  * 2.0 + 260
+  for (k = 0; k < worldMap.sphere.geometry.vertices.length; k++) {
+    var spherical = worldMap.geo.projection.invert([
+      -worldMap.sphere.geometry.vertices[k].x,
+      worldMap.sphere.geometry.vertices[k].y * 2.0 + 250,
+    ]); //  * 2.0 + 260
 
     spherical[0] = THREE.Math.degToRad(spherical[0]);
     spherical[1] = THREE.Math.degToRad(spherical[1]);
 
-    worldMap.sphereGeometry3D.vertices[k].x = (Config.globeRadius - 1) * Math.cos(spherical[0]) * Math.cos(spherical[1]);
-    worldMap.sphereGeometry3D.vertices[k].y = -(Config.globeRadius - 1) * Math.sin(spherical[1]);
-    worldMap.sphereGeometry3D.vertices[k].z = (Config.globeRadius - 1) * Math.sin(spherical[0]) * Math.cos(spherical[1]);
+    worldMap.sphereGeometry3D.vertices[k].x =
+      (Config.globeRadius - 1) *
+      Math.cos(spherical[0]) *
+      Math.cos(spherical[1]);
+    worldMap.sphereGeometry3D.vertices[k].y =
+      -(Config.globeRadius - 1) * Math.sin(spherical[1]);
+    worldMap.sphereGeometry3D.vertices[k].z =
+      (Config.globeRadius - 1) *
+      Math.sin(spherical[0]) *
+      Math.cos(spherical[1]);
 
     /*
     if(worldMap.sphereGeometry3D.vertices[k].z < 0.0) {
@@ -728,38 +886,41 @@ export function createSphere(worldMap) {
       //worldMap.sphereGeometry3D.vertices[k].multiplyScalar(1.04);
     }
     */
-
   }
   // rotate and bake transform into vertices:
   var m = new THREE.Matrix4();
-  m.makeRotationX( THREE.Math.degToRad(45) );
+  m.makeRotationX(THREE.Math.degToRad(45));
   worldMap.sphereGeometry3D.applyMatrix(m);
-
-};
-
+}
 
 export function getIntersects(worldMap, mouse) {
   var vector = new THREE.Vector3();
   vector.copy(mouse);
-  vector.unproject( worldMap.camera );
+  vector.unproject(worldMap.camera);
 
-  worldMap.raycaster.set( worldMap.camera.position, vector.sub( worldMap.camera.position ).normalize() );
+  worldMap.raycaster.set(
+    worldMap.camera.position,
+    vector.sub(worldMap.camera.position).normalize()
+  );
 
-  var intersects = worldMap.raycaster.intersectObjects( worldMap.countriesObject3D.children );
-  intersects.sort( function( a, b ) { return a.distance - b.distance; } );
+  var intersects = worldMap.raycaster.intersectObjects(
+    worldMap.countriesObject3D.children
+  );
+  intersects.sort(function (a, b) {
+    return a.distance - b.distance;
+  });
 
   return intersects;
-};
-
+}
 
 export function createLines(worldMap) {
   // log('Geometry.createLines()');
 
-  if(worldMap.mode !== 'destinations' && worldMap.mode !== 'sources') {
+  if (worldMap.mode !== "destinations" && worldMap.mode !== "sources") {
     return;
   }
 
-  if(worldMap.selectedCountry || worldMap.selectedDestinationCountry) {
+  if (worldMap.selectedCountry || worldMap.selectedDestinationCountry) {
     var points2D;
     var points3D;
     var line;
@@ -770,77 +931,110 @@ export function createLines(worldMap) {
     worldMap.linesObject = new THREE.Object3D();
     worldMap.scene.add(worldMap.linesObject);
 
-    if(worldMap.selectedCountry && worldMap.selectedDestinationCountry) {
+    if (worldMap.selectedCountry && worldMap.selectedDestinationCountry) {
       points2D = [];
       points3D = [];
 
-      if(worldMap.mode === 'destinations') {
-        points2D.push( worldMap.selectedCountry.center2D );
-        points2D.push( worldMap.selectedDestinationCountry.center2D );
+      if (worldMap.mode === "destinations") {
+        points2D.push(worldMap.selectedCountry.center2D);
+        points2D.push(worldMap.selectedDestinationCountry.center2D);
 
-        points3D.push( worldMap.selectedCountry.center3D );
-        points3D.push( worldMap.selectedDestinationCountry.center3D );
+        points3D.push(worldMap.selectedCountry.center3D);
+        points3D.push(worldMap.selectedDestinationCountry.center3D);
       } else {
-        points2D.push( worldMap.selectedDestinationCountry.center2D );
-        points2D.push( worldMap.selectedCountry.center2D );
+        points2D.push(worldMap.selectedDestinationCountry.center2D);
+        points2D.push(worldMap.selectedCountry.center2D);
 
-        points3D.push( worldMap.selectedDestinationCountry.center3D );
-        points3D.push( worldMap.selectedCountry.center3D );
+        points3D.push(worldMap.selectedDestinationCountry.center3D);
+        points3D.push(worldMap.selectedCountry.center3D);
       }
 
-      worldMap.selectedDestinationCountry.spline2D = new THREE.Spline( points2D );
-      worldMap.selectedDestinationCountry.spline3D = new THREE.Spline( points3D );
+      worldMap.selectedDestinationCountry.spline2D = new THREE.Spline(points2D);
+      worldMap.selectedDestinationCountry.spline3D = new THREE.Spline(points3D);
 
-      worldMap.selectedDestinationCountry.splineLength = points2D[0].distanceTo(points2D[1]);
-      worldMap.selectedDestinationCountry.splineHeight = worldMap.selectedDestinationCountry.splineLength * 0.25;
+      worldMap.selectedDestinationCountry.splineLength = points2D[0].distanceTo(
+        points2D[1]
+      );
+      worldMap.selectedDestinationCountry.splineHeight =
+        worldMap.selectedDestinationCountry.splineLength * 0.25;
       worldMap.selectedDestinationCountry.geometrySpline = new THREE.Geometry();
 
-      line = new THREE.Line( worldMap.selectedDestinationCountry.geometrySpline, CountryDataHelpers.getLineMaterial(worldMap.selectedDestinationCountry), THREE.LineStrip );
+      line = new THREE.Line(
+        worldMap.selectedDestinationCountry.geometrySpline,
+        CountryDataHelpers.getLineMaterial(worldMap.selectedDestinationCountry),
+        THREE.LineStrip
+      );
       worldMap.linesObject.add(line);
-
-    } else if(worldMap.selectedCountry && !worldMap.selectedDestinationCountry) {
-      if(worldMap.mode === 'destinations') {
-        for(c = 0; c < worldMap.countries.length; c++) {
-          if(worldMap.countries[c].visa_required === 'no' || worldMap.countries[c].visa_required === 'on-arrival' || worldMap.countries[c].visa_required === 'free-eu') {
+    } else if (
+      worldMap.selectedCountry &&
+      !worldMap.selectedDestinationCountry
+    ) {
+      if (worldMap.mode === "destinations") {
+        for (c = 0; c < worldMap.countries.length; c++) {
+          if (
+            worldMap.countries[c].visa_required === "no" ||
+            worldMap.countries[c].visa_required === "on-arrival" ||
+            worldMap.countries[c].visa_required === "free-eu"
+          ) {
             points2D = [];
-            points2D.push( worldMap.selectedCountry.center2D );
-            points2D.push( worldMap.countries[c].center2D );
-            worldMap.countries[c].spline2D = new THREE.Spline( points2D );
+            points2D.push(worldMap.selectedCountry.center2D);
+            points2D.push(worldMap.countries[c].center2D);
+            worldMap.countries[c].spline2D = new THREE.Spline(points2D);
 
             points3D = [];
-            points3D.push( worldMap.selectedCountry.center3D );
-            points3D.push( worldMap.countries[c].center3D );
-            worldMap.countries[c].spline3D = new THREE.Spline( points3D );
+            points3D.push(worldMap.selectedCountry.center3D);
+            points3D.push(worldMap.countries[c].center3D);
+            worldMap.countries[c].spline3D = new THREE.Spline(points3D);
 
-            worldMap.countries[c].splineLength = points2D[0].distanceTo(points2D[1]);
-            worldMap.countries[c].splineHeight = worldMap.countries[c].splineLength * 0.25;
+            worldMap.countries[c].splineLength = points2D[0].distanceTo(
+              points2D[1]
+            );
+            worldMap.countries[c].splineHeight =
+              worldMap.countries[c].splineLength * 0.25;
             worldMap.countries[c].geometrySpline = new THREE.Geometry();
 
-            line = new THREE.Line( worldMap.countries[c].geometrySpline, CountryDataHelpers.getLineMaterial(worldMap.countries[c]), THREE.LineStrip );
+            line = new THREE.Line(
+              worldMap.countries[c].geometrySpline,
+              CountryDataHelpers.getLineMaterial(worldMap.countries[c]),
+              THREE.LineStrip
+            );
             worldMap.linesObject.add(line);
           }
         }
       }
-
-    } else if(!worldMap.selectedCountry && worldMap.selectedDestinationCountry) {
-      if(worldMap.mode === 'sources') {
-        for(c = 0; c < worldMap.countries.length; c++) {
-          if(worldMap.countries[c].visa_required === 'no' || worldMap.countries[c].visa_required === 'on-arrival' || worldMap.countries[c].visa_required === 'free-eu') {
+    } else if (
+      !worldMap.selectedCountry &&
+      worldMap.selectedDestinationCountry
+    ) {
+      if (worldMap.mode === "sources") {
+        for (c = 0; c < worldMap.countries.length; c++) {
+          if (
+            worldMap.countries[c].visa_required === "no" ||
+            worldMap.countries[c].visa_required === "on-arrival" ||
+            worldMap.countries[c].visa_required === "free-eu"
+          ) {
             points2D = [];
-            points2D.push( worldMap.selectedDestinationCountry.center2D );
-            points2D.push( worldMap.countries[c].center2D );
-            worldMap.countries[c].spline2D = new THREE.Spline( points2D );
+            points2D.push(worldMap.selectedDestinationCountry.center2D);
+            points2D.push(worldMap.countries[c].center2D);
+            worldMap.countries[c].spline2D = new THREE.Spline(points2D);
 
             points3D = [];
-            points3D.push( worldMap.selectedDestinationCountry.center3D );
-            points3D.push( worldMap.countries[c].center3D );
-            worldMap.countries[c].spline3D = new THREE.Spline( points3D );
+            points3D.push(worldMap.selectedDestinationCountry.center3D);
+            points3D.push(worldMap.countries[c].center3D);
+            worldMap.countries[c].spline3D = new THREE.Spline(points3D);
 
-            worldMap.countries[c].splineLength = points2D[0].distanceTo(points2D[1]);
-            worldMap.countries[c].splineHeight = worldMap.countries[c].splineLength * 0.25;
+            worldMap.countries[c].splineLength = points2D[0].distanceTo(
+              points2D[1]
+            );
+            worldMap.countries[c].splineHeight =
+              worldMap.countries[c].splineLength * 0.25;
             worldMap.countries[c].geometrySpline = new THREE.Geometry();
 
-            line = new THREE.Line( worldMap.countries[c].geometrySpline, CountryDataHelpers.getLineMaterial(worldMap.countries[c]), THREE.LineStrip );
+            line = new THREE.Line(
+              worldMap.countries[c].geometrySpline,
+              CountryDataHelpers.getLineMaterial(worldMap.countries[c]),
+              THREE.LineStrip
+            );
             worldMap.linesObject.add(line);
           }
         }
@@ -851,62 +1045,71 @@ export function createLines(worldMap) {
     worldMap.animationProps.lineAnimateOffset = 0;
 
     worldMap.tweenLines = new TWEEN.Tween(worldMap.animationProps)
-      .to({lineAnimatePos: 1}, Config.lineAnimateDuration)
-      .onStart(function() {
-      })
-      .onUpdate(function(time) {
+      .to({ lineAnimatePos: 1 }, Config.lineAnimateDuration)
+      .onStart(function () {})
+      .onUpdate(function (time) {
         // worldMap.updateLines(time);
       })
       .easing(TWEEN.Easing.Sinusoidal.Out)
       .start();
   }
-
-};
-
+}
 
 export function updateLines(worldMap) {
   // log('Geometry.updateLines()');
 
-  worldMap.animationProps.lineAnimateOffset += Config.lineAnimateSpeed * worldMap.clock.getDelta();
+  worldMap.animationProps.lineAnimateOffset +=
+    Config.lineAnimateSpeed * worldMap.clock.getDelta();
   worldMap.animationProps.lineAnimateOffset %= Config.lineDashOffsetLimit;
 
-  if(worldMap.selectedCountry || worldMap.selectedDestinationCountry) {
-
-    for(var c = 0; c < worldMap.countries.length; c++) {
-      var offset = worldMap.animationProps.lineAnimateOffset / worldMap.countries[c].splineLength;
+  if (worldMap.selectedCountry || worldMap.selectedDestinationCountry) {
+    for (var c = 0; c < worldMap.countries.length; c++) {
+      var offset =
+        worldMap.animationProps.lineAnimateOffset /
+        worldMap.countries[c].splineLength;
 
       // if(worldMap.countries[c].visa_required === 'no' || worldMap.countries[c].visa_required === 'on-arrival' || worldMap.countries[c].visa_required === 'free-eu') {
-      if(worldMap.countries[c].geometrySpline) {
+      if (worldMap.countries[c].geometrySpline) {
         var subdivisions = 30;
-        for(var i = 0; i < subdivisions; i++) {
+        for (var i = 0; i < subdivisions; i++) {
           var index;
-          index = i / subdivisions * worldMap.animationProps.lineAnimatePos;
+          index = (i / subdivisions) * worldMap.animationProps.lineAnimatePos;
           index += offset;
-          if(worldMap.mode === 'sources') {
+          if (worldMap.mode === "sources") {
             index = 1 - index;
           }
           index = Math.min(index, 1);
           index = Math.max(index, 0);
 
-          var position2D = worldMap.countries[c].spline2D.getPoint( index );
-          var position3D = worldMap.countries[c].spline3D.getPoint( index );
+          var position2D = worldMap.countries[c].spline2D.getPoint(index);
+          var position3D = worldMap.countries[c].spline3D.getPoint(index);
 
           var z = 0;
 
-          if(index < 0.5) {
-            z = TWEEN.Easing.Sinusoidal.Out( index * 2 ) * worldMap.countries[c].splineHeight;
+          if (index < 0.5) {
+            z =
+              TWEEN.Easing.Sinusoidal.Out(index * 2) *
+              worldMap.countries[c].splineHeight;
           } else {
-            z = TWEEN.Easing.Sinusoidal.Out( 1 - (index - 0.5) * 2 ) * worldMap.countries[c].splineHeight;
+            z =
+              TWEEN.Easing.Sinusoidal.Out(1 - (index - 0.5) * 2) *
+              worldMap.countries[c].splineHeight;
           }
 
-          worldMap.countries[c].geometrySpline.vertices[ i ] = new THREE.Vector3( position2D.x, position2D.y, position2D.z );
-          worldMap.countries[c].geometrySpline.vertices[ i ].z += z;
+          worldMap.countries[c].geometrySpline.vertices[i] = new THREE.Vector3(
+            position2D.x,
+            position2D.y,
+            position2D.z
+          );
+          worldMap.countries[c].geometrySpline.vertices[i].z += z;
 
-          var v3D = new THREE.Vector3( position3D.x, position3D.y, position3D.z );
+          var v3D = new THREE.Vector3(position3D.x, position3D.y, position3D.z);
           v3D.setLength(Config.globeRadius + z);
 
-          worldMap.countries[c].geometrySpline.vertices[ i ].lerp(v3D, worldMap.animationProps.interpolatePos);
-
+          worldMap.countries[c].geometrySpline.vertices[i].lerp(
+            v3D,
+            worldMap.animationProps.interpolatePos
+          );
         }
         worldMap.countries[c].geometrySpline.verticesNeedUpdate = true;
         worldMap.countries[c].geometrySpline.lineDistancesNeedUpdate = true;
@@ -914,21 +1117,19 @@ export function updateLines(worldMap) {
       }
     }
   }
-};
-
+}
 
 export function deleteLinesObject(worldMap) {
   // log('Geometry.deleteLinesObject()');
 
-  if(worldMap.linesObject) {
+  if (worldMap.linesObject) {
     worldMap.scene.remove(worldMap.linesObject);
     worldMap.linesObject = null;
   }
-};
-
+}
 
 export function toScreenXY(camera, pos3D) {
-  var v = pos3D.project( camera );
+  var v = pos3D.project(camera);
   var percX = (v.x + 1) / 2;
   var percY = (-v.y + 1) / 2;
 
@@ -936,4 +1137,4 @@ export function toScreenXY(camera, pos3D) {
   var top = percY * window.innerHeight;
 
   return new THREE.Vector2(left, top);
-};
+}
