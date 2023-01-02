@@ -41,6 +41,7 @@ export function createCountriesGeometry(worldMap) {
 
         var country = {
           name: feature.properties.NAME, // NAME_LONG
+          nameLong: feature.properties.NAME_LONG,
           nameSort: feature.properties.NAME_SORT,
           sovereignt: feature.properties.SOVEREIGNT,
           brkName: feature.properties.BRK_NAME, // in disputed areas
@@ -115,7 +116,7 @@ export function createCountriesGeometry(worldMap) {
 
           if (CountryDataHelpers.isCountry(country)) {
             var text = country.name;
-            if (text === "United States") {
+            if (text === "United States of America") {
               text += " (USA)";
             } else if (text === "United Kingdom") {
               text += " (UK)";
