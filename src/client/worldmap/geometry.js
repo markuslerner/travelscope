@@ -46,8 +46,12 @@ export function createCountriesGeometry(worldMap) {
           sovereignt: feature.properties.SOVEREIGNT,
           brkName: feature.properties.BRK_NAME, // in disputed areas
           noteBrk: feature.properties.NOTE_BRK, // in disputed areas
-          gdp: feature.properties.GDP_MD_EST,
-          gdpPerCapita: feature.properties.GDP_PER_CAPITA,
+          gdp: feature.properties.GDP_MD,
+          gdpPerCapita:
+            feature.properties.POP_EST > 0
+              ? (feature.properties.GDP_MD / feature.properties.POP_EST) *
+                1000000
+              : 0,
           population: feature.properties.POP_EST,
           type: feature.properties.TYPE,
           disputed: feature.disputed === true,
@@ -240,19 +244,16 @@ export function createCountriesGeometry(worldMap) {
         worldMap.maxPopulation = worldMap.countries[i].population;
       }
       worldMap.totalPopulation += worldMap.countries[i].population;
-      worldMap.countries[i].gdpPerCapita =
-        (worldMap.countries[i].gdp / worldMap.countries[i].population) *
-        1000000;
-      if (worldMap.countries[i].gdpPerCapita > worldMap.maxGDPPerCapita) {
-        if (worldMap.countries[i].gdp > 100) {
-          worldMap.maxGDPPerCapita =
-            (worldMap.countries[i].gdp / worldMap.countries[i].population) *
-            1000000;
-          // log( worldMap.countries[i].name );
-          // log( 'population: ' + worldMap.countries[i].population );
-          // log( 'gdp: ' + worldMap.countries[i].gdp );
-          // log( 'gdp per capita: ' + worldMap.maxGDPPerCapita );
-        }
+
+      if (
+        worldMap.countries[i].gdpPerCapita < 1000000 &&
+        worldMap.countries[i].gdpPerCapita > worldMap.maxGDPPerCapita
+      ) {
+        worldMap.maxGDPPerCapita = worldMap.countries[i].gdpPerCapita;
+        log(worldMap.countries[i].name);
+        log("population: " + worldMap.countries[i].population);
+        log("gdp: " + worldMap.countries[i].gdp);
+        log("gdp per capita: " + worldMap.maxGDPPerCapita);
       }
     }
   }
