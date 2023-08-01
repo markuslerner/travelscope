@@ -104,7 +104,11 @@ function parseWikiText($text, $debug, $country_name)
                         }
 
                         if ($colID == 1) {
-                            $data['d_name'] = trim(getSubString($col, "{{flag|", "}}"));
+                            if (stripos($col, 'flagu') !== false) {
+                                $data['d_name'] = trim(getSubString($col, "{{flagu|", "}}"));
+                            } else if (stripos($col, 'flag') !== false) {
+                                $data['d_name'] = trim(getSubString($col, "{{flag|", "}}"));
+                            }
 
                             if (stripos($data['d_name'], "|") > -1) {
                                 // $split = spliti("\\|", $data['d_name']);
