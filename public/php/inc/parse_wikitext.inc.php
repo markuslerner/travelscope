@@ -60,18 +60,23 @@ function parseWikiText($text, $debug, $country_name)
     // fix | at the end:
     $text = str_replace("|}}", "}}", $text);
 
-    $start_string = "class=\"sortable wikitable\"";
+    $start_string = "class=\"sortable wikitable";
     $rows = getAllRows($text, $start_string);
 
     if (sizeof($rows) == 0) {
-        $start_string = "class=\"wikitable sortable\"";
+        $start_string = "class=\"wikitable sortable";
         $rows = getAllRows($text, $start_string);
     }
 
-    if (sizeof($rows) == 0) {
-        $start_string = "class=\"wikitable sortable mw-collapsible mw-collapsed\"";
-        $rows = getAllRows($text, $start_string);
-    }
+    // if (sizeof($rows) == 0) {
+    //     $start_string = "class=\"wikitable sortable mw-collapsible mw-collapsed\"";
+    //     $rows = getAllRows($text, $start_string);
+    // }
+
+    // if (sizeof($rows) == 0) {
+    //     $start_string = "class=\"wikitable sortable mw-collapsible\"";
+    //     $rows = getAllRows($text, $start_string);
+    // }
 
     // load info for territories (not used yet, because many pages still don't have this info in tabular form):
     // $start_string = "{| class=\"wikitable\"";
