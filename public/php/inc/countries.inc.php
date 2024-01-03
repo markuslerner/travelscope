@@ -192,7 +192,7 @@ $countries = array(
     array("Benin", "BEN", "Visa_requirements_for_Beninese_citizens"),
     array("Niger", "NER", "Visa_requirements_for_Nigerien_citizens"),
     array("Chad", "TCD", "Visa_requirements_for_Chadian_citizens"),
-    array("Central African Republic", "CAF", "Visa_requirements_for_Central_African_Republic_citizens"),
+    array("Central African Republic", "CAF", "Visa_requirements_for_Central_African_citizens"),
     array("Equatorial Guinea", "GNQ", "Visa_requirements_for_Equatorial_Guinean_citizens"),
     array("The Gambia", "GMB", "Visa_requirements_for_Gambian_citizens"),
     array("Gabon", "GAB", "Visa_requirements_for_Gabonese_citizens"),
