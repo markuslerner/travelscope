@@ -68,7 +68,7 @@ $countries = array(
     array("Netherlands", "NL1", "Visa_requirements_for_Dutch_citizens"),
     array("Eritrea", "ERI", "Visa_requirements_for_Eritrean_citizens"),
     array("Côte d'Ivoire", "CIV", "Visa_requirements_for_Ivorian_citizens"),
-    array("Singapore", "SGP", "Visa_requirements_for_Singaporean_citizens"),
+    array("Singapore", "SGP", "Visa_requirements_for_Singapore_citizens"),
     array("The Bahamas", "BHS", "Visa_requirements_for_Bahamian_citizens"),
     array("Nauru", "NRU", "Visa_requirements_for_Nauruan_citizens"),
     array("Papua New Guinea", "PNG", "Visa_requirements_for_Papua_New_Guinean_citizens"),
