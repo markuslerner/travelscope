@@ -1,5 +1,13 @@
 <?php
 
+function getTextAfter($text, $start_string) {
+    if (stripos($text, $start_string) !== false) {
+        return getSubStringAfter($text, $start_string);
+    } else {
+        return $text;
+    }
+}
+
 function getAllRows($text, $start_string)
 {
     $start_index = 0;
@@ -60,6 +68,8 @@ function parseWikiText($text, $debug, $country_name)
     // fix | at the end:
     $text = str_replace("|}}", "}}", $text);
 
+    $text = getTextAfter($text, "==Visa requirements==");
+
     $start_string = "class=\"sortable wikitable";
     $rows = getAllRows($text, $start_string);
 
@@ -111,6 +121,8 @@ function parseWikiText($text, $debug, $country_name)
                         if ($colID == 1) {
                             if (stripos($col, 'flagu') !== false) {
                                 $data['d_name'] = trim(getSubString($col, "{{flagu|", "}}"));
+                            } else if (stripos($col, 'flagcountry') !== false) {
+                                $data['d_name'] = trim(getSubString($col, "{{flagcountry|", "}}"));
                             } else if (stripos($col, 'flag') !== false) {
                                 $data['d_name'] = trim(getSubString($col, "{{flag|", "}}"));
                             }
