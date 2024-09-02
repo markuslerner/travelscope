@@ -50,7 +50,7 @@ $countries = array(
     array("Swaziland", "SWZ", "Visa_requirements_for_Swazi_citizens"),
     array("Grenada", "GRD", "Visa_requirements_for_Grenadian_citizens"),
     array("New Zealand", "NZ1", "Visa_requirements_for_New_Zealand_citizens"),
-    array("Poland", "POL", "Travel_requirements_for_Polish_citizens"),
+    array("Poland", "POL", "Visa_requirements_for_Polish_citizens"),
     array("Belize", "BLZ", "Visa_requirements_for_Belizean_citizens"),
     array("Bolivia", "BOL", "Visa_requirements_for_Bolivian_citizens"),
     array("Botswana", "BWA", "Visa_requirements_for_Botswana_citizens"),
