@@ -177,13 +177,11 @@ b {
   }
 }
 
-// .navbar-right {
-//   width: calc(100% - 600px);
-//
-//   li {
-//     float: right;
-//   }
-// }
+@media (min-width: 861px) {
+  .navbar-nav.navbar-right:last-child {
+    margin-right: 0px;
+  }
+}
 
 #navbar-search {
   .navbar-nav {
