@@ -1,56 +1,56 @@
 <?php
-// error_reporting(E_ALL);
+    // error_reporting(E_ALL);
 
-$brand = "Travelscope";
-$title = $brand . " – Interactive worldmap of visa-free travel – A Chrome Experiment";
-$description = "A visual exploration of the travel freedom attached to passports";
-$visa_requirements_folder = "data/visa_requirements";
+    $brand                    = "Travelscope";
+    $title                    = $brand . " – Interactive worldmap of visa-free travel – A Chrome Experiment";
+    $description              = "A visual exploration of the travel freedom attached to passports";
+    $visa_requirements_folder = "data/visa_requirements";
 
-require __DIR__ . '/../vendor/autoload.php';
-$dotenv = new Dotenv\Dotenv(__DIR__ . '/../');
-$dotenv->load();
+    require __DIR__ . '/../vendor/autoload.php';
+    $dotenv = new Dotenv\Dotenv(__DIR__ . '/../');
+    $dotenv->load();
 
-define('URL', getenv('URL'));
-define('CDN_URL', getenv('CDN_URL'));
+    define('URL', getenv('URL'));
+    define('CDN_URL', getenv('CDN_URL'));
 
-$package = file_get_contents('../package.json');
-$package = json_decode($package, true);
-define('VERSION', $package['version']);
+    $package = file_get_contents('../package.json');
+    $package = json_decode($package, true);
+    define('VERSION', $package['version']);
 
-$detect = new Mobile_Detect;
-$isDesktop = !$detect->isMobile() && !$detect->isTablet();
+    $detect    = new Mobile_Detect;
+    $isDesktop = ! $detect->isMobile() && ! $detect->isTablet();
 
-// get most recent visa requirements filename:
-function getLatestVisaRequirementsFilename($path)
-{
-    $latest_ctime = 0;
-    $latest_filename = '';
-    $d = dir($path);
-    while (false !== ($entry = $d->read())) {
-        $filepath = "{$path}/{$entry}";
-        // could do also other checks than just checking whether the entry is a file
-        if (is_file($filepath) && filectime($filepath) > $latest_ctime) {
-            $latest_ctime = filectime($filepath);
-            $latest_filename = $entry;
+    // get most recent visa requirements filename:
+    function getLatestVisaRequirementsFilename($path)
+    {
+        $latest_ctime    = 0;
+        $latest_filename = '';
+        $d               = dir($path);
+        while (false !== ($entry = $d->read())) {
+            $filepath = "{$path}/{$entry}";
+            // could do also other checks than just checking whether the entry is a file
+            if (is_file($filepath) && filectime($filepath) > $latest_ctime) {
+                $latest_ctime    = filectime($filepath);
+                $latest_filename = $entry;
+            }
         }
+        return [$latest_ctime, $latest_filename];
     }
-    return [$latest_ctime, $latest_filename];
-}
 
-$data = getLatestVisaRequirementsFilename($visa_requirements_folder);
-$latest_visa_requirements_filename = $visa_requirements_folder . "/" . $data[1];
+    $data                              = getLatestVisaRequirementsFilename($visa_requirements_folder);
+    $latest_visa_requirements_filename = $visa_requirements_folder . "/" . $data[1];
 
 ?><!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title><?=$title?></title>
+    <title><?php echo $title ?></title>
 
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   	<meta http-equiv="expires" content="0" />
   	<meta http-equiv="Content-Language" content="en" />
 
-  	<meta name="description" content="<?=$description?>" />
+  	<meta name="description" content="<?php echo $description ?>" />
   	<meta name="keywords" content="travel, scope, power, passport, pass, reisepass, visa, visa-free, country, world, freedom, movement" />
 
   	<meta name="language" content="english, en" />
@@ -64,8 +64,8 @@ $latest_visa_requirements_filename = $visa_requirements_folder . "/" . $data[1];
   	<meta name="apple-mobile-web-app-capable" content="yes">
   	<meta name="apple-mobile-web-app-status-bar-style" content="black">
 
-  	<meta property="og:site_name" content="<?=$brand?>" />
-  	<meta property="og:description" content="<?=$title?>" />
+  	<meta property="og:site_name" content="<?php echo $brand ?>" />
+  	<meta property="og:description" content="<?php echo $title ?>" />
   	<meta property="og:type" content="website" />
   	<meta property="og:image" content="//cdn.markuslerner.com/wordpress/wp-content/uploads/2016/04/travelscope_4k_1_cropped-640x400@2x.png" />
 
@@ -90,31 +90,29 @@ $latest_visa_requirements_filename = $visa_requirements_folder . "/" . $data[1];
     <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <link rel="canonical" href="<?=URL?>" />
+    <link rel="canonical" href="<?php echo URL ?>" />
 
-    <link rel="shortcut icon" href="<?=CDN_URL?>favicon.ico" type="image/x-icon" />
-    <link rel="apple-touch-icon" sizes="180x180" href="<?=CDN_URL?>apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="<?=CDN_URL?>favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="<?=CDN_URL?>favicon-16x16.png">
-    <link rel="manifest" href="<?=CDN_URL?>site.webmanifest">
+    <link rel="shortcut icon" href="<?php echo CDN_URL ?>favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo CDN_URL ?>apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo CDN_URL ?>favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo CDN_URL ?>favicon-16x16.png">
+    <link rel="manifest" href="<?php echo CDN_URL ?>site.webmanifest">
 
-    <link rel="preload" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,300,600,400" as="style" />
-    <link rel="preload" href="<?=CDN_URL?>assets/fonts/fonts.css?v=<?=VERSION?>" as="style" />
-    <link rel="preload" href="<?=CDN_URL?>css/main.css?v=<?=VERSION?>" as="style" />
+    <link rel="preload" href="<?php echo CDN_URL ?>assets/fonts/fonts.css?v=<?php echo VERSION ?>" as="style" />
+    <link rel="preload" href="<?php echo CDN_URL ?>css/main.css?v=<?php echo VERSION ?>" as="style" />
 
-    <link rel="preload" href="<?=CDN_URL?>js/client.js?v=<?=VERSION?>" as="script" />
+    <link rel="preload" href="<?php echo CDN_URL ?>js/client.js?v=<?php echo VERSION ?>" as="script" />
 
-    <link rel='stylesheet' type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,300,600,400" />
-    <link rel="stylesheet" type="text/css" href="<?=CDN_URL?>assets/fonts/fonts.css?v=<?=VERSION?>" />
-    <link rel="stylesheet" type="text/css" href="<?=CDN_URL?>css/main.css?v=<?=VERSION?>" />
+    <link rel="stylesheet" type="text/css" href="<?php echo CDN_URL ?>assets/fonts/fonts.css?v=<?php echo VERSION ?>" />
+    <link rel="stylesheet" type="text/css" href="<?php echo CDN_URL ?>css/main.css?v=<?php echo VERSION ?>" />
 
     <script language="JavaScript" type="text/javascript">
       var IS_DESKTOP = <?echo $isDesktop ? 'true' : 'false'; ?>;
-      var CDN_URL = '<?=CDN_URL?>';
-      var VISA_REQUIREMENTS_URL = '<?=$latest_visa_requirements_filename;?>';
+      var CDN_URL = '<?php echo CDN_URL ?>';
+      var VISA_REQUIREMENTS_URL = '<?php echo $latest_visa_requirements_filename; ?>';
     </script>
 
-    <script type="text/javascript" src="<?=CDN_URL?>js/client.js?v=<?=VERSION?>"></script>
+    <script type="text/javascript" src="<?php echo CDN_URL ?>js/client.js?v=<?php echo VERSION ?>"></script>
 
   </head>
 
@@ -231,11 +229,11 @@ $latest_visa_requirements_filename = $visa_requirements_folder . "/" . $data[1];
         Sources:
         <a href="http://www.naturalearthdata.com/" target="_blank">Natural Earth Data</a> (5.1.1, 2022-05-09),
         <a href="http://en.wikipedia.org/wiki/Category:Visa_requirements_by_nationality" target="_new">Wikipedia</a> (<?php
-if (file_exists($latest_visa_requirements_filename)) {
-    date_default_timezone_set('Europe/Berlin');
-    echo date("Y-m-d", filemtime($latest_visa_requirements_filename));
-}
-?>)</div>
+                                                                                                                          if (file_exists($latest_visa_requirements_filename)) {
+                                                                                                                              date_default_timezone_set('Europe/Berlin');
+                                                                                                                              echo date("Y-m-d", filemtime($latest_visa_requirements_filename));
+                                                                                                                      }
+                                                                                                                      ?>)</div>
     </div>
   </div>
 
@@ -248,18 +246,18 @@ if (file_exists($latest_visa_requirements_filename)) {
 		<h2 class="title">About</h2>
 		<div class="panel-close"></div>
     <?php if (file_exists('content/about.inc.php')) {
-    require_once 'content/about.inc.php';
-}
-?>
+            require_once 'content/about.inc.php';
+        }
+    ?>
 	</div>
 
 	<div id="disclaimer" class="panel">
 		<h2 class="title">Disclaimer</h2>
 		<div class="panel-close"></div>
     <?php if (file_exists('content/disclaimer.inc.php')) {
-    require_once 'content/disclaimer.inc.php';
-}
-?>
+            require_once 'content/disclaimer.inc.php';
+        }
+    ?>
 	</div>
 
 	<div id="loading">
@@ -268,9 +266,9 @@ if (file_exists($latest_visa_requirements_filename)) {
 	</div>
 
   <?php if (file_exists('content/before-body-closing.inc.php')) {
-    require_once 'content/before-body-closing.inc.php';
-}
-?>
+          require_once 'content/before-body-closing.inc.php';
+      }
+  ?>
 
   </body>
 </html>
